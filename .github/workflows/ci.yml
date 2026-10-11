@@ -35,5 +35,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm run lint
+      # LayoutProps/PageProps เป็น global type ที่ Next สร้างไว้ใน .next/types ต้อง typegen ก่อน
+      - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npm run build
