@@ -1,5 +1,15 @@
 # แนวทางการทำงานร่วมกัน (7 คน)
 
+## TL;DR
+```bash
+git switch main && git pull
+git switch -c feature/<รหัส task>-<ชื่อ task>
+# ...ทำงาน และ commit...
+git fetch origin && git rebase origin/main
+git push -u origin HEAD
+gh pr create --fill
+```
+
 ## Git workflow
 
 - `main` = โค้ดที่ทำงานได้เสมอ **ห้าม push ตรง** — ทุกอย่างเข้าผ่าน Pull Request
@@ -12,7 +22,7 @@
 ### Commit message
 
 ```
-<ประเภท>:[รหัส task] <=ชื่อ Task>
+<ประเภท>:[รหัส task] <ชื่อ Task>
 
 feat: เพิ่มหน้า login
 fix: แก้ validation 
