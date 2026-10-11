@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: backend
+
+  # อ่านค่าจากไฟล์ .env (ลองทั้งโฟลเดอร์ปัจจุบันและโฟลเดอร์แม่)
+  config:
+    import:
+      - "optional:file:.env[.properties]"
+      - "optional:file:../.env[.properties]"
+
+  # --- Database ---
+  datasource:
+    url: "jdbc:sqlserver://localhost:1433;databaseName=appdb;encrypt=true;trustServerCertificate=true"
+    username: sa
+    password: "${MSSQL_SA_PASSWORD}"
+
+  # --- JPA / Hibernate ---
+  jpa:
+    hibernate:
+      ddl-auto: validate          # Flyway เป็นคนสร้างตาราง Hibernate แค่ตรวจ
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_nationalized_character_data: true   # String → NVARCHAR รองรับภาษาไทย
+
+# --- CORS ---
+app:
+  cors:
+    allowed-origins: "http://localhost:3000"
