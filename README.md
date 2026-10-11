@@ -8,6 +8,7 @@ Web application: **Next.js** (frontend) + **Spring Boot** (backend) + **SQL Serv
 .
 ├── compose.yaml              # SQL Server + สร้างฐานข้อมูล appdb อัตโนมัติ
 ├── .env.example              # ตัวอย่างค่าลับ → copy เป็น .env
+├── .doc                      # โฟลเดอร์สำหรับเก็บไฟล์เอกสาร
 ├── backend/                  # Spring Boot 4 / Java 21 / Maven
 │   └── src/main/java/th/ac/tu/cs261/group3/backend/
 │       ├── common/           # โค้ดที่ใช้ร่วมกัน (exception handler ฯลฯ)
