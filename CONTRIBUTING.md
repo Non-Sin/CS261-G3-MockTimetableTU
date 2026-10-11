@@ -7,7 +7,7 @@ git switch -c feature/<รหัส task>-<ชื่อ task>
 # ...ทำงาน และ commit...
 git fetch origin && git rebase origin/main
 git push -u origin HEAD
-gh pr create --fill
+gh pr create --fill #กรณีที่มี gh CLI ถ้าไม่มีให้เช็คบนเว็บ
 ```
 
 ## Git workflow
