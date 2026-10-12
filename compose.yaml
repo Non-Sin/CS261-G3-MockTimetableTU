@@ -1,7 +1,7 @@
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2025-latest
-    # platform: linux/amd64     # เปิดบรรทัดนี้ถ้าใช้ Mac ชิป M
+    platform: linux/amd64     # เปิดบรรทัดนี้ถ้าใช้ Mac ชิป M
     container_name: sqlserver
     environment:
       ACCEPT_EULA: "Y"
