@@ -47,7 +47,7 @@ refactor / test / docs / chore: ...
 - ตั้งชื่อด้วย **วันเวลา** เพื่อไม่ให้เลข version ชนกันเมื่อหลายคนสร้างพร้อมกัน:
   `V<ปีเดือนวัน>_<ชั่วโมงนาที>__<คำอธิบาย>.sql` เช่น `V20261011_1430__create_orders_table.sql`
 - ใช้ `NVARCHAR` สำหรับข้อความ (รองรับภาษาไทย)
-- ถ้า DB ในเครื่องพังจาก migration ระหว่างพัฒนา: `docker compose down -v && docker compose up -d`
+- ถ้า DB ในเครื่องพังจาก migration ระหว่างพัฒนา: `docker compose down -v && docker compose up -d sqlserver db-init`
 
 ## Checklist ก่อนเปิด PR
 

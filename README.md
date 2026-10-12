@@ -6,7 +6,7 @@ Web application: **Next.js** (frontend) + **Spring Boot** (backend) + **SQL Serv
 
 ```
 .
-├── compose.yaml              # SQL Server + สร้างฐานข้อมูล appdb อัตโนมัติ
+├── compose.yaml              # SQL Server + appdb + backend + frontend
 ├── .env.example              # ตัวอย่างค่าลับ → copy เป็น .env
 ├── .doc                      # โฟลเดอร์สำหรับเก็บไฟล์เอกสาร
 ├── backend/                  # Spring Boot 4 / Java 21 / Maven
@@ -41,8 +41,8 @@ Web application: **Next.js** (frontend) + **Spring Boot** (backend) + **SQL Serv
 # 1) ตั้งค่า secrets
 cp .env.example .env
 
-# 2) เปิดฐานข้อมูล (ครั้งแรกรอ ~30 วินาที db-init จะสร้าง appdb ให้)
-docker compose up -d
+# 2) เปิดเฉพาะฐานข้อมูล (ครั้งแรกรอ ~30 วินาที db-init จะสร้าง appdb ให้)
+docker compose up -d sqlserver db-init
 
 # 3) รัน backend → http://localhost:8080
 cd backend
@@ -54,6 +54,15 @@ npm install
 npm run dev
 ```
 
+### รันทั้งระบบด้วย Docker (ไม่ต้องลง Java / Node)
+
+```bash
+cp .env.example .env
+docker compose up -d --build     # DB + backend (:8080) + frontend (:3000)
+```
+
+หลังแก้โค้ดต้องรัน `docker compose up -d --build` ใหม่ (ไม่มี hot reload) — ถ้ากำลังพัฒนาให้ใช้วิธีด้านบนแทน
+
 Frontend เรียก `/api/*` แล้ว Next.js จะ rewrite ไปที่ backend ให้ (ดู `frontend/next.config.ts`)
 
 ## คำสั่งที่ใช้บ่อย
@@ -64,7 +73,9 @@ Frontend เรียก `/api/*` แล้ว Next.js จะ rewrite ไปท�
 | รันเทสต์ backend ทั้งหมด (ต้องเปิด DB) | `cd backend && ./mvnw test` |
 | ตรวจ lint / type frontend | `cd frontend && npm run lint && npx tsc --noEmit` |
 | build frontend | `cd frontend && npm run build` |
-| ปิดฐานข้อมูล | `docker compose down` |
+| รันทั้งระบบใน Docker | `docker compose up -d --build` |
+| ดู log | `docker compose logs -f backend frontend` |
+| ปิดทุก container | `docker compose down` |
 | ล้างฐานข้อมูลทิ้งทั้งหมด | `docker compose down -v` |
 
 ## API

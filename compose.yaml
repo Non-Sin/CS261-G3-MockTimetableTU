@@ -31,5 +31,32 @@ services:
       - '/opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$${MSSQL_SA_PASSWORD}" -C -b -Q "IF DB_ID(''appdb'') IS NULL CREATE DATABASE appdb"'
     restart: "no"
 
+  # Spring Boot → http://localhost:8080 (Flyway สร้างตารางตอน start)
+  backend:
+    build: ./backend
+    container_name: backend
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=appdb;encrypt=true;trustServerCertificate=true"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # Next.js → http://localhost:3000 (rewrite /api/* ไปที่ backend ภายใน network ของ compose)
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        BACKEND_URL: http://backend:8080
+    container_name: frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
 volumes:
   sqlserver-data:
