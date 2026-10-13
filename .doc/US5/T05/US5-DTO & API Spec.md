@@ -1,0 +1,135 @@
+# US5 — DTO & API Spec: บันทึกตารางเรียนส่งออกเป็นภาพ
+
+Oct 13, 2026 · @Wongsakorn
+
+## ภาพรวม
+
+US5 ส่งออกตารางเรียนจำลองเป็นไฟล์ `.png` **ฝั่ง browser** จากตารางที่แสดงอยู่บนหน้าจอ จึง**ไม่มี endpoint ใหม่และไม่มี DTO ใหม่** ใช้ `GET /api/timetable` และ `TimetableResponse` ของ [US1-T05](../../US1/T05/US1-DTO%20&%20API%20Spec.md) ตามที่ US1 เขียนไว้ว่า "US5 สร้าง PNG ฝั่ง client จาก `GET /api/timetable` ได้เลย"
+
+สิ่งที่ออกแบบในเอกสารนี้คือ**สัญญาฝั่ง frontend**: component ปุ่ม PNG รับอะไร, ส่วนไหนของหน้าถูกถ่ายเป็นภาพ, ตั้งชื่อไฟล์อย่างไร และจัดการกรณีตารางว่าง/error อย่างไร ให้ US5-T07 (Develop UI) และ US5-T11 (Unit Test UI) ใช้ต่อ
+
+- **UI:** ปุ่ม "⬇ PNG" ที่หัวกล่อง "ตารางเรียนจำลอง" ข้างปุ่ม "ไปยัง REG-TU" ตาม UI Prototype ใน [Google Stitch](https://stitch.withgoogle.com/projects/17068207687263442838) และ Figma [frame 1:2544](https://www.figma.com/design/U0Ot2xwePE9ooeQV2CZC5V/CS261?node-id=1-2544)
+- **Test case:** CoS ของ US5 ข้อ 1–2 และ [UAT ของ US5 (US5-T16)](../US5-T16-uat-test-cases.md)
+- **นอกขอบเขต:** การแชร์ภาพไปที่อื่น, การเลือกชนิดไฟล์อื่น (มีแค่ PNG), การส่งออกจาก server
+
+## API ที่ใช้ (ของ US1 ไม่เปลี่ยน)
+
+| Method | Path | US5 ใช้ทำอะไร |
+| --- | --- | --- |
+| GET | `/api/timetable?academicYear=2568&semester=1` | ข้อมูลที่วาดอยู่ในกล่องตาราง และใช้ `academicYear` / `semester` ตั้งชื่อไฟล์ |
+
+ตอนกดปุ่ม PNG **ไม่เรียก API ซ้ำ** เพราะ US1 โหลด `Timetable` มาวาดหน้าจอไว้แล้ว ภาพจึงตรงกับสิ่งที่ผู้ใช้เห็นตอนกด (UAT-US5-01 ขั้นที่ 4) ถ้าในอนาคตกดเพิ่ม/ลบวิชาแล้ว US1/US2 อัปเดต state ใหม่ ภาพครั้งถัดไปก็จะตามหน้าจอเอง
+
+## DTO ที่ใช้ (ของ US1 ไม่เปลี่ยน)
+
+ใช้ type `Timetable` จาก `frontend/features/timetable/types.ts` ของ US1 field ที่ปรากฏในภาพ:
+
+| ส่วนในภาพ | Field |
+| --- | --- |
+| หัวข้อ "ตารางเรียนจำลอง" | — (ข้อความคงที่) |
+| chip รหัสวิชาเหนือ grid | `entries[].courseCode` |
+| หัวแถววัน / หัวคอลัมน์เวลา | คำนวณจาก `entries[].schedules` ด้วย `getGridRange` ของ US1 (ตารางว่างได้ จ.–ศ. 08:00–16:00) |
+| บล็อกวิชา: รหัส, Sec, เวลา, ห้อง | `courseCode`, `sectionNo`, `schedules[].startTime`–`endTime`, `room` |
+| บล็อกแดงเวลาชน (ถ้ามี) | `conflicts[]`, `entries[].conflictWith` |
+| "วิชาในตารางเรียน: N วิชา (X หน่วยกิต)" | `entries.length`, `totalCredits` |
+| ชื่อไฟล์ | `academicYear`, `semester` |
+
+## สัญญาฝั่ง frontend
+
+โค้ดอยู่ใน `frontend/features/timetable-export/` แยกจาก `features/timetable/` ของ US1 ตามหลัก "1 ฟีเจอร์ = 1 โฟลเดอร์" ใน README เพื่อไม่ให้แก้ไฟล์เดียวกับเจ้าของ US1 ส่วนที่ต้องแตะไฟล์ของ US1 มีแค่ 2 จุดในขั้น Integrate (ดูหัวข้อ "จุดเชื่อมกับ US1")
+
+```ts
+// frontend/features/timetable-export/types.ts
+export type ExportStatus = "idle" | "exporting" | "error";
+
+export type ExportPngButtonProps = {
+  targetRef: React.RefObject<HTMLElement | null>; // กล่อง "ตารางเรียนจำลอง" ของ US1
+  academicYear: number;                          // Timetable.academicYear
+  semester: number;                              // Timetable.semester
+};
+```
+
+```ts
+// frontend/features/timetable-export/exportPng.ts
+export const EXPORT_IGNORE_ATTR = "data-export-ignore";
+
+/** timetable-2568-1.png */
+export function buildExportFileName(academicYear: number, semester: number): string;
+
+/** ถ่าย element เป็น PNG แล้วสั่ง browser ดาวน์โหลด — throw ถ้าสร้างภาพไม่ได้ */
+export function exportElementToPng(element: HTMLElement, fileName: string): Promise<void>;
+```
+
+### พฤติกรรมของปุ่ม
+
+| สถานะ | ปุ่มแสดง | กดได้ |
+| --- | --- | --- |
+| `idle` | "⬇ PNG" | ได้ **รวมถึงตอนตารางว่าง** (CoS ข้อ 2) |
+| `exporting` | "กำลังสร้างภาพ…" | ไม่ได้ (กันกดซ้ำแล้วได้หลายไฟล์) |
+| `error` | "⬇ PNG" + ข้อความแดงใต้ปุ่ม "ส่งออกภาพไม่สำเร็จ กรุณาลองใหม่" | ได้ (กดใหม่ = ลองใหม่ และล้างข้อความ) |
+
+### ขั้นตอนใน `exportElementToPng`
+
+1. รอ `document.fonts.ready` ให้ฟอนต์ไทยโหลดครบก่อน ไม่งั้นภาพอาจได้ฟอนต์สำรองหรือตัวอักษรหาย (UAT-US5-01 ขั้นที่ 5)
+2. ถ่ายด้วย `toPng` ของไลบรารี [`html-to-image`](https://www.npmjs.com/package/html-to-image) โดยตั้งค่า:
+   - `pixelRatio: 2` ให้ภาพคมพออ่านบนมือถือ
+   - `backgroundColor: "#ffffff"` กันพื้นหลังโปร่งใส
+   - `width` / `height` = `element.scrollWidth` / `scrollHeight` เพราะ grid มี `min-w-[900px]` และ `overflow-x-auto` ถ้าไม่ตั้ง จอแคบจะได้ภาพแค่ส่วนที่มองเห็น (ตารางถูกตัด)
+   - `filter` ตัด element ที่มี `data-export-ignore` ออก (ปุ่ม PNG และ "ไปยัง REG-TU" ไม่ควรอยู่ในภาพ)
+3. สร้าง `<a download={fileName} href={dataUrl}>` แล้ว `click()` เพื่อดาวน์โหลด
+
+**ทำไม `html-to-image` ไม่ใช่ `html2canvas`:** Tailwind 4 ที่โปรเจกต์ใช้กำหนดสีด้วย `oklch()` ซึ่ง `html2canvas` อ่านไม่ได้และ error ส่วน `html-to-image` ให้ browser วาด CSS เอง จึงได้สีและฟอนต์ตรงกับหน้าจอ (ยืนยันอีกครั้งตอน US5-T07 ถ้าเจอปัญหาให้ลอง `modern-screenshot` ซึ่งใช้ API แบบเดียวกัน) — เพิ่ม dependency ใน `package.json` เป็นไฟล์ร่วม ต้องบอกกลุ่มก่อนตาม CONTRIBUTING
+
+### ส่วนที่อยู่ในภาพ
+
+ภาพ = กล่อง `<section>` "ตารางเรียนจำลอง" ทั้งกล่อง ยกเว้นปุ่ม:
+
+| อยู่ในภาพ | ไม่อยู่ในภาพ |
+| --- | --- |
+| หัวข้อ "ตารางเรียนจำลอง" | ปุ่ม PNG และ "ไปยัง REG-TU" (`data-export-ignore`) |
+| chip รหัสวิชา | แถบเตือน "ตรวจพบเวลาเรียนซ้อนทับกัน" (อยู่นอกกล่อง) |
+| grid วัน × เวลา พร้อมบล็อกวิชา และบล็อกเวลาชน | header ของเว็บ, ชื่อ/รหัสนักศึกษา, ส่วนค้นหารายวิชา |
+| แถบสรุป "วิชาในตารางเรียน: … / เวลาชน …" | ข้อความ "บันทึกตารางร่างล่าสุดเมื่อ…" (เป็นสถานะการบันทึก ไม่ใช่ข้อมูลตาราง) — ใส่ `data-export-ignore` |
+
+วิชาที่เวลาชน**แสดงในภาพตามหน้าจอ** ไม่ซ่อน เพราะ UAT-US5-01 กำหนดให้ภาพตรงกับหน้าจอ
+
+แถบเตือน**ทุกแบบ** (เวลาชน, หน่วยกิตเกิน) ไม่อยู่ในภาพ ถ้าภายหลังย้ายแถบเตือนเข้าไปอยู่ในกล่องตาราง ให้ใส่ `data-export-ignore` ด้วย
+
+grid ขยายวันและเวลาตามวิชาในตาราง (`getGridRange` ของ US1) ภาพจึงกว้างหรือสูงต่างกันในแต่ละคน เช่น มีเรียนวันเสาร์หรือเรียนเย็น การถ่ายด้วย `scrollWidth` / `scrollHeight` ทำให้ได้ตารางครบไม่ถูกตัด
+
+### ชื่อไฟล์
+
+`timetable-{academicYear}-{semester}.png` เช่น `timetable-2568-1.png` ใช้ตัวอักษรอังกฤษล้วน กันปัญหาชื่อไฟล์ภาษาไทยบนบางระบบ ปีและภาคมาจาก `Timetable` ที่แสดงอยู่ (`academicYear`, `semester`) **ไม่ใช่ค่าในตัวกรองของส่วนค้นหารายวิชา** ถ้ากดหลายครั้ง browser จะเติม `(1)`, `(2)` ให้เอง
+
+## Error
+
+ไม่มี HTTP error เพราะไม่เรียก API มีแค่ error ฝั่ง browser:
+
+| กรณี | ผล |
+| --- | --- |
+| `targetRef.current` เป็น `null` (กล่องตารางยังไม่ render) | สถานะ `error` แสดงข้อความแดง ไม่ดาวน์โหลด |
+| `toPng` throw (เช่น browser ไม่รองรับ หรือหน่วยความจำไม่พอ) | สถานะ `error` แสดงข้อความแดง และ `console.error` ไว้ debug |
+| ตารางว่าง (`entries: []`) | **ไม่ใช่ error** ได้ภาพตารางเปล่า จ.–ศ. 08:00–16:00 (CoS ข้อ 2, UAT-US5-02) |
+
+## จุดเชื่อมกับ US1 (ทำใน US5-T07 / ขั้น Integrate)
+
+1. component ตารางของ US1 ส่ง `ref` ของ `<section>` ให้ `ExportPngButton` และวางปุ่มแทนปุ่ม PNG ที่เป็นแค่หน้าตาใน prototype
+2. ใส่ `data-export-ignore` ที่ปุ่ม "ไปยัง REG-TU" และข้อความ "บันทึกตารางร่างล่าสุด…"
+
+ทั้งสองจุดเป็นไฟล์ของ US1 ต้องคุยกับเจ้าของ US1-T07 ก่อนแก้
+
+## สิ่งที่ US5-T11 ควรออกแบบเทสต์ (ข้อเสนอ)
+
+- `buildExportFileName(2568, 1)` = `"timetable-2568-1.png"`
+- ปุ่มกดได้ตอน `entries: []`
+- ระหว่าง `exporting` ปุ่ม disabled และเปลี่ยนข้อความ
+- `toPng` ถูกเรียกด้วย element จาก `targetRef` และ filter ตัด `data-export-ignore`
+- `toPng` throw → แสดงข้อความ error และกดใหม่ได้
+- `targetRef.current = null` → แสดงข้อความ error ไม่ดาวน์โหลด
+
+## เอกสารที่เกี่ยวข้อง
+
+- [DTO Class Diagram](./US5-DTO-Class-Diagram.md)
+- [API Class Diagram](./US5-API-Class-Diagram.md)
+- [US1 — DTO & API Spec](../../US1/T05/US1-DTO%20&%20API%20Spec.md)
+- [User Acceptance Test (US5-T16)](../US5-T16-uat-test-cases.md)
