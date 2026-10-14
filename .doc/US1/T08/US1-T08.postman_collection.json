@@ -29,13 +29,13 @@
       "name": "01 TC1 GET /api/courses รายวิชาภาค 2568/1",
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
         "const courses = pm.response.json();",
-        "pm.test('200 และได้ 8 วิชาเรียงตามรหัส', () => {",
+        "pm.test('200 และได้ 9 วิชาเรียงตามรหัส (พบ 9 รายวิชา ตาม Figma)', () => {",
         "  pm.response.to.have.status(200);",
-        "  pm.expect(courses.map(c => c.courseCode)).to.eql(['CS111','CS213','EL171','JP171','LAS101','MA211','ST216','TU109']);",
+        "  pm.expect(courses.map(c => c.courseCode)).to.eql(['CS111','CS180','JP171','LAS101','MA211','ST216','TU101','TU106','TU109']);",
         "});",
         "pm.test('CS111 มี 2 กลุ่ม พร้อมคาบเรียนเรียงตามวัน เวลาเป็น HH:mm', () => {",
         "  const cs111 = courses.find(c => c.courseCode === 'CS111');",
-        "  pm.expect(cs111.courseName).to.eql('OBJECT-ORIENTED CONCEPTS');",
+        "  pm.expect(cs111.courseName).to.eql('Object-Oriented Concepts');",
         "  pm.expect(cs111.category).to.eql('MAJOR');",
         "  pm.expect(cs111.credits).to.eql(3);",
         "  pm.expect(cs111.sections.map(s => s.sectionNo)).to.eql(['030001','030002']);",
@@ -43,18 +43,23 @@
         "  pm.expect(s1.instructor).to.eql('ผศ.ดร.สมชาย ใจดี');",
         "  pm.expect(s1.schedules.map(x => x.dayOfWeek + ' ' + x.startTime + '-' + x.endTime)).to.eql(['TUESDAY 11:00-12:30','THURSDAY 11:00-12:30']);",
         "});",
+        "pm.test('MA211 Sec 020001 ห้อง SC-3015 ตาม UI Prototype', () => {",
+        "  const ma211 = courses.find(c => c.courseCode === 'MA211').sections[0];",
+        "  pm.expect(ma211.sectionNo).to.eql('020001');",
+        "  pm.expect(ma211.schedules.map(x => x.room)).to.eql(['SC-3015','SC-3015']);",
+        "});",
         "pm.test('ไม่มี CS223 ที่เปิดเฉพาะ 2568/2', () => {",
         "  pm.expect(courses.map(c => c.courseCode)).to.not.include('CS223');",
         "});",
         "const id = (code, no) => courses.find(c => c.courseCode === code).sections.find(s => s.sectionNo === no).sectionId;",
         "pm.collectionVariables.set('cs111_030001', id('CS111','030001'));",
         "pm.collectionVariables.set('cs111_030002', id('CS111','030002'));",
-        "pm.collectionVariables.set('ma211', id('MA211','010001'));",
+        "pm.collectionVariables.set('ma211', id('MA211','020001'));",
         "pm.collectionVariables.set('tu109', id('TU109','780001'));",
         "pm.collectionVariables.set('las101', id('LAS101','780004'));",
-        "pm.collectionVariables.set('cs213', id('CS213','030001'));",
-        "pm.collectionVariables.set('el171', id('EL171','900001'));",
-        "pm.collectionVariables.set('jp171', id('JP171','920001'));",
+        "pm.collectionVariables.set('cs180', id('CS180','820001'));",
+        "pm.collectionVariables.set('tu101', id('TU101','900001'));",
+        "pm.collectionVariables.set('tu106', id('TU106','540001'));",
         "pm.collectionVariables.set('st216', id('ST216','040001'));"
       ] } }],
       "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester={{semester}}" }
@@ -62,9 +67,9 @@
     {
       "name": "02 TC1 ค้นด้วย q=cs1",
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('ได้ CS111 อย่างเดียว (รหัสขึ้นต้นด้วย q ไม่สนตัวพิมพ์)', () => {",
+        "pm.test('ได้ CS111, CS180 (รหัสขึ้นต้นด้วย q ไม่สนตัวพิมพ์)', () => {",
         "  pm.response.to.have.status(200);",
-        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['CS111']);",
+        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['CS111','CS180']);",
         "});"
       ] } }],
       "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester={{semester}}&q=cs1" }
@@ -72,8 +77,8 @@
     {
       "name": "03 TC1 ค้นด้วย q=CS (ไม่ตรงกับ STATISTICS)",
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('ได้ CS111, CS213 ไม่มี ST216 (ชื่อวิชาค้นแบบคำขึ้นต้นด้วย q)', () => {",
-        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['CS111','CS213']);",
+        "pm.test('ได้ CS111, CS180 ไม่มี ST216 (ชื่อวิชาค้นแบบคำขึ้นต้นด้วย q)', () => {",
+        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['CS111','CS180']);",
         "});"
       ] } }],
       "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester={{semester}}&q=CS" }
@@ -92,7 +97,7 @@
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
         "pm.test('ได้เฉพาะวิชาศึกษาทั่วไป', () => {",
         "  const courses = pm.response.json();",
-        "  pm.expect(courses.map(c => c.courseCode)).to.eql(['EL171','LAS101','TU109']);",
+        "  pm.expect(courses.map(c => c.courseCode)).to.eql(['LAS101','TU101','TU106','TU109']);",
         "  pm.expect(courses.every(c => c.category === 'GENERAL_EDUCATION')).to.be.true;",
         "});"
       ] } }],
@@ -152,7 +157,7 @@
         "  pm.response.to.have.status(200);",
         "  const e = pm.response.json().entries[0];",
         "  pm.expect(e.courseCode).to.eql('CS111');",
-        "  pm.expect(e.courseName).to.eql('OBJECT-ORIENTED CONCEPTS');",
+        "  pm.expect(e.courseName).to.eql('Object-Oriented Concepts');",
         "  pm.expect(e.schedules.map(x => x.dayOfWeek + ' ' + x.startTime + '-' + x.endTime + ' ' + x.room)).to.eql(['TUESDAY 11:00-12:30 LC3-121','THURSDAY 11:00-12:30 LC3-121']);",
         "  pm.expect(e.conflictWith).to.eql([]);",
         "});"
@@ -232,7 +237,7 @@
       "request": { "method": "GET", "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester={{semester}}" }
     },
     {
-      "name": "16 TC6 POST CS213",
+      "name": "16 TC6 POST CS180 (จ. 13:30–16:30)",
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
         "pm.test('201 รวม 15 หน่วยกิต', () => {",
         "  pm.response.to.have.status(201);",
@@ -240,11 +245,11 @@
         "});"
       ] } }],
       "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
-        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{cs213}} }" },
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{cs180}} }" },
         "url": "{{baseUrl}}/api/timetable/entries" }
     },
     {
-      "name": "17 TC6 POST EL171",
+      "name": "17 TC6 POST TU101 (พ. 13:30–16:30)",
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
         "pm.test('201 รวม 18 หน่วยกิต', () => {",
         "  pm.response.to.have.status(201);",
@@ -252,11 +257,11 @@
         "});"
       ] } }],
       "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
-        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{el171}} }" },
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{tu101}} }" },
         "url": "{{baseUrl}}/api/timetable/entries" }
     },
     {
-      "name": "18 TC6 POST JP171 (ครบ 7 วิชา 21 หน่วยกิต)",
+      "name": "18 TC6 POST TU106 (พฤ. 13:30–16:30) ครบ 7 วิชาตาม UI Prototype 21 หน่วยกิต",
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
         "pm.test('201 รวม 21 หน่วยกิต', () => {",
         "  pm.response.to.have.status(201);",
@@ -264,7 +269,7 @@
         "});"
       ] } }],
       "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
-        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{jp171}} }" },
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{tu106}} }" },
         "url": "{{baseUrl}}/api/timetable/entries" }
     },
     {
@@ -272,19 +277,19 @@
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
         "const t = pm.response.json();",
         "const slots = Object.fromEntries(t.entries.map(e => [e.courseCode, e.schedules.map(x => x.dayOfWeek.slice(0,3) + ' ' + x.startTime + '-' + x.endTime).join(', ')]));",
-        "pm.test('ครบ 7 วิชา 21 หน่วยกิต ตามลำดับที่เพิ่ม', () => {",
-        "  pm.expect(t.entries.map(e => e.courseCode)).to.eql(['CS111','MA211','TU109','LAS101','CS213','EL171','JP171']);",
+        "pm.test('ครบ 7 วิชาตาม UI Prototype 21 หน่วยกิต ตามลำดับที่เพิ่ม', () => {",
+        "  pm.expect(t.entries.map(e => e.courseCode)).to.eql(['CS111','MA211','TU109','LAS101','CS180','TU101','TU106']);",
         "  pm.expect(t.totalCredits).to.eql(21);",
         "});",
-        "pm.test('วันและเวลาของแต่ละวิชาตรงกับ seed', () => {",
+        "pm.test('วันและเวลาของแต่ละวิชาตรงกับ UI Prototype', () => {",
         "  pm.expect(slots).to.eql({",
         "    CS111: 'TUE 11:00-12:30, THU 11:00-12:30',",
         "    MA211: 'TUE 09:30-11:00, THU 09:30-11:00',",
         "    TU109: 'WED 09:30-12:30',",
         "    LAS101: 'WED 09:30-12:30',",
-        "    CS213: 'MON 09:30-11:00, FRI 09:30-11:00',",
-        "    EL171: 'MON 11:00-12:30, FRI 11:00-12:30',",
-        "    JP171: 'FRI 13:30-16:30'",
+        "    CS180: 'MON 13:30-16:30',",
+        "    TU101: 'WED 13:30-16:30',",
+        "    TU106: 'THU 13:30-16:30'",
         "  });",
         "});",
         "pm.test('ยังมีคู่ชนคู่เดียว TU109–LAS101', () => {",

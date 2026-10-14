@@ -3,127 +3,128 @@ newman
 US1-T08 Mock Timetable API
 
 → 00 Precondition: ตาราง 2568/1 ยังว่าง
-  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 358B, 462ms]
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 358B, 621ms]
   √  200 และยังไม่มีวิชาในตาราง (ถ้าไม่ผ่าน ให้ล้างตารางของนักศึกษา demo ก่อน)
 
 → 01 TC1 GET /api/courses รายวิชาภาค 2568/1
-  GET http://localhost:8080/api/courses?academicYear=2568&semester=1 [200 OK, 3.36kB, 156ms]
-  √  200 และได้ 8 วิชาเรียงตามรหัส
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=1 [200 OK, 3.5kB, 361ms]
+  √  200 และได้ 9 วิชาเรียงตามรหัส (พบ 9 รายวิชา ตาม Figma)
   √  CS111 มี 2 กลุ่ม พร้อมคาบเรียนเรียงตามวัน เวลาเป็น HH:mm
+  √  MA211 Sec 020001 ห้อง SC-3015 ตาม UI Prototype
   √  ไม่มี CS223 ที่เปิดเฉพาะ 2568/2
 
 → 02 TC1 ค้นด้วย q=cs1
-  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=cs1 [200 OK, 902B, 52ms]
-  √  ได้ CS111 อย่างเดียว (รหัสขึ้นต้นด้วย q ไม่สนตัวพิมพ์)
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=cs1 [200 OK, 1.23kB, 108ms]
+  √  ได้ CS111, CS180 (รหัสขึ้นต้นด้วย q ไม่สนตัวพิมพ์)
 
 → 03 TC1 ค้นด้วย q=CS (ไม่ตรงกับ STATISTICS)
-  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=CS [200 OK, 1.27kB, 64ms]
-  √  ได้ CS111, CS213 ไม่มี ST216 (ชื่อวิชาค้นแบบคำขึ้นต้นด้วย q)
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=CS [200 OK, 1.23kB, 39ms]
+  √  ได้ CS111, CS180 ไม่มี ST216 (ชื่อวิชาค้นแบบคำขึ้นต้นด้วย q)
 
 → 04 TC1 ค้นด้วยคำในชื่อวิชา q=thinking
-  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=thinking [200 OK, 574B, 164ms]
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=thinking [200 OK, 574B, 76ms]
   √  ได้ LAS101
 
 → 05 TC1 กรองหมวด GENERAL_EDUCATION
-  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&category=GENERAL_EDUCATION [200 OK, 1.29kB, 31ms]
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&category=GENERAL_EDUCATION [200 OK, 1.55kB, 264ms]
   √  ได้เฉพาะวิชาศึกษาทั่วไป
 
 → 06 GET /api/courses ภาคอื่น 2568/2
-  GET http://localhost:8080/api/courses?academicYear=2568&semester=2 [200 OK, 928B, 29ms]
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=2 [200 OK, 928B, 42ms]
   √  ได้ CS111, CS223 ของ 2568/2
 
 → 07 GET /api/courses ไม่ส่ง semester → 400
-  GET http://localhost:8080/api/courses?academicYear=2568 [400 Bad Request, 360B, 21ms]
+  GET http://localhost:8080/api/courses?academicYear=2568 [400 Bad Request, 360B, 69ms]
   √  400 ProblemDetail
 
 → 08 GET /api/courses category ผิดค่า → 400
-  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&category=SCIENCE [400 Bad Request, 365B, 10ms]
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=1&category=SCIENCE [400 Bad Request, 365B, 32ms]
   √  400 ProblemDetail
 
 → 09 TC2 POST เพิ่ม CS111 Sec 030001
-  POST http://localhost:8080/api/timetable/entries [201 Created, 717B, 221ms]
+  POST http://localhost:8080/api/timetable/entries [201 Created, 717B, 425ms]
   √  201 และตารางมี CS111
   √  updatedAt เป็น ISO 8601 พร้อม offset ไม่มีเศษวินาที
 
 → 10 TC3 GET ตาราง แสดงรหัส ชื่อ วัน เวลา ถูกต้อง
-  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 712B, 33ms]
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 712B, 111ms]
   √  CS111 แสดงรหัส ชื่อ วันอังคาร/พฤหัส 11:00–12:30 ห้อง LC3-121
 
 → 11 TC4 POST MA211 (09:30–11:00 ต่อกับ CS111 ที่เริ่ม 11:00) ไม่ชน
-  POST http://localhost:8080/api/timetable/entries [201 Created, 1.04kB, 40ms]
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.03kB, 65ms]
   √  201 ไม่มีเวลาชน และ CS111 ยังอยู่
 
 → 12 POST TU109 (พุธ 09:30–12:30)
-  POST http://localhost:8080/api/timetable/entries [201 Created, 1.32kB, 39ms]
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.32kB, 56ms]
   √  201 ยังไม่มีเวลาชน
 
 → 13 TC5 POST LAS101 (พุธ 09:30–12:30) ชนกับ TU109
-  POST http://localhost:8080/api/timetable/entries [201 Created, 1.72kB, 47ms]
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.72kB, 62ms]
   √  201 (เวลาชนไม่ block ตาม Spec) พร้อม conflict 1 รายการ
   √  conflictWith ของ TU109 และ LAS101 ชี้หากัน
 
 → 14 TC8 POST CS111 Sec 030002 (วิชาเดิมคนละกลุ่ม) → 409
-  POST http://localhost:8080/api/timetable/entries [409 Conflict, 571B, 54ms]
+  POST http://localhost:8080/api/timetable/entries [409 Conflict, 571B, 55ms]
   √  409 COURSE_ALREADY_IN_TIMETABLE พร้อม courseCode และ existingSectionNo
 
 → 15 TC8 GET ตาราง ยังมี CS111 กลุ่มเดียว
-  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 1.71kB, 22ms]
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 1.71kB, 26ms]
   √  CS111 มีแค่ Sec 030001
 
-→ 16 TC6 POST CS213
-  POST http://localhost:8080/api/timetable/entries [201 Created, 2.04kB, 55ms]
+→ 16 TC6 POST CS180 (จ. 13:30–16:30)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.99kB, 102ms]
   √  201 รวม 15 หน่วยกิต
 
-→ 17 TC6 POST EL171
-  POST http://localhost:8080/api/timetable/entries [201 Created, 2.37kB, 36ms]
+→ 17 TC6 POST TU101 (พ. 13:30–16:30)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 2.27kB, 68ms]
   √  201 รวม 18 หน่วยกิต
 
-→ 18 TC6 POST JP171 (ครบ 7 วิชา 21 หน่วยกิต)
-  POST http://localhost:8080/api/timetable/entries [201 Created, 2.62kB, 40ms]
+→ 18 TC6 POST TU106 (พฤ. 13:30–16:30) ครบ 7 วิชาตาม UI Prototype 21 หน่วยกิต
+  POST http://localhost:8080/api/timetable/entries [201 Created, 2.54kB, 60ms]
   √  201 รวม 21 หน่วยกิต
 
 → 19 TC6 GET ตาราง ทุกวิชาอยู่ในวันเวลาที่ถูกต้อง
-  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 2.62kB, 23ms]
-  √  ครบ 7 วิชา 21 หน่วยกิต ตามลำดับที่เพิ่ม
-  √  วันและเวลาของแต่ละวิชาตรงกับ seed
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 2.53kB, 35ms]
+  √  ครบ 7 วิชาตาม UI Prototype 21 หน่วยกิต ตามลำดับที่เพิ่ม
+  √  วันและเวลาของแต่ละวิชาตรงกับ UI Prototype
   √  ยังมีคู่ชนคู่เดียว TU109–LAS101
 
 → 20 TC7 POST ST216 (21 + 3 = 24 เกิน 22) → 409
-  POST http://localhost:8080/api/timetable/entries [409 Conflict, 598B, 33ms]
+  POST http://localhost:8080/api/timetable/entries [409 Conflict, 598B, 48ms]
   √  409 CREDIT_LIMIT_EXCEEDED พร้อม currentCredits, courseCredits, maxCredits
 
 → 21 TC7 GET ตาราง ยัง 21 หน่วยกิต ไม่มี ST216
-  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 2.62kB, 76ms]
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 2.53kB, 28ms]
   √  หน่วยกิตรวมยังเป็น 21 และ ST216 ไม่อยู่ในตาราง
 
 → 22 POST section ที่ไม่มีอยู่ → 404
-  POST http://localhost:8080/api/timetable/entries [404 Not Found, 383B, 17ms]
+  POST http://localhost:8080/api/timetable/entries [404 Not Found, 383B, 27ms]
   √  404 ProblemDetail
 
 → 23 POST ไม่ส่ง sectionId → 400
-  POST http://localhost:8080/api/timetable/entries [400 Bad Request, 384B, 57ms]
+  POST http://localhost:8080/api/timetable/entries [400 Bad Request, 384B, 50ms]
   √  400 พร้อม errors.sectionId
 
 → 24 GET ตารางภาคอื่น 2568/2 ไม่ปนกัน
-  GET http://localhost:8080/api/timetable?academicYear=2568&semester=2 [200 OK, 358B, 19ms]
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=2 [200 OK, 358B, 24ms]
   √  ตารางว่าง updatedAt เป็น null
 
-┌─────────────────────────┬───────────────────┬───────────────────┐
-│                         │          executed │            failed │
-├─────────────────────────┼───────────────────┼───────────────────┤
-│              iterations │                 1 │                 0 │
-├─────────────────────────┼───────────────────┼───────────────────┤
-│                requests │                25 │                 0 │
-├─────────────────────────┼───────────────────┼───────────────────┤
-│            test-scripts │                25 │                 0 │
-├─────────────────────────┼───────────────────┼───────────────────┤
-│      prerequest-scripts │                 0 │                 0 │
-├─────────────────────────┼───────────────────┼───────────────────┤
-│              assertions │                31 │                 0 │
-├─────────────────────────┴───────────────────┴───────────────────┤
-│ total run duration: 3.8s                                        │
-├─────────────────────────────────────────────────────────────────┤
-│ total data received: 24.94kB (approx)                           │
-├─────────────────────────────────────────────────────────────────┤
-│ average response time: 72ms [min: 10ms, max: 462ms, s.d.: 93ms] │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────┬────────────────────┬────────────────────┐
+│                         │           executed │             failed │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│              iterations │                  1 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│                requests │                 25 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│            test-scripts │                 25 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│      prerequest-scripts │                  0 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│              assertions │                 32 │                  0 │
+├─────────────────────────┴────────────────────┴────────────────────┤
+│ total run duration: 5s                                            │
+├───────────────────────────────────────────────────────────────────┤
+│ total data received: 25.2kB (approx)                              │
+├───────────────────────────────────────────────────────────────────┤
+│ average response time: 114ms [min: 24ms, max: 621ms, s.d.: 144ms] │
+└───────────────────────────────────────────────────────────────────┘
