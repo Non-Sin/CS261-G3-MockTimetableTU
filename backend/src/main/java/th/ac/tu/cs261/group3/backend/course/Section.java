@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "section")
 @Getter
@@ -33,4 +36,8 @@ public class Section {
 
     @Column(nullable = false)
     private int semester;
+
+    /** Section "1" *-- "1..*" ScheduleSlot ใน DAO Class Diagram */
+    @OneToMany(mappedBy = "section")
+    private List<ScheduleSlot> slots = new ArrayList<>();
 }

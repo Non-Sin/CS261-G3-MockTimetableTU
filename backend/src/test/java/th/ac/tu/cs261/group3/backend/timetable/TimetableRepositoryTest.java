@@ -1,93 +1,88 @@
 package th.ac.tu.cs261.group3.backend.timetable;
 
-import org.hibernate.Hibernate;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
-import th.ac.tu.cs261.group3.backend.course.Section;
+import th.ac.tu.cs261.group3.backend.support.DaoFixture;
+import th.ac.tu.cs261.group3.backend.support.DaoTest;
 
-import java.util.List;
+import java.time.OffsetDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * ทดสอบกับ SQL Server จริงและ seed 2568/1 (ต้องเปิด docker compose ก่อน) rollback ทุกเทสต์
+ * US1-T12 UT-DAO-08 – 11: TimetableRepository
  */
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DaoTest
 class TimetableRepositoryTest {
 
     @Autowired
     private TestEntityManager em;
 
     @Autowired
-    private TimetableRepository timetableRepository;
+    private TimetableRepository repository;
 
-    @Autowired
-    private TimetableEntryRepository entryRepository;
+    private DaoFixture fixture;
 
-    private Section findSection(String courseCode, String sectionNo) {
-        return em.getEntityManager().createQuery("""
-                        select s from Section s
-                        where s.course.courseCode = :code and s.sectionNo = :no
-                          and s.academicYear = 2568 and s.semester = 1""", Section.class)
-                .setParameter("code", courseCode)
-                .setParameter("no", sectionNo)
-                .getSingleResult();
+    @BeforeEach
+    void setUp() {
+        fixture = DaoFixture.persist(em);
     }
 
-    private Timetable saveTimetable(String studentId, int academicYear, int semester) {
+    private long find(String studentId, int academicYear, int semester) {
+        return repository.findByStudentIdAndAcademicYearAndSemester(studentId, academicYear, semester)
+                .orElseThrow().getTimetableId();
+    }
+
+    /** UT-DAO-08 */
+    @Test
+    void findByStudentIdAndTerm_existing_returnsOnlyThatTimetable() {
+        assertEquals(fixture.t1, find("6609000000", 2568, 1));
+        assertEquals(fixture.t3, find("6609000000", 2568, 2));
+        assertEquals(fixture.t2, find("6609000001", 2568, 1));
+    }
+
+    /** UT-DAO-09 */
+    @Test
+    void findByStudentIdAndTerm_none_returnsEmpty() {
+        assertTrue(repository.findByStudentIdAndAcademicYearAndSemester("6609000002", 2568, 1).isEmpty());
+        assertTrue(repository.findByStudentIdAndAcademicYearAndSemester("6609000000", 2569, 1).isEmpty());
+    }
+
+    /** UT-DAO-10 */
+    @Test
+    void save_newTimetable_generatesIdAndKeepsUpdatedAt() {
         Timetable timetable = new Timetable();
-        timetable.setStudentId(studentId);
-        timetable.setAcademicYear(academicYear);
-        timetable.setSemester(semester);
-        return timetableRepository.saveAndFlush(timetable);
-    }
+        timetable.setStudentId("6609000002");
+        timetable.setAcademicYear(2568);
+        timetable.setSemester(1);
+        timetable.setUpdatedAt(DaoFixture.UPDATED_AT);
 
-    private TimetableEntry saveEntry(Timetable timetable, Section section) {
-        TimetableEntry entry = new TimetableEntry();
-        entry.setTimetable(timetable);
-        entry.setSection(section);
-        return entryRepository.saveAndFlush(entry);
-    }
-
-    @Test
-    void findByStudentIdAndTerm_matchesOnlyExactTerm() {
-        Timetable t = saveTimetable("TEST000001", 2568, 1);
-        saveTimetable("TEST000001", 2568, 2);
-        saveTimetable("TEST000002", 2568, 1);
-
-        assertEquals(t.getTimetableId(), timetableRepository
-                .findByStudentIdAndAcademicYearAndSemester("TEST000001", 2568, 1)
-                .orElseThrow().getTimetableId());
-        assertTrue(timetableRepository.findByStudentIdAndAcademicYearAndSemester("TEST000001", 2567, 1).isEmpty());
-        assertTrue(timetableRepository.findByStudentIdAndAcademicYearAndSemester("TEST999999", 2568, 1).isEmpty());
-    }
-
-    @Test
-    void findByTimetableId_returnsOwnEntriesInOrderWithSectionAndCourseLoaded() {
-        Timetable mine = saveTimetable("TEST000001", 2568, 1);
-        Timetable other = saveTimetable("TEST000002", 2568, 1);
-        saveEntry(mine, findSection("TU109", "780001"));
-        saveEntry(mine, findSection("LAS101", "780004"));
-        saveEntry(other, findSection("CS111", "030001"));
+        Long id = repository.save(timetable).getTimetableId();
+        em.flush();
         em.clear();
 
-        List<TimetableEntry> entries = entryRepository.findByTimetableId(mine.getTimetableId());
-
-        assertEquals(2, entries.size());
-        assertTrue(Hibernate.isInitialized(entries.getFirst().getSection()));
-        assertTrue(Hibernate.isInitialized(entries.getFirst().getSection().getCourse()));
-        assertEquals(List.of("TU109", "LAS101"),
-                entries.stream().map(e -> e.getSection().getCourse().getCourseCode()).toList());
+        assertNotNull(id);
+        Timetable reloaded = repository.findByStudentIdAndAcademicYearAndSemester("6609000002", 2568, 1).orElseThrow();
+        assertEquals(id, reloaded.getTimetableId());
+        assertEquals(DaoFixture.UPDATED_AT.toInstant(), reloaded.getUpdatedAt().toInstant());
     }
 
+    /** UT-DAO-11 */
     @Test
-    void findByTimetableId_emptyTimetable_returnsEmptyList() {
-        Timetable t = saveTimetable("TEST000001", 2568, 1);
+    void save_existingTimetable_updatesWithoutNewRow() {
+        OffsetDateTime newUpdatedAt = OffsetDateTime.parse("2026-10-14T09:00:00+07:00");
+        Timetable t1 = repository.findById(fixture.t1).orElseThrow();
+        t1.setUpdatedAt(newUpdatedAt);
 
-        assertTrue(entryRepository.findByTimetableId(t.getTimetableId()).isEmpty());
+        repository.save(t1);
+        em.flush();
+        em.clear();
+
+        Timetable reloaded = repository.findById(fixture.t1).orElseThrow();
+        assertEquals(fixture.t1, reloaded.getTimetableId());
+        assertEquals(newUpdatedAt.toInstant(), reloaded.getUpdatedAt().toInstant());
+        assertEquals(4, repository.count());
     }
 }

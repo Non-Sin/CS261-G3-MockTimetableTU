@@ -1,93 +1,81 @@
 package th.ac.tu.cs261.group3.backend.course;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
+import th.ac.tu.cs261.group3.backend.support.DaoFixture;
+import th.ac.tu.cs261.group3.backend.support.DaoTest;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * ทดสอบกับ SQL Server จริงและ seed 2568/1 (ต้องเปิด docker compose ก่อน)
+ * US1-T12 UT-DAO-01 – 05: CourseRepository.search
  */
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DaoTest
 class CourseRepositoryTest {
 
     @Autowired
-    private CourseRepository courseRepository;
+    private TestEntityManager em;
 
     @Autowired
-    private SectionRepository sectionRepository;
+    private CourseRepository repository;
 
-    private List<String> codes(List<Course> courses) {
-        return courses.stream().map(Course::getCourseCode).toList();
+    @BeforeEach
+    void setUp() {
+        DaoFixture.persist(em);
     }
 
-    @Test
-    void search_noFilter_returnsCoursesOfTermSortedByCode() {
-        List<String> codes = codes(courseRepository.search(2568, 1, null, null));
-
-        assertEquals(List.of("CS111", "CS213", "EL171", "JP171", "LAS101", "MA211", "ST216", "TU109"), codes);
+    private List<String> search(String q, CourseCategory category) {
+        return repository.search(2568, 1, q, category).stream().map(Course::getCourseCode).toList();
     }
 
+    /** UT-DAO-01 */
     @Test
-    void search_otherTerm_returnsOnlyThatTerm() {
-        assertEquals(List.of("CS111", "CS223"), codes(courseRepository.search(2568, 2, null, null)));
-        assertEquals(List.of("MA211"), codes(courseRepository.search(2567, 1, null, null)));
-        assertTrue(courseRepository.search(2569, 1, null, null).isEmpty());
+    void search_byTermOnly_returnsOfferedCoursesSortedByCode() {
+        List<String> expected = List.of("CS111", "FE001", "LAS101", "MA211", "TU109");
+
+        // CS111 มี 2 กลุ่ม 4 คาบในภาคนี้ แต่ต้องได้ครั้งเดียว และไม่มี CS213 ที่เปิดเฉพาะ 2568/2
+        assertEquals(expected, search(null, null));
+        assertEquals(expected, search("", null));
     }
 
+    /** UT-DAO-02 */
     @Test
-    void search_emptyQ_sameAsNull() {
-        assertEquals(8, courseRepository.search(2568, 1, "", null).size());
+    void search_codePrefixIgnoreCase_returnsMatchingCourses() {
+        assertEquals(List.of("CS111"), search("cs1", null));
+        // รหัสต้องขึ้นต้นด้วย q ไม่ใช่มี q อยู่กลางรหัส
+        assertEquals(List.of(), search("S11", null));
     }
 
+    /**
+     * UT-DAO-03 ปรับตาม spec ปัจจุบัน (ค้นชื่อแบบคำขึ้นต้นด้วย q แทนแบบมี q อยู่ตรงไหนก็ได้)
+     * ภาษาไทยไม่เว้นวรรคระหว่างคำ "ถ่ายภาพ" จึงไม่ตรงกับ "การถ่ายภาพเบื้องต้น" แต่ "การถ่าย" ตรง
+     */
     @Test
-    void search_qMatchesCodePrefixIgnoringCase() {
-        assertEquals(List.of("CS213"), codes(courseRepository.search(2568, 1, "cs2", null)));
-        // รหัสต้องขึ้นต้นด้วย q ไม่ใช่แค่มี q อยู่ข้างใน
-        assertTrue(courseRepository.search(2568, 1, "111", null).isEmpty());
+    void search_nameWordPrefixIgnoreCase_returnsMatchingCourses() {
+        assertEquals(List.of("LAS101"), search("thinking", null));
+        // ยืนยันว่า parameter ภาษาไทยส่งเป็น NVARCHAR ไม่กลายเป็น ?
+        assertEquals(List.of("FE001"), search("การถ่าย", null));
+        assertEquals(List.of(), search("ถ่ายภาพ", null));
     }
 
+    /** UT-DAO-04 */
     @Test
-    void search_qMatchesNameWordPrefixIgnoringCase() {
-        // คำแรกของชื่อ
-        assertEquals(List.of("CS111"), codes(courseRepository.search(2568, 1, "object", null)));
-        // คำหลังช่องว่าง
-        assertEquals(List.of("LAS101"), codes(courseRepository.search(2568, 1, "thinking", null)));
-        // คำหลัง "-" (OBJECT-ORIENTED)
-        assertEquals(List.of("CS111"), codes(courseRepository.search(2568, 1, "oriented", null)));
+    void search_byCategory_returnsOnlyThatCategory() {
+        assertEquals(List.of("LAS101", "TU109"), search(null, CourseCategory.GENERAL_EDUCATION));
+        assertEquals(List.of("FE001"), search(null, CourseCategory.FREE_ELECTIVE));
+        // CS111 ไม่ใช่หมวดศึกษาทั่วไป
+        assertEquals(List.of(), search("cs", CourseCategory.GENERAL_EDUCATION));
     }
 
+    /** UT-DAO-05 */
     @Test
-    void search_qInMiddleOfWord_doesNotMatch() {
-        // STATISTICS ของ ST216 มี "CS" อยู่ท้ายคำ จึงได้แค่วิชาที่รหัสขึ้นต้นด้วย CS
-        assertEquals(List.of("CS111", "CS213"), codes(courseRepository.search(2568, 1, "CS", null)));
-        assertTrue(courseRepository.search(2568, 1, "hinking", null).isEmpty());
-    }
-
-    @Test
-    void search_category() {
-        assertEquals(List.of("EL171", "LAS101", "TU109"),
-                codes(courseRepository.search(2568, 1, null, CourseCategory.GENERAL_EDUCATION)));
-        assertEquals(List.of("JP171"),
-                codes(courseRepository.search(2568, 1, null, CourseCategory.FREE_ELECTIVE)));
-    }
-
-    @Test
-    void search_qAndCategoryCombined() {
-        assertEquals(List.of("CS111"), codes(courseRepository.search(2568, 1, "CS1", CourseCategory.MAJOR)));
-        assertTrue(courseRepository.search(2568, 1, "CS1", CourseCategory.GENERAL_EDUCATION).isEmpty());
-    }
-
-    @Test
-    void sectionFindById_returnsSectionOrEmpty() {
-        Section any = sectionRepository.findAll().getFirst();
-
-        assertEquals(any.getSectionNo(), sectionRepository.findById(any.getSectionId()).orElseThrow().getSectionNo());
-        assertTrue(sectionRepository.findById(-1L).isEmpty());
+    void search_likeWildcardInQuery_isTreatedLiterally() {
+        // ถ้าไม่ escape ข้อแรกจะได้ CS111 และข้อสองจะได้ทุกวิชา
+        assertEquals(List.of(), search("_S1", null));
+        assertEquals(List.of(), search("%", null));
     }
 }

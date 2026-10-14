@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 
@@ -36,14 +35,13 @@ public class Timetable {
     private int semester;
 
     /**
-     * Hibernate ตั้งค่าเองตอน insert และตอนที่ field ของ Timetable เปลี่ยน
-     * การเพิ่มหรือลบ TimetableEntry ไม่ได้แก้แถวนี้ service จึงต้องเรียก {@link #touch()} เอง
+     * service เป็นคนตั้งค่า ไม่ใช้ {@code @UpdateTimestamp} เพราะจะเขียนทับค่าที่ตั้งเอง
+     * และไม่ทำงานตอนเพิ่ม/ลบ TimetableEntry อยู่แล้ว ให้เรียก {@link #touch()} ทุกครั้งที่ตารางเปลี่ยน
+     * รวมถึงตอนสร้างตารางใหม่ (column เป็น NOT NULL)
      */
-    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    /** ทำให้ entity dirty เพื่อให้ {@code updatedAt} อัปเดตตอน flush */
     public void touch() {
         this.updatedAt = OffsetDateTime.now();
     }
