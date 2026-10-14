@@ -1,0 +1,361 @@
+{
+  "info": {
+    "name": "US1-T08 Mock Timetable API",
+    "description": "ทดสอบ API ของ US1 ตาม US1-T05 DTO & API Spec และ Test case 1–8 ของการ์ด US1\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย seed V20261014_2010 (2568/1)\n- นักศึกษา demo (app.timetable.demo-student-id) ยังไม่มีตารางภาค 2568/1 และ 2568/2\n\nต้องรันตามลำดับ (Run collection) เพราะแต่ละ request ใช้ผลของ request ก่อนหน้า",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "academicYear", "value": "2568" },
+    { "key": "semester", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "00 Precondition: ตาราง 2568/1 ยังว่าง",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('200 และยังไม่มีวิชาในตาราง (ถ้าไม่ผ่าน ให้ล้างตารางของนักศึกษา demo ก่อน)', () => {",
+        "  pm.response.to.have.status(200);",
+        "  const t = pm.response.json();",
+        "  pm.expect(t.entries).to.eql([]);",
+        "  pm.expect(t.totalCredits).to.eql(0);",
+        "  pm.expect(t.maxCredits).to.eql(22);",
+        "  pm.expect(t.conflicts).to.eql([]);",
+        "  pm.expect(t.updatedAt).to.eql(null);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester={{semester}}" }
+    },
+    {
+      "name": "01 TC1 GET /api/courses รายวิชาภาค 2568/1",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "const courses = pm.response.json();",
+        "pm.test('200 และได้ 8 วิชาเรียงตามรหัส', () => {",
+        "  pm.response.to.have.status(200);",
+        "  pm.expect(courses.map(c => c.courseCode)).to.eql(['CS111','CS213','EL171','JP171','LAS101','MA211','ST216','TU109']);",
+        "});",
+        "pm.test('CS111 มี 2 กลุ่ม พร้อมคาบเรียนเรียงตามวัน เวลาเป็น HH:mm', () => {",
+        "  const cs111 = courses.find(c => c.courseCode === 'CS111');",
+        "  pm.expect(cs111.courseName).to.eql('OBJECT-ORIENTED CONCEPTS');",
+        "  pm.expect(cs111.category).to.eql('MAJOR');",
+        "  pm.expect(cs111.credits).to.eql(3);",
+        "  pm.expect(cs111.sections.map(s => s.sectionNo)).to.eql(['030001','030002']);",
+        "  const s1 = cs111.sections[0];",
+        "  pm.expect(s1.instructor).to.eql('ผศ.ดร.สมชาย ใจดี');",
+        "  pm.expect(s1.schedules.map(x => x.dayOfWeek + ' ' + x.startTime + '-' + x.endTime)).to.eql(['TUESDAY 11:00-12:30','THURSDAY 11:00-12:30']);",
+        "});",
+        "pm.test('ไม่มี CS223 ที่เปิดเฉพาะ 2568/2', () => {",
+        "  pm.expect(courses.map(c => c.courseCode)).to.not.include('CS223');",
+        "});",
+        "const id = (code, no) => courses.find(c => c.courseCode === code).sections.find(s => s.sectionNo === no).sectionId;",
+        "pm.collectionVariables.set('cs111_030001', id('CS111','030001'));",
+        "pm.collectionVariables.set('cs111_030002', id('CS111','030002'));",
+        "pm.collectionVariables.set('ma211', id('MA211','010001'));",
+        "pm.collectionVariables.set('tu109', id('TU109','780001'));",
+        "pm.collectionVariables.set('las101', id('LAS101','780004'));",
+        "pm.collectionVariables.set('cs213', id('CS213','030001'));",
+        "pm.collectionVariables.set('el171', id('EL171','900001'));",
+        "pm.collectionVariables.set('jp171', id('JP171','920001'));",
+        "pm.collectionVariables.set('st216', id('ST216','040001'));"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester={{semester}}" }
+    },
+    {
+      "name": "02 TC1 ค้นด้วย q=cs1",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('ได้ CS111 อย่างเดียว (รหัสขึ้นต้นด้วย q ไม่สนตัวพิมพ์)', () => {",
+        "  pm.response.to.have.status(200);",
+        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['CS111']);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester={{semester}}&q=cs1" }
+    },
+    {
+      "name": "03 TC1 ค้นด้วย q=CS (ไม่ตรงกับ STATISTICS)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('ได้ CS111, CS213 ไม่มี ST216 (ชื่อวิชาค้นแบบคำขึ้นต้นด้วย q)', () => {",
+        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['CS111','CS213']);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester={{semester}}&q=CS" }
+    },
+    {
+      "name": "04 TC1 ค้นด้วยคำในชื่อวิชา q=thinking",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('ได้ LAS101', () => {",
+        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['LAS101']);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester={{semester}}&q=thinking" }
+    },
+    {
+      "name": "05 TC1 กรองหมวด GENERAL_EDUCATION",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('ได้เฉพาะวิชาศึกษาทั่วไป', () => {",
+        "  const courses = pm.response.json();",
+        "  pm.expect(courses.map(c => c.courseCode)).to.eql(['EL171','LAS101','TU109']);",
+        "  pm.expect(courses.every(c => c.category === 'GENERAL_EDUCATION')).to.be.true;",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester={{semester}}&category=GENERAL_EDUCATION" }
+    },
+    {
+      "name": "06 GET /api/courses ภาคอื่น 2568/2",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('ได้ CS111, CS223 ของ 2568/2', () => {",
+        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['CS111','CS223']);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear=2568&semester=2" }
+    },
+    {
+      "name": "07 GET /api/courses ไม่ส่ง semester → 400",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('400 ProblemDetail', () => {",
+        "  pm.response.to.have.status(400);",
+        "  pm.expect(pm.response.json().status).to.eql(400);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}" }
+    },
+    {
+      "name": "08 GET /api/courses category ผิดค่า → 400",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('400 ProblemDetail', () => {",
+        "  pm.response.to.have.status(400);",
+        "  pm.expect(pm.response.json().status).to.eql(400);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester={{semester}}&category=SCIENCE" }
+    },
+    {
+      "name": "09 TC2 POST เพิ่ม CS111 Sec 030001",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "const t = pm.response.json();",
+        "pm.test('201 และตารางมี CS111', () => {",
+        "  pm.response.to.have.status(201);",
+        "  pm.expect(t.entries.map(e => e.courseCode)).to.eql(['CS111']);",
+        "  pm.expect(t.entries[0].sectionNo).to.eql('030001');",
+        "  pm.expect(t.totalCredits).to.eql(3);",
+        "});",
+        "pm.test('updatedAt เป็น ISO 8601 พร้อม offset ไม่มีเศษวินาที', () => {",
+        "  pm.expect(t.updatedAt).to.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([+-][0-9]{2}:[0-9]{2}|Z)$/);",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{cs111_030001}} }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "10 TC3 GET ตาราง แสดงรหัส ชื่อ วัน เวลา ถูกต้อง",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('CS111 แสดงรหัส ชื่อ วันอังคาร/พฤหัส 11:00–12:30 ห้อง LC3-121', () => {",
+        "  pm.response.to.have.status(200);",
+        "  const e = pm.response.json().entries[0];",
+        "  pm.expect(e.courseCode).to.eql('CS111');",
+        "  pm.expect(e.courseName).to.eql('OBJECT-ORIENTED CONCEPTS');",
+        "  pm.expect(e.schedules.map(x => x.dayOfWeek + ' ' + x.startTime + '-' + x.endTime + ' ' + x.room)).to.eql(['TUESDAY 11:00-12:30 LC3-121','THURSDAY 11:00-12:30 LC3-121']);",
+        "  pm.expect(e.conflictWith).to.eql([]);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester={{semester}}" }
+    },
+    {
+      "name": "11 TC4 POST MA211 (09:30–11:00 ต่อกับ CS111 ที่เริ่ม 11:00) ไม่ชน",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('201 ไม่มีเวลาชน และ CS111 ยังอยู่', () => {",
+        "  pm.response.to.have.status(201);",
+        "  const t = pm.response.json();",
+        "  pm.expect(t.entries.map(e => e.courseCode)).to.eql(['CS111','MA211']);",
+        "  pm.expect(t.conflicts).to.eql([]);",
+        "  pm.expect(t.entries.every(e => e.conflictWith.length === 0)).to.be.true;",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{ma211}} }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "12 POST TU109 (พุธ 09:30–12:30)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('201 ยังไม่มีเวลาชน', () => {",
+        "  pm.response.to.have.status(201);",
+        "  pm.expect(pm.response.json().conflicts).to.eql([]);",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{tu109}} }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "13 TC5 POST LAS101 (พุธ 09:30–12:30) ชนกับ TU109",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "const t = pm.response.json();",
+        "pm.test('201 (เวลาชนไม่ block ตาม Spec) พร้อม conflict 1 รายการ', () => {",
+        "  pm.response.to.have.status(201);",
+        "  pm.expect(t.conflicts).to.eql([{ dayOfWeek: 'WEDNESDAY', overlapStart: '09:30', overlapEnd: '12:30', courseCodes: ['TU109','LAS101'] }]);",
+        "});",
+        "pm.test('conflictWith ของ TU109 และ LAS101 ชี้หากัน', () => {",
+        "  const byCode = Object.fromEntries(t.entries.map(e => [e.courseCode, e.conflictWith]));",
+        "  pm.expect(byCode.TU109).to.eql(['LAS101']);",
+        "  pm.expect(byCode.LAS101).to.eql(['TU109']);",
+        "  pm.expect(byCode.CS111).to.eql([]);",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{las101}} }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "14 TC8 POST CS111 Sec 030002 (วิชาเดิมคนละกลุ่ม) → 409",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('409 COURSE_ALREADY_IN_TIMETABLE พร้อม courseCode และ existingSectionNo', () => {",
+        "  pm.response.to.have.status(409);",
+        "  const p = pm.response.json();",
+        "  pm.expect(p.code).to.eql('COURSE_ALREADY_IN_TIMETABLE');",
+        "  pm.expect(p.courseCode).to.eql('CS111');",
+        "  pm.expect(p.existingSectionNo).to.eql('030001');",
+        "  pm.expect(p.detail).to.eql('CS111 อยู่ในตารางแล้ว (Sec 030001) 1 วิชาเพิ่มได้ 1 กลุ่มเรียน');",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{cs111_030002}} }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "15 TC8 GET ตาราง ยังมี CS111 กลุ่มเดียว",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('CS111 มีแค่ Sec 030001', () => {",
+        "  const cs111 = pm.response.json().entries.filter(e => e.courseCode === 'CS111');",
+        "  pm.expect(cs111.map(e => e.sectionNo)).to.eql(['030001']);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester={{semester}}" }
+    },
+    {
+      "name": "16 TC6 POST CS213",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('201 รวม 15 หน่วยกิต', () => {",
+        "  pm.response.to.have.status(201);",
+        "  pm.expect(pm.response.json().totalCredits).to.eql(15);",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{cs213}} }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "17 TC6 POST EL171",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('201 รวม 18 หน่วยกิต', () => {",
+        "  pm.response.to.have.status(201);",
+        "  pm.expect(pm.response.json().totalCredits).to.eql(18);",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{el171}} }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "18 TC6 POST JP171 (ครบ 7 วิชา 21 หน่วยกิต)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('201 รวม 21 หน่วยกิต', () => {",
+        "  pm.response.to.have.status(201);",
+        "  pm.expect(pm.response.json().totalCredits).to.eql(21);",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{jp171}} }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "19 TC6 GET ตาราง ทุกวิชาอยู่ในวันเวลาที่ถูกต้อง",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "const t = pm.response.json();",
+        "const slots = Object.fromEntries(t.entries.map(e => [e.courseCode, e.schedules.map(x => x.dayOfWeek.slice(0,3) + ' ' + x.startTime + '-' + x.endTime).join(', ')]));",
+        "pm.test('ครบ 7 วิชา 21 หน่วยกิต ตามลำดับที่เพิ่ม', () => {",
+        "  pm.expect(t.entries.map(e => e.courseCode)).to.eql(['CS111','MA211','TU109','LAS101','CS213','EL171','JP171']);",
+        "  pm.expect(t.totalCredits).to.eql(21);",
+        "});",
+        "pm.test('วันและเวลาของแต่ละวิชาตรงกับ seed', () => {",
+        "  pm.expect(slots).to.eql({",
+        "    CS111: 'TUE 11:00-12:30, THU 11:00-12:30',",
+        "    MA211: 'TUE 09:30-11:00, THU 09:30-11:00',",
+        "    TU109: 'WED 09:30-12:30',",
+        "    LAS101: 'WED 09:30-12:30',",
+        "    CS213: 'MON 09:30-11:00, FRI 09:30-11:00',",
+        "    EL171: 'MON 11:00-12:30, FRI 11:00-12:30',",
+        "    JP171: 'FRI 13:30-16:30'",
+        "  });",
+        "});",
+        "pm.test('ยังมีคู่ชนคู่เดียว TU109–LAS101', () => {",
+        "  pm.expect(t.conflicts.map(c => c.courseCodes)).to.eql([['TU109','LAS101']]);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester={{semester}}" }
+    },
+    {
+      "name": "20 TC7 POST ST216 (21 + 3 = 24 เกิน 22) → 409",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('409 CREDIT_LIMIT_EXCEEDED พร้อม currentCredits, courseCredits, maxCredits', () => {",
+        "  pm.response.to.have.status(409);",
+        "  const p = pm.response.json();",
+        "  pm.expect(p.code).to.eql('CREDIT_LIMIT_EXCEEDED');",
+        "  pm.expect(p.currentCredits).to.eql(21);",
+        "  pm.expect(p.courseCredits).to.eql(3);",
+        "  pm.expect(p.maxCredits).to.eql(22);",
+        "  pm.expect(p.detail).to.eql('เพิ่ม ST216 (3 หน่วยกิต) แล้วจะเป็น 24 หน่วยกิต เกินกำหนด 22 หน่วยกิต');",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": {{st216}} }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "21 TC7 GET ตาราง ยัง 21 หน่วยกิต ไม่มี ST216",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('หน่วยกิตรวมยังเป็น 21 และ ST216 ไม่อยู่ในตาราง', () => {",
+        "  const t = pm.response.json();",
+        "  pm.expect(t.totalCredits).to.eql(21);",
+        "  pm.expect(t.entries.map(e => e.courseCode)).to.not.include('ST216');",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester={{semester}}" }
+    },
+    {
+      "name": "22 POST section ที่ไม่มีอยู่ → 404",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('404 ProblemDetail', () => {",
+        "  pm.response.to.have.status(404);",
+        "  pm.expect(pm.response.json().detail).to.eql('Section not found with id: 999999');",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"sectionId\": 999999 }" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "23 POST ไม่ส่ง sectionId → 400",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('400 พร้อม errors.sectionId', () => {",
+        "  pm.response.to.have.status(400);",
+        "  pm.expect(pm.response.json().errors).to.have.property('sectionId');",
+        "});"
+      ] } }],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{}" },
+        "url": "{{baseUrl}}/api/timetable/entries" }
+    },
+    {
+      "name": "24 GET ตารางภาคอื่น 2568/2 ไม่ปนกัน",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('ตารางว่าง updatedAt เป็น null', () => {",
+        "  pm.response.to.have.status(200);",
+        "  const t = pm.response.json();",
+        "  pm.expect(t.entries).to.eql([]);",
+        "  pm.expect(t.updatedAt).to.eql(null);",
+        "});"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/timetable?academicYear=2568&semester=2" }
+    }
+  ]
+}

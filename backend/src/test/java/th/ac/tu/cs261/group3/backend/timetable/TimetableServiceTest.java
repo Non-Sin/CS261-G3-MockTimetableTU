@@ -22,6 +22,7 @@ import th.ac.tu.cs261.group3.backend.timetable.dto.TimetableResponse;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -234,7 +235,7 @@ class TimetableServiceTest {
         givenSection(tu109);
         when(timetableRepository.findByStudentIdAndAcademicYearAndSemester(STUDENT, 2568, 1))
                 .thenReturn(Optional.empty());
-        OffsetDateTime before = OffsetDateTime.now();
+        OffsetDateTime before = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
         TimetableResponse response = service.addEntry(STUDENT, new AddTimetableEntryRequest(tu109.getSectionId()));
 
@@ -245,6 +246,7 @@ class TimetableServiceTest {
         assertThat(timetable.getValue().getSemester()).isEqualTo(1);
         // column updated_at เป็น NOT NULL ต้องตั้งก่อนบันทึกตารางใหม่
         assertThat(timetable.getValue().getUpdatedAt()).isAfterOrEqualTo(before);
+        assertThat(timetable.getValue().getUpdatedAt().getNano()).isZero();
 
         ArgumentCaptor<TimetableEntry> entry = ArgumentCaptor.forClass(TimetableEntry.class);
         verify(entryRepository).save(entry.capture());
