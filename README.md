@@ -87,6 +87,7 @@ Frontend เรียก `/api/*` แล้ว Next.js จะ rewrite ไปท�
 | POST | `/api/items` | สร้าง (`{ "name": "...", "description": "..." }`) |
 | PUT | `/api/items/{id}` | แก้ไข |
 | DELETE | `/api/items/{id}` | ลบ |
+| GET | `/api/courses?academicYear=2568&semester=1&q=&category=` | รายวิชาที่เปิดในภาคนั้น พร้อมกลุ่มเรียนและคาบเรียน (US1) |
 
 Error ทุกตัวตอบกลับเป็น [ProblemDetail (RFC 9457)](https://www.rfc-editor.org/rfc/rfc9457) เช่น
 `{ "status": 400, "title": "Bad Request", "detail": "Validation failed", "errors": { "name": "must not be blank" } }`
