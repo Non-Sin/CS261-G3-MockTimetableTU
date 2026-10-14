@@ -36,7 +36,7 @@ erDiagram
         NVARCHAR(20) student_id
         int academic_year
         int semester
-        timestamp updated_at "ส่งเป็น OffsetDateTime"
+        DATETIMEOFFSET updated_at "ส่งเป็น OffsetDateTime"
     }
     TIMETABLE_ENTRY {
         bigint entry_id PK
