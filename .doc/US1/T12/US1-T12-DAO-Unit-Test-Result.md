@@ -4,12 +4,13 @@ Oct 14, 2026 · @Non
 
 ## สรุปผล
 
-รัน unit test 21 กรณีตามเอกสาร "US1-T12 Design Unit Test Cases ส่วน DAO" (Oct 14, 2026 · branch `docs/US1-T12-design-unit-test-dao`) กับโค้ด DAO ของ US1-T09 **ผ่านครบ 21/21** และ `./mvnw test` ทั้งโปรเจกต์ผ่าน 31/31
+รัน unit test 21 กรณีตามเอกสาร "US1-T12 Design Unit Test Cases ส่วน DAO" (Oct 14, 2026 · branch `docs/US1-T12-design-unit-test-dao`) กับโค้ด DAO ของ US1-T09 **ผ่านครบ 21/21** และกรณีที่เพิ่มหลัง T12 (UT-DAO-22, 23) ผ่าน 3/3 `./mvnw test` ทั้งโปรเจกต์ผ่าน 34/34
 
 | Repository | Test case | ผ่าน |
 | --- | --- | --- |
 | `CourseRepository` | UT-DAO-01 – 05 | 5/5 |
 | `SectionRepository` | UT-DAO-06 – 07 | 2/2 |
+| `SectionRepository` (เพิ่มหลัง T12) | UT-DAO-22 – 23 | 3/3 |
 | `TimetableRepository` | UT-DAO-08 – 11 | 4/4 |
 | `TimetableEntryRepository` | UT-DAO-12 – 16 | 5/5 |
 | Schema (Flyway + constraint) | UT-DAO-17 – 21 | 5/5 |
@@ -55,6 +56,16 @@ Oct 14, 2026 · @Non
 
 เวลาไม่รวมการ start container และ Spring context (ครั้งเดียวต่อการรัน ทุก test class ใช้ร่วมกัน)
 
+### กรณีที่เพิ่มหลัง T12: SectionRepository.findByCourseCodesAndTerm
+
+ตอนตรวจขั้นตอนทดสอบพบว่า `GET /api/courses` ต้องคืน `sections` พร้อมคาบเรียน แต่ `CourseRepository.search` คืนแค่วิชา และไม่มี query ไหนดึงกลุ่มเรียนของรายการวิชา จึงเพิ่ม `SectionRepository.findByCourseCodesAndTerm` (fetch join course + slots เรียงตามรหัสวิชาแล้วรหัสกลุ่ม) และอัปเดต DAO Class Diagram กับ Extended API Class Diagram ของ T06 ใช้ fixture ชุดเดิม
+
+| ID | Test method | สิ่งที่ตรวจ | ผล | เวลา (s) |
+| --- | --- | --- | --- | --- |
+| UT-DAO-22 | `findByCourseCodesAndTerm_returnsSectionsOfTermWithCourseAndSlots` | ส่ง CS111, TU109 ภาค 2568/1 ได้ CS111 030001, CS111 030002, TU109 780001 ตามลำดับ course และ slots โหลดแล้ว ไม่มี S7 (2568/2) แต่ละกลุ่มไม่ซ้ำแม้มีหลายคาบ | PASS | 0.295 |
+| UT-DAO-22 | `findByCourseCodesAndTerm_withSearchResult_returnsEverySectionOfTerm` | ส่งรหัสวิชาจาก `search(2568, 1, null, null)` ต่อ ได้ S1–S6 ครบ 6 กลุ่ม | PASS | 0.410 |
+| UT-DAO-23 | `findByCourseCodesAndTerm_noMatch_returnsEmptyList` | list ว่าง, วิชาที่ไม่เปิดในภาคนั้น (CS213) และรหัสที่ไม่มีอยู่ ได้ list ว่าง | PASS | 0.294 |
+
 ## ส่วนที่ต่างจากเอกสารออกแบบ
 
 **UT-DAO-03 ค้นชื่อภาษาไทย** หลังออกแบบ test ทีมเปลี่ยน spec ของ `q` ใน [US1-T05 DTO & API Spec](../T05/US1-DTO%20&%20API%20Spec.md) จาก "ชื่อวิชาที่มี q" เป็น "ชื่อวิชาที่มีคำขึ้นต้นด้วย q (คำคั่นด้วยช่องว่างหรือ `-`)" เพื่อไม่ให้ `CS` ตรงกับ STATISTICS ภาษาไทยไม่เว้นวรรคระหว่างคำ ข้อ 2 ที่ค้น "ถ่ายภาพ" แล้วคาดว่าเจอ "การถ่ายภาพเบื้องต้น" จึงขัดกับ spec ใหม่ ปรับเป็น
@@ -90,12 +101,15 @@ UT-DAO-16 ยืนยันว่า `join fetch s.slots` ไม่ทำให
 | 1 | Error 21/21 ที่ `@BeforeEach` | `Violation of PRIMARY KEY constraint 'pk_course' ... (CS111)` ไฟล์ seed เก่ายังค้างใน `target/classes/db/migration` หลังย้ายไป `db/seed` Flyway จึงรัน seed ก่อน fixture เป็นปัญหาของ build ไม่ใช่โค้ด แก้ด้วย `./mvnw clean` |
 | 2 | **PASS 21/21** | Flyway รันแค่ `V1` และ `V20261014_1940` |
 | 3 | PASS 31/31 (`./mvnw test` ทั้งโปรเจกต์) | รวม `BackendApplicationTests` ที่ใช้ DB จาก `docker compose` และยังโหลด seed จาก `db/seed` ได้ |
+| 4 | Error 1/31 | ตรวจขั้นตอนทดสอบใน PR บน Docker ที่ไม่มี DB ของ compose `BackendApplicationTests` ต่อ `localhost:1433` ไม่ได้ ต้อง `docker compose up -d sqlserver db-init` ก่อน (ไม่ใช่ปัญหาของ DAO) |
+| 5 | PASS 31/31 | หลังเปิด compose |
+| 6 | **PASS 34/34** | หลังเพิ่ม `findByCourseCodesAndTerm` และ UT-DAO-22, 23 |
 
 ## ข้อที่ต้องตัดสินในเอกสารออกแบบ
 
 | ข้อ | ที่ทำ |
 | --- | --- |
-| `search` คืนวิชาทุกภาคหรือเฉพาะภาคที่ค้น | คืนเฉพาะวิชาที่มีกลุ่มเรียนในภาคที่ค้น (`exists` subquery) แต่ไม่ได้โหลด section มาด้วย `CourseService` ต้องดึง section ของภาคนั้นเองตอนสร้าง `CourseResponse` |
+| `search` คืนวิชาทุกภาคหรือเฉพาะภาคที่ค้น | คืนเฉพาะวิชาที่มีกลุ่มเรียนในภาคที่ค้น (`exists` subquery) ไม่โหลด section มาด้วย `CourseService` ส่งรหัสวิชาต่อให้ `SectionRepository.findByCourseCodesAndTerm` เพื่อดึงกลุ่มเรียนของภาคนั้นพร้อมคาบเรียน (UT-DAO-22, 23) รวม 2 query ต่อ request |
 | seed ชนกับ fixture | ย้าย seed ไป `src/main/resources/db/seed/` แอปโหลดทั้ง `db/migration` และ `db/seed` (`spring.flyway.locations` ใน `application.yaml`) ส่วน DAO test โหลดแค่ `db/migration` Flyway จำ migration ด้วย version จึงไม่กระทบ DB ที่รัน seed ไปแล้ว |
 | ชนิด column `updated_at` | `DATETIMEOFFSET` ตาม ER Diagram UT-DAO-10, 11 เทียบเป็น instant ผ่าน |
 | Testcontainers ใน `pom.xml` | เพิ่ม `spring-boot-testcontainers`, `testcontainers-junit-jupiter`, `testcontainers-mssqlserver` (scope `test`) **`pom.xml` เป็นไฟล์ร่วม ต้องบอกกลุ่มก่อน merge** |

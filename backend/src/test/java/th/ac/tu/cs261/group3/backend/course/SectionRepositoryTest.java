@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * US1-T12 UT-DAO-06 – 07: SectionRepository.findById
+ * และ UT-DAO-22 – 23 (เพิ่มหลัง T12): SectionRepository.findByCourseCodesAndTerm
  */
 @DaoTest
 class SectionRepositoryTest {
@@ -85,5 +86,44 @@ class SectionRepositoryTest {
         Optional<Section> result = assertDoesNotThrow(() -> repository.findById(fixture.maxId() + 1000));
 
         assertTrue(result.isEmpty());
+    }
+
+    /** UT-DAO-22 (เพิ่มหลัง T12) กลุ่มเรียนของรายการวิชาสำหรับ GET /api/courses */
+    @Test
+    void findByCourseCodesAndTerm_returnsSectionsOfTermWithCourseAndSlots() {
+        List<Section> sections = repository.findByCourseCodesAndTerm(List.of("CS111", "TU109"), 2568, 1);
+
+        PersistenceUnitUtil util = em.getEntityManager().getEntityManagerFactory().getPersistenceUnitUtil();
+        for (Section s : sections) {
+            assertTrue(util.isLoaded(s, "course"), "course ต้องโหลดมาแล้ว");
+            assertTrue(util.isLoaded(s, "slots"), "slots ต้องโหลดมาแล้ว");
+        }
+
+        // เรียงตามรหัสวิชาแล้วรหัสกลุ่ม ไม่มี CS111 ของ 2568/2 (S7) และแต่ละกลุ่มไม่ซ้ำแม้มีหลายคาบ
+        assertEquals(List.of("CS111 030001", "CS111 030002", "TU109 780001"), sections.stream()
+                .map(s -> s.getCourse().getCourseCode() + " " + s.getSectionNo()).toList());
+        assertEquals(List.of(2, 2, 1), sections.stream().map(s -> s.getSlots().size()).toList());
+        assertEquals(DaoFixture.S1_INSTRUCTOR, sections.getFirst().getInstructor());
+    }
+
+    /** UT-DAO-22 ใช้ต่อจาก CourseRepository.search ได้ครบทุกวิชาของภาค */
+    @Test
+    void findByCourseCodesAndTerm_withSearchResult_returnsEverySectionOfTerm(@Autowired CourseRepository courses) {
+        List<String> codes = courses.search(2568, 1, null, null).stream().map(Course::getCourseCode).toList();
+
+        List<Long> ids = repository.findByCourseCodesAndTerm(codes, 2568, 1).stream()
+                .map(Section::getSectionId).toList();
+
+        assertEquals(Set.of(fixture.s1, fixture.s2, fixture.s3, fixture.s4, fixture.s5, fixture.s6), Set.copyOf(ids));
+        assertEquals(6, ids.size());
+    }
+
+    /** UT-DAO-23 (เพิ่มหลัง T12) */
+    @Test
+    void findByCourseCodesAndTerm_noMatch_returnsEmptyList() {
+        assertEquals(List.of(), repository.findByCourseCodesAndTerm(List.of(), 2568, 1));
+        // CS213 เปิดเฉพาะ 2568/2
+        assertEquals(List.of(), repository.findByCourseCodesAndTerm(List.of("CS213"), 2568, 1));
+        assertEquals(List.of(), repository.findByCourseCodesAndTerm(List.of("XX999"), 2568, 1));
     }
 }
