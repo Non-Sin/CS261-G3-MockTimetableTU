@@ -30,6 +30,7 @@ app:
   cors:
     allowed-origins: "http://localhost:3000"
 
-  # --- Demo (ใช้จนกว่า US3 จะมี login) ---
-  demo:
-    student-id: "6609000000"
+  # --- Timetable ---
+  timetable:
+    max-credits: 22                    # หน่วยกิตสูงสุดต่อภาคเรียน (CREDIT_LIMIT_EXCEEDED)
+    demo-student-id: "6609000000"      # ใช้จนกว่า US3 จะมี login
