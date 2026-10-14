@@ -29,3 +29,7 @@ spring:
 app:
   cors:
     allowed-origins: "http://localhost:3000"
+
+  # --- Demo (ใช้จนกว่า US3 จะมี login) ---
+  demo:
+    student-id: "6609000000"
