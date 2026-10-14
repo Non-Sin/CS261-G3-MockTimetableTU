@@ -1,0 +1,36 @@
+package th.ac.tu.cs261.group3.backend.course;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name = "section")
+@Getter
+@Setter
+@NoArgsConstructor
+public class Section {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "section_id")
+    private Long sectionId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "course_code", nullable = false)
+    private Course course;
+
+    @Column(name = "section_no", nullable = false, length = 10)
+    private String sectionNo;
+
+    @Column(length = 100)
+    private String instructor;
+
+    /** ปีการศึกษา (พ.ศ.) */
+    @Column(name = "academic_year", nullable = false)
+    private int academicYear;
+
+    @Column(nullable = false)
+    private int semester;
+}
