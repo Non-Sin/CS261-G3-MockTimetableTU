@@ -10,30 +10,30 @@ erDiagram
     SECTION ||--o{ TIMETABLE_ENTRY : "ถูกเลือก"
 
     COURSE {
-        varchar course_code PK
-        varchar course_name
-        varchar category "MAJOR, GENERAL_EDUCATION, FREE_ELECTIVE"
+        NVARCHAR(10) course_code PK
+        NVARCHAR(200) course_name
+        NVARCHAR(20) category "MAJOR, GENERAL_EDUCATION, FREE_ELECTIVE"
         int credits
     }
     SECTION {
         bigint section_id PK
-        varchar course_code FK
-        varchar section_no
-        varchar instructor
+        NVARCHAR(10) course_code FK
+        NVARCHAR(10) section_no
+        NVARCHAR(100) instructor
         int academic_year "พ.ศ."
         int semester
     }
     SCHEDULE_SLOT {
         bigint slot_id PK
         bigint section_id FK
-        varchar day_of_week "MONDAY ... SUNDAY"
+        NVARCHAR(10) day_of_week "MONDAY ... SUNDAY"
         time start_time
         time end_time
-        varchar room
+        NVARCHAR(50) room
     }
     TIMETABLE {
         bigint timetable_id PK
-        varchar student_id
+        NVARCHAR(20) student_id
         int academic_year
         int semester
         timestamp updated_at "ส่งเป็น OffsetDateTime"
