@@ -55,7 +55,7 @@ classDiagram
 
     Timetable "1" *-- "0..*" TimetableEntry
     Timetable "1" *-- "0..*" TimeConflict
-    TimetableEntry "1" *-- "1..*" ScheduleSlot
+    TimetableEntry "1" *-- "0..*" ScheduleSlot
     ExportPngButtonProps ..> Timetable : academicYear, semester
 ```
 

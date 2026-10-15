@@ -174,4 +174,18 @@ class TimetableEntryRepositoryTest {
         assertEquals(4, after.size());
         assertEquals(11, after.stream().mapToInt(e -> e.getSection().getCourse().getCredits()).sum());
     }
+
+    /** กลุ่มเรียน e-learning ไม่มีคาบ ต้องยังได้ entry คืนมา (left join fetch s.slots) */
+    @Test
+    void findByTimetableId_sectionWithoutSlots_returnsEntryWithEmptySlots() {
+        addEntry(fixture.t2, fixture.s9);
+
+        List<TimetableEntry> entries = repository.findByTimetableId(fixture.t2);
+
+        assertEquals(Set.of("MA211 010001", "TU107 000002"), labels(entries));
+        Map<String, Section> byCode = entries.stream().map(TimetableEntry::getSection)
+                .collect(Collectors.toMap(s -> s.getCourse().getCourseCode(), s -> s));
+        assertTrue(byCode.get("TU107").getSlots().isEmpty());
+        assertEquals(2, byCode.get("MA211").getSlots().size());
+    }
 }

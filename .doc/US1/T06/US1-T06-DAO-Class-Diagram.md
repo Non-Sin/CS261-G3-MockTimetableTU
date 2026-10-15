@@ -67,7 +67,7 @@ classDiagram
     TimetableEntryRepository ..> TimetableEntry : คืน
 
     Course "1" *-- "1..*" Section : มีกลุ่มเรียน
-    Section "1" *-- "1..*" ScheduleSlot : มีคาบเรียน
+    Section "1" *-- "0..*" ScheduleSlot : มีคาบเรียน
     Timetable "1" *-- "0..*" TimetableEntry : มีวิชา
     TimetableEntry "0..*" --> "1" Section : เลือกกลุ่ม
     Course ..> CourseCategory
