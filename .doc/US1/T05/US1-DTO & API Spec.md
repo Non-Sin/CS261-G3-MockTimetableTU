@@ -29,7 +29,7 @@ US1 ใช้ 3 endpoint และ DTO หลักตัวเดียวค�
 | --- | --- | --- | --- | --- |
 | `academicYear` | int (พ.ศ.) | ใช่ | 2568 | dropdown "ปีการศึกษา" |
 | `semester` | int | ใช่ | 1 | dropdown "ภาคเรียน" |
-| `q` | string | ไม่ | CS1 | ช่องค้นหา ตรงกับรหัสวิชาที่ขึ้นต้นด้วย q หรือชื่อวิชาที่มี q (ไม่สนตัวพิมพ์) |
+| `q` | string | ไม่ | CS1 | ช่องค้นหา ตรงกับรหัสวิชาที่ขึ้นต้นด้วย q หรือชื่อวิชาที่มีคำขึ้นต้นด้วย q (ไม่สนตัวพิมพ์ คำคั่นด้วยช่องว่างหรือ `-`) เช่น `CS` ไม่ตรงกับ STATISTICS แต่ `ORIENTED` ตรงกับ OBJECT-ORIENTED |
 | `category` | enum | ไม่ | MAJOR | ตัวกรอง "ทุกหมวดวิชา": `MAJOR` วิชาเฉพาะ, `GENERAL_EDUCATION` ศึกษาทั่วไป, `FREE_ELECTIVE` เลือกเสรี |
 
 ตอบ `200` เป็น `List<CourseResponse>` เรียงตาม `courseCode` จำนวน "พบ 9 รายวิชา" คือความยาว array ไม่ส่ง `academicYear` หรือ `semester` หรือ `category` ผิดค่า ตอบ `400`
