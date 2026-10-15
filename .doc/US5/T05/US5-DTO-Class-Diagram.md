@@ -45,6 +45,7 @@ classDiagram
         +targetRef: RefObject~HTMLElement~
         +academicYear: number
         +semester: number
+        +hasConflicts: boolean
     }
     class ExportStatus {
         <<US5 enumeration>>
@@ -61,9 +62,9 @@ classDiagram
 
 | Type | เจ้าของ | US5 ใช้อย่างไร |
 | --- | --- | --- |
-| `Timetable` | US1 (`features/timetable/types.ts`) | ข้อมูลทั้งหมดในภาพ + `academicYear` / `semester` สำหรับชื่อไฟล์ |
-| `TimetableEntry`, `ScheduleSlot`, `TimeConflict` | US1 | วาดบล็อกวิชาและบล็อกเวลาชนในภาพ (US1 วาดบนหน้าจอ US5 ถ่ายภาพตามนั้น) |
-| `ExportPngButtonProps` | US5 (`features/timetable-export/types.ts`) | props ของปุ่ม PNG |
+| `Timetable` | US1 (`features/timetable/types.ts`) | ข้อมูลทั้งหมดในภาพ + `academicYear` / `semester` สำหรับชื่อไฟล์ + `conflicts` สำหรับ `hasConflicts` |
+| `TimetableEntry`, `ScheduleSlot`, `TimeConflict` | US1 | วาดบล็อกวิชาในภาพ (US1 วาดบนหน้าจอ US5 ถ่ายภาพตามนั้น) ถ้ามี `TimeConflict` ปุ่ม PNG จะ disabled |
+| `ExportPngButtonProps` | US5 (`features/timetable-export/types.ts`) | props ของปุ่ม PNG (`hasConflicts` = true ทำให้ปุ่ม disabled) |
 | `ExportStatus` | US5 | สถานะปุ่ม `idle` / `exporting` / `error` |
 
 ฝั่ง backend ไม่มี record ใหม่ field ทุกตัวของ type ฝั่ง frontend เป็น public (+) เพราะเป็น TypeScript type ไม่มี private/protected

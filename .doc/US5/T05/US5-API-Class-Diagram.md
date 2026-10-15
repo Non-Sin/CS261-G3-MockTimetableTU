@@ -36,7 +36,7 @@ classDiagram
     }
 
     TimetableSection --> TimetableApi : โหลดข้อมูล (US1)
-    TimetableSection *-- ExportPngButton : ส่ง sectionRef, academicYear, semester
+    TimetableSection *-- ExportPngButton : ส่ง sectionRef, academicYear, semester, hasConflicts
     ExportPngButton ..> exportPng : เรียกตอนกด
     exportPng ..> htmlToImage : toPng()
 ```
@@ -44,7 +44,7 @@ classDiagram
 | ส่วน | หน้าที่ |
 | --- | --- |
 | `TimetableSection` (US1) | โหลด `Timetable` ด้วย `GET /api/timetable` วาดกล่องตาราง และส่ง `ref` ของกล่องให้ปุ่ม PNG — US5 ไม่ได้เพิ่ม method ในนี้ แค่วางปุ่มกับใส่ `data-export-ignore` ตอน Integrate |
-| `ExportPngButton` | เก็บ `status` ตัดสินว่าปุ่มกดได้ไหม และแสดงข้อความ error ตามตาราง "พฤติกรรมของปุ่ม" ใน Spec |
+| `ExportPngButton` | เก็บ `status` ตัดสินว่าปุ่มกดได้ไหม (disabled ระหว่าง `exporting` และเมื่อ `hasConflicts`) และแสดงข้อความ error ตามตาราง "พฤติกรรมของปุ่ม" ใน Spec |
 | `exportPng.buildExportFileName` | สร้างชื่อ `timetable-{ปี}-{ภาค}.png` (pure function เทสต์ง่าย) |
 | `exportPng.exportElementToPng` | รอฟอนต์ → `toPng` (pixelRatio 2, พื้นขาว, ขนาดเต็ม scroll, filter `data-export-ignore`) → ดาวน์โหลด |
 | `exportPng.triggerDownload` (private) | สร้าง `<a download>` แล้วคลิก |
