@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -45,6 +46,6 @@ public class Timetable {
 
     /** ตัดเหลือวินาที ให้ JSON เป็น "2026-10-13T11:20:05+07:00" ตาม Spec ไม่มีเศษวินาที 7 หลัก */
     public void touch() {
-        this.updatedAt = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        this.updatedAt = OffsetDateTime.now(ZoneId.of("Asia/Bangkok")).truncatedTo(ChronoUnit.SECONDS);
     }
 }

@@ -22,6 +22,7 @@ import th.ac.tu.cs261.group3.backend.timetable.dto.TimetableResponse;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -247,6 +248,7 @@ class TimetableServiceTest {
         // column updated_at เป็น NOT NULL ต้องตั้งก่อนบันทึกตารางใหม่
         assertThat(timetable.getValue().getUpdatedAt()).isAfterOrEqualTo(before);
         assertThat(timetable.getValue().getUpdatedAt().getNano()).isZero();
+        assertThat(timetable.getValue().getUpdatedAt().getOffset()).isEqualTo(ZoneOffset.ofHours(7));
 
         ArgumentCaptor<TimetableEntry> entry = ArgumentCaptor.forClass(TimetableEntry.class);
         verify(entryRepository).save(entry.capture());
