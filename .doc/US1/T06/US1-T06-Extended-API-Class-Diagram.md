@@ -9,6 +9,7 @@ classDiagram
     class CourseService {
         <<Service>>
         -courseRepository CourseRepository
+        -sectionRepository SectionRepository
         +search(academicYear, semester, q, category) List~CourseResponse~
     }
     class TimetableService {
@@ -42,6 +43,7 @@ classDiagram
     }
 
     CourseService --> CourseRepository
+    CourseService --> SectionRepository
     TimetableService --> SectionRepository
     TimetableService --> TimetableRepository
     TimetableService --> TimetableEntryRepository
