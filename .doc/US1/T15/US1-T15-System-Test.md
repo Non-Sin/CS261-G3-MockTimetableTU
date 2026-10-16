@@ -26,11 +26,13 @@ US1: เพิ่มวิชาเข้าไปในตารางเรี
 
 ## Test Approach
 - System Test ใช้ระบบจริงทั้งชุด ไม่ mock: หน้าเว็บ (Next.js) + backend (Spring Boot) + SQL Server รันด้วย `docker compose up -d --build` ตาม README
-- ใช้ข้อมูล seed ภาคเรียน 1/2568 จาก US1-T09 (`db/seed/V20261014_2010__seed_courses_2568_1.sql`) ซึ่งมีรายวิชาตาม UI Prototype
+- ใช้ข้อมูลรายวิชาภาคเรียน 2/2569 ตาม UI Prototype ซึ่งเป็นภาคเรียนที่ทีมตกลงใช้ ไม่รวมภาคฤดูร้อน
+- **ก่อนรันจริงใน US1-T19:** seed บน main ตอนนี้ยังเป็นภาคเรียน 1/2568 (`db/seed/V20261014_2010__seed_courses_2568_1.sql` จาก US1-T09) ต้องมี seed ภาคเรียน 2/2569 ที่มีรายวิชาใน "ข้อมูลทดสอบ" ก่อน
+- การแจ้งเตือนบนหน้าเว็บมีเฉพาะกรณีเวลาชน (ST-04) ส่วนหน่วยกิตเกินไม่มีข้อความแจ้งเตือน แต่ระบบไม่อนุญาตให้เพิ่มวิชา (ST-06) ตามข้อสรุปการประชุมทีม
 - ผู้ใช้คือนักศึกษา demo `6609000000` จาก `app.timetable.demo-student-id` (ระหว่างที่ US3 ยังไม่มี login)
 - Test case ต่อเนื่องกันตามลำดับ ST-01 ถึง ST-09 เพราะสถานะตารางสะสมไปเรื่อย ๆ ต้องล้างตารางก่อนเริ่มทุกครั้ง
 - ตรวจผล 3 ชั้นในทุก test case: หน้าเว็บ, API response (ดูใน DevTools แท็บ Network หรือ Postman) และข้อมูลใน DB
-- กรณีที่ทำผ่านหน้าเว็บไม่ได้ (ST-03 ส่งกลุ่มซ้ำ, ST-07, ST-08) ให้ยิง API ตรงด้วย Postman หรือ `curl`
+- กรณีที่ทำผ่านหน้าเว็บไม่ได้ (ST-03 ส่งกลุ่มซ้ำ, ST-06 หน่วยกิตเกิน, ST-07, ST-08) ให้ยิง API ตรงด้วย Postman หรือ `curl`
 - ยังไม่ได้ดำเนินการทดสอบจริง เพราะหน้าเว็บของ US1 (US1-T07) อยู่ระหว่างพัฒนา ข้อความบนหน้าเว็บอาจปรับตาม Implementation จริง
 
 ## สภาพแวดล้อมและการเตรียมข้อมูล
@@ -40,7 +42,7 @@ US1: เพิ่มวิชาเข้าไปในตารางเรี
 | เปิดระบบ | `cp .env.example .env` แล้ว `docker compose up -d --build` |
 | หน้าเว็บ | http://localhost:3000 |
 | API | http://localhost:8080 |
-| ภาคเรียน | ปีการศึกษา 2568 ภาคเรียน 1 |
+| ภาคเรียน | ปีการศึกษา 2569 ภาคเรียน 2 |
 | นักศึกษา | `6609000000` (demo) |
 
 **ล้างตารางก่อนเริ่ม** (ลบ `timetable` แล้ว `timetable_entry` ถูกลบตามด้วย ON DELETE CASCADE):
@@ -52,7 +54,7 @@ docker exec sqlserver bash -c '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa 
 **หา `sectionId`** ของแต่ละกลุ่มเรียน (ค่า id ขึ้นกับลำดับที่ seed ถูก insert):
 
 ```
-GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=CS111
+GET http://localhost:8080/api/courses?academicYear=2569&semester=2&q=CS111
 ```
 
 **คำสั่งตรวจ DB** (ใช้ในหลาย test case):
@@ -62,11 +64,11 @@ SELECT t.timetable_id, t.updated_at, s.course_code, s.section_no
 FROM timetable t
 LEFT JOIN timetable_entry e ON e.timetable_id = t.timetable_id
 LEFT JOIN section s ON s.section_id = e.section_id
-WHERE t.student_id = N'6609000000' AND t.academic_year = 2568 AND t.semester = 1
+WHERE t.student_id = N'6609000000' AND t.academic_year = 2569 AND t.semester = 2
 ORDER BY e.entry_id;
 ```
 
-**ข้อมูลทดสอบ** (seed ภาคเรียน 1/2568 ทุกวิชา 3 หน่วยกิต):
+**ข้อมูลทดสอบ** (ภาคเรียน 2/2569 ทุกวิชา 3 หน่วยกิต):
 
 | รหัสวิชา | Sec | วัน | เวลา | ใช้ใน |
 | --- | --- | --- | --- | --- |
@@ -78,7 +80,7 @@ ORDER BY e.entry_id;
 | CS180 | 820001 | จันทร์ | 13:30 - 16:30 | ST-05 |
 | TU101 | 900001 | พุธ | 13:30 - 16:30 | ST-05 |
 | TU106 | 540001 | พฤหัสบดี | 13:30 - 16:30 | ST-05 |
-| ST216 | 040001 | อังคาร | 13:30 - 16:30 | ST-06 (เกิน 22 หน่วยกิต) |
+| ST216 | 040001 | อังคาร, พฤหัสบดี | 13:00 - 15:00 | ST-06 (เกิน 22 หน่วยกิต) |
 
 ## Test Cases
 
@@ -90,10 +92,10 @@ ORDER BY e.entry_id;
 
 **Preconditions:**
 - ล้างตารางของนักศึกษา `6609000000` แล้ว
-- เปิดหน้าเว็บ เลือกภาคเรียน 1 ปีการศึกษา 2568
+- เปิดหน้าเว็บ เลือกภาคเรียน 2 ปีการศึกษา 2569
 
 **Test Steps:**
-1. ตรวจว่าตารางว่าง และ `GET /api/timetable?academicYear=2568&semester=1` ได้ `entries: []`, `updatedAt: null`
+1. ตรวจว่าตารางว่าง และ `GET /api/timetable?academicYear=2569&semester=2` ได้ `entries: []`, `updatedAt: null`
 2. ค้นหา "CS111" แล้วกด "+ เพิ่มวิชา" ที่ Sec 030001
 3. ตรวจหน้าเว็บ, API response และ DB
 
@@ -189,15 +191,16 @@ ORDER BY e.entry_id;
 - จดจำนวนแถว `timetable_entry` และ `updated_at` จาก DB ไว้
 
 **Test Steps:**
-1. ค้นหา "ST216" แล้วกด "+ เพิ่มวิชา" ที่ Sec 040001
-2. ตรวจหน้าเว็บ, API response และ DB
+1. ค้นหา "ST216" บนหน้าเว็บ แล้วลองเพิ่ม Sec 040001
+2. ส่ง `POST /api/timetable/entries` ด้วย `sectionId` ของ ST216 040001 ผ่าน Postman (กันกรณีส่ง API ตรง)
+3. ตรวจหน้าเว็บ, API response และ DB
 
 **Expected Result:**
-- หน้าเว็บ: แสดงข้อความแจ้งว่าหน่วยกิตเกินกำหนด (ใช้ `detail` จาก API) ST216 ไม่ปรากฏในตาราง แถบสรุปยังเป็น "7 วิชา (21 หน่วยกิต)"
+- หน้าเว็บ: ไม่สามารถเพิ่ม ST216 ได้ และ**ไม่มีข้อความแจ้งเตือนหน่วยกิตเกิน** ST216 ไม่ปรากฏในตาราง แถบสรุปยังเป็น "7 วิชา (21 หน่วยกิต)"
 - API: `409 Conflict` ได้ ProblemDetail ที่มี `code: "CREDIT_LIMIT_EXCEEDED"`, `currentCredits: 21`, `courseCredits: 3`, `maxCredits: 22`
 - DB: จำนวนแถว `timetable_entry` และ `updated_at` เท่าเดิม
 
-**หมายเหตุ:** US1-T05 กำหนดให้แสดงแถบเตือนสีแดงแบบเดียวกับเวลาชน แต่ UI Prototype ล่าสุดไม่มีหน้าจอกรณีนี้ ต้องยืนยันรูปแบบข้อความกับเจ้าของ US1-T07
+**หมายเหตุ:** ตามข้อสรุปการประชุมทีม หน่วยกิตเกินไม่มีการแจ้งเตือนบนหน้าเว็บ แต่ไม่อนุญาตให้เพิ่มวิชาแทน ส่วน API ยังตอบ 409 ตาม US1-T05 เพื่อกันการส่ง API ตรง
 
 ### [ST-07] ส่ง sectionId ที่ไม่มีในระบบ
 
@@ -243,13 +246,13 @@ ORDER BY e.entry_id;
 - ผ่าน ST-08 (มี 7 วิชา 21 หน่วยกิต)
 
 **Test Steps:**
-1. รีเฟรชหน้าเว็บ (ภาคเรียน 1/2568)
-2. เปลี่ยนตัวเลือกเป็นภาคเรียน 2 ปีการศึกษา 2568
-3. เปลี่ยนกลับเป็นภาคเรียน 1/2568
+1. รีเฟรชหน้าเว็บ (ภาคเรียน 2/2569)
+2. เปลี่ยนตัวเลือกเป็นภาคเรียน 1 ปีการศึกษา 2569
+3. เปลี่ยนกลับเป็นภาคเรียน 2/2569
 
 **Expected Result:**
-- ข้อ 1: ตารางแสดง 7 วิชาเหมือนก่อนรีเฟรช แถบเตือนเวลาชน TU109/LAS101 ยังอยู่ `GET /api/timetable?academicYear=2568&semester=1` ได้ `entries` 7 รายการ
-- ข้อ 2: ตารางว่าง `GET /api/timetable?academicYear=2568&semester=2` ได้ `entries: []`, `updatedAt: null`
+- ข้อ 1: ตารางแสดง 7 วิชาเหมือนก่อนรีเฟรช แถบเตือนเวลาชน TU109/LAS101 ยังอยู่ `GET /api/timetable?academicYear=2569&semester=2` ได้ `entries` 7 รายการ
+- ข้อ 2: ตารางว่าง `GET /api/timetable?academicYear=2569&semester=1` ได้ `entries: []`, `updatedAt: null`
 - ข้อ 3: กลับมาเห็น 7 วิชาเหมือนเดิม
 
 ## สรุปความครอบคลุม
@@ -261,7 +264,7 @@ ORDER BY e.entry_id;
 | ST-03 | วิชาซ้ำคนละกลุ่ม → 409 | 8 |
 | ST-04 | เวลาชน → 201 + แจ้งเตือน | 5 |
 | ST-05 | หลายวิชาแสดงถูกวันเวลา (21 หน่วยกิต) | 3, 6 |
-| ST-06 | หน่วยกิตเกิน 22 → 409 | 7 |
+| ST-06 | หน่วยกิตเกิน 22 → เพิ่มไม่ได้ ไม่มีแจ้งเตือน (API 409) | 7 |
 | ST-07 | ไม่พบ section → 404 | - |
 | ST-08 | ไม่ส่ง sectionId → 400 | - |
 | ST-09 | ข้อมูลคงอยู่ และภาคอื่นไม่ปน | 3, 6 |
