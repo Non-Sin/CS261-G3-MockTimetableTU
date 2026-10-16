@@ -114,8 +114,9 @@ class SectionRepositoryTest {
         List<Long> ids = repository.findByCourseCodesAndTerm(codes, 2568, 1).stream()
                 .map(Section::getSectionId).toList();
 
-        assertEquals(Set.of(fixture.s1, fixture.s2, fixture.s3, fixture.s4, fixture.s5, fixture.s6), Set.copyOf(ids));
-        assertEquals(6, ids.size());
+        assertEquals(Set.of(fixture.s1, fixture.s2, fixture.s3, fixture.s4, fixture.s5, fixture.s6, fixture.s9),
+                Set.copyOf(ids));
+        assertEquals(7, ids.size());
     }
 
     /** UT-DAO-23 (เพิ่มหลัง T12) */

@@ -56,8 +56,8 @@ classDiagram
 
     Timetable "1" *-- "0..*" TimetableEntry
     Timetable "1" *-- "0..*" TimeConflict
-    TimetableEntry "1" *-- "1..*" ScheduleSlot
-    ExportPngButtonProps ..> Timetable : academicYear, semester, conflicts
+    TimetableEntry "1" *-- "0..*" ScheduleSlot
+    ExportPngButtonProps ..> Timetable : academicYear, semester
 ```
 
 | Type | เจ้าของ | US5 ใช้อย่างไร |
