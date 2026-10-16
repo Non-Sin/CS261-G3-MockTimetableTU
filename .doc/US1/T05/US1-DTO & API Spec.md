@@ -110,7 +110,7 @@ US1 ใช้ 3 endpoint และ DTO หลักตัวเดียวค�
 
 สองคาบชนกันเมื่ออยู่วันเดียวกันและ `a.startTime < b.endTime && b.startTime < a.endTime` คาบต่อกันพอดีไม่นับเป็นชน เหมือน MA211 09:30–11:00 ต่อด้วย CS111 11:00–12:30 ใน Figma `conflicts` มี 1 รายการต่อ 1 คู่ต่อ 1 วัน ถ้าคู่เดียวกันชนทั้งวันอังคารและพฤหัสจะได้ 2 รายการ ตัวเลข "เวลาชน: N คู่" จึงนับจาก `courseCodes` ที่ไม่ซ้ำกัน ไม่ใช่ `conflicts.length`
 
-`updatedAt` เป็น `OffsetDateTime` ส่งพร้อม offset เช่น `2026-10-13T11:20:05+07:00` frontend จึงคำนวณ "เมื่อสักครู่" ได้ถูก แม้ server ใน Docker จะใช้เวลา UTC
+`updatedAt` เป็น `OffsetDateTime` ส่งพร้อม offset เช่น `2026-10-13T11:20:05+07:00` backend ส่งเวลาไทย (`+07:00`) เสมอ ไม่ว่า server หรือ container จะตั้ง timezone อะไร frontend จึงคำนวณ "เมื่อสักครู่" ได้ถูก
 
 ### 3. POST /api/timetable/entries — เพิ่มวิชาลงตาราง
 

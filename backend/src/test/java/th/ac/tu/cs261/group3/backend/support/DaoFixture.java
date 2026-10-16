@@ -16,7 +16,9 @@ import java.util.stream.LongStream;
 import static java.time.DayOfWeek.*;
 
 /**
- * Test Data ของ US1-T12 (กลุ่มเรียน S1–S8 และตารางเรียน T1–T4)
+ * Test Data ของ US1-T12 (กลุ่มเรียน S1–S9 และตารางเรียน T1–T4)
+ * <p>
+ * S9 (TU107 เรียน e-learning) ไม่มีคาบเรียน และไม่อยู่ในตารางใด
  * <p>
  * เรียก {@link #persist} ใน {@code @BeforeEach} แล้ว fixture จะ {@code flush()} + {@code clear()} ให้
  * id ทุกตัวเป็น IDENTITY จึงเก็บไว้ใน field ห้าม hard-code ตัวเลข
@@ -26,7 +28,7 @@ public final class DaoFixture {
     public static final OffsetDateTime UPDATED_AT = OffsetDateTime.parse("2026-10-13T11:20:05+07:00");
     public static final String S1_INSTRUCTOR = "ผศ.ดร.ทรงศักดิ์ รองวิริยะพานิช";
 
-    public long s1, s2, s3, s4, s5, s6, s7, s8;
+    public long s1, s2, s3, s4, s5, s6, s7, s8, s9;
     public long t1, t2, t3, t4;
 
     private final TestEntityManager em;
@@ -44,6 +46,7 @@ public final class DaoFixture {
         Course las101 = f.course("LAS101", "CRITICAL THINKING, READING, AND WRITING", CourseCategory.GENERAL_EDUCATION, 3);
         Course fe001 = f.course("FE001", "การถ่ายภาพเบื้องต้น", CourseCategory.FREE_ELECTIVE, 2);
         Course cs213 = f.course("CS213", "DATA STRUCTURES", CourseCategory.MAJOR, 3);
+        Course tu107 = f.course("TU107", "DIGITAL SKILL AND PROBLEM SOLVING", CourseCategory.GENERAL_EDUCATION, 3);
 
         Section s1 = f.section(cs111, "030001", S1_INSTRUCTOR, 2568, 1);
         f.slot(s1, TUESDAY, "11:00", "12:30", "LC3-121");
@@ -72,6 +75,9 @@ public final class DaoFixture {
         Section s8 = f.section(cs213, "040001", "อ.กิตติพงษ์ แสงทอง", 2568, 2);
         f.slot(s8, WEDNESDAY, "13:30", "16:30", "SC3-216");
 
+        // เรียน e-learning จึงไม่มีคาบ
+        Section s9 = f.section(tu107, "000002", null, 2568, 1);
+
         Timetable t1 = f.timetable("6609000000", 2568, 1);
         f.entry(t1, s1);
         f.entry(t1, s4);
@@ -93,6 +99,7 @@ public final class DaoFixture {
         f.s6 = s6.getSectionId();
         f.s7 = s7.getSectionId();
         f.s8 = s8.getSectionId();
+        f.s9 = s9.getSectionId();
         f.t1 = t1.getTimetableId();
         f.t2 = t2.getTimetableId();
         f.t3 = t3.getTimetableId();
@@ -105,7 +112,7 @@ public final class DaoFixture {
 
     /** id ที่มากที่สุดใน fixture ใช้สร้าง id ที่ไม่มีอยู่จริง */
     public long maxId() {
-        return LongStream.of(s1, s2, s3, s4, s5, s6, s7, s8, t1, t2, t3, t4).max().orElseThrow();
+        return LongStream.of(s1, s2, s3, s4, s5, s6, s7, s8, s9, t1, t2, t3, t4).max().orElseThrow();
     }
 
     private Course course(String code, String name, CourseCategory category, int credits) {
