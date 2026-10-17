@@ -131,7 +131,7 @@ US1 ใช้ 3 endpoint และ DTO หลักตัวเดียวค�
 | `COURSE_ALREADY_IN_TIMETABLE` | 409 | มีวิชานี้ในตารางแล้ว ไม่ว่ากลุ่มไหน | `courseCode`, `existingSectionNo` | TC8 |
 | `CREDIT_LIMIT_EXCEEDED` | 409 | หน่วยกิตรวมหลังเพิ่มเกิน `maxCredits` (22) | `currentCredits`, `courseCredits`, `maxCredits` | TC7 |
 
-การแสดงผลใน UI: `CREDIT_LIMIT_EXCEEDED` ขึ้นแถบเตือนสีแดงแบบเดียวกับเวลาชน ใช้ `detail` เป็นข้อความ และวิชาไม่ถูกเพิ่ม ส่วนกลุ่มอื่นของวิชาที่อยู่ในตารางแล้ว UI ไม่แสดงปุ่ม "+ เพิ่มวิชา" ตั้งแต่แรก backend ยังคืน 409 `COURSE_ALREADY_IN_TIMETABLE` ไว้กันการยิง API ตรง และใช้ทดสอบ TC8 ผ่าน Postman
+การแสดงผลใน UI: `CREDIT_LIMIT_EXCEEDED` ไม่แสดงข้อความแจ้งเตือนบนหน้าเว็บ (ตามข้อสรุปของทีม) วิชาไม่ถูกเพิ่มและตารางคงเดิม ส่วน `detail` ใน ProblemDetail มีไว้สำหรับคนยิง API ตรงและ debug ส่วนกลุ่มอื่นของวิชาที่อยู่ในตารางแล้ว UI ไม่แสดงปุ่ม "+ เพิ่มวิชา" ตั้งแต่แรก backend ยังคืน 409 `COURSE_ALREADY_IN_TIMETABLE` ไว้กันการยิง API ตรง และใช้ทดสอบ TC8 ผ่าน Postman
 
 ลำดับใน `TimetableService.addEntry`:
 
@@ -170,7 +170,7 @@ US1 ใช้ 3 endpoint และ DTO หลักตัวเดียวค�
 }
 ```
 
-ฝั่ง backend เพิ่ม `BusinessRuleException(status, code, properties)` ใน `common/exception` พร้อม handler ใน `GlobalExceptionHandler` ฝั่ง frontend ให้ `ApiError` ใน `lib/api.ts` เก็บ `code` ไว้ ทั้งสองไฟล์เป็นไฟล์ร่วม ต้องบอกกลุ่มและแยก PR เล็กตาม CONTRIBUTING
+ฝั่ง backend เพิ่ม `BusinessRuleException(status, code, detail, properties)` ใน `common/exception` พร้อม handler ใน `GlobalExceptionHandler` ฝั่ง frontend ให้ `ApiError` ใน `lib/api.ts` เก็บ `code` ไว้ ทั้งสองไฟล์เป็นไฟล์ร่วม ต้องบอกกลุ่มและแยก PR เล็กตาม CONTRIBUTING
 
 ## DTO class diagram
 
@@ -279,53 +279,26 @@ export const countConflictPairs = (conflicts: TimeConflict[]) =>
 
 ## ขอบเขต grid (frontend)
 
-grid คำนวณช่วงวันและเวลาจาก `entries` ฝั่ง frontend ไม่ต้องเพิ่ม field ใน API เริ่มจาก จ.–ศ. 08:00–17:00 แล้วขยายตาม min/max ของวิชาในตาราง
+grid เป็นช่วงคงที่ **จ.–ส. 08:00–21:00** ตาม UI Prototype ไม่ขึ้นกับวิชาในตาราง และไม่ต้องเพิ่ม field ใน API
 
-- **วัน:** จาก `min(จ., วันแรกที่มีเรียน)` ถึง `max(ศ., วันสุดท้ายที่มีเรียน)` แสดงทุกวันในช่วงแม้ว่าง
-- **เวลา:** เริ่มที่เวลาเริ่มเร็วสุดปัดลง จบที่เวลาเลิกช้าสุดปัดขึ้นเป็นชั่วโมงเต็ม คอลัมน์ละ 1 ชม.
-
-| วิชาในตาราง | วันที่แสดง | หัวคอลัมน์เวลา |
-| --- | --- | --- |
-| ไม่มี (frame 1:2) | จ.–ศ. | 08:00 … 16:00 |
-| 7 วิชาใน frame 1:1057 (จ.–พฤ., 09:30–16:30) | จ.–ศ. | 08:00 … 16:00 |
-| จ. 09:30–11:00 และ ส. 13:00–16:00 | จ.–ส. | 08:00 … 16:00 |
-| อ. 17:00–20:00 | จ.–ศ. | 08:00 … 19:00 |
-
-หมายเหตุ: หัวคอลัมน์คือเวลาเริ่มของช่องละ 1 ชม. เหมือนใน Figma เช่น "19:00" คือช่อง 19:00–20:00 จึงรับวิชาที่เลิก 20:00 ได้พอดี grid เริ่มที่ 08:00 เสมอ เว้นแต่มีวิชาเริ่มก่อน 08:00
+- **วัน:** จันทร์ถึงเสาร์ 6 แถว แสดงครบทุกวันแม้ไม่มีวิชา
+- **เวลา:** คอลัมน์ละ 1 ชม. หัวคอลัมน์ 08:00 … 20:00 รวม 13 ช่อง หัวคอลัมน์คือเวลาเริ่มของช่อง เช่น "20:00" คือช่อง 20:00–21:00
+- ตารางว่าง (frame 1:2) และตาราง 7 วิชาใน frame 1:1057 ใช้ grid ขนาดเดียวกัน
+- grid กว้างกว่าหน้าจอ จึงเลื่อนแนวนอนได้ ส่วน US5 ถ่ายภาพด้วย `scrollWidth` / `scrollHeight` ให้ได้ตารางครบ
 
 ```typescript
 // frontend/features/timetable/gridRange.ts
 import type { DayOfWeek } from "@/features/courses/types";
-import type { TimetableEntry } from "./types";
 
-const DAYS: DayOfWeek[] = [
-  "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY",
+export const GRID_DAYS: DayOfWeek[] = [
+  "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY",
 ];
-const DEFAULT_FIRST_DAY = 0; // MONDAY
-const DEFAULT_LAST_DAY = 4;  // FRIDAY
-const DEFAULT_START_HOUR = 8;
-const DEFAULT_END_HOUR = 17;
+export const GRID_START_HOUR = 8;
+export const GRID_END_HOUR = 21;
 
-const toMinutes = (hhmm: string) =>
-  Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
-
-export function getGridRange(entries: TimetableEntry[]) {
-  const slots = entries.flatMap((e) => e.schedules);
-  const dayIdx = slots.map((s) => DAYS.indexOf(s.dayOfWeek));
-  const firstDay = Math.min(DEFAULT_FIRST_DAY, ...dayIdx);
-  const lastDay = Math.max(DEFAULT_LAST_DAY, ...dayIdx);
-  const startHour = Math.min(
-    DEFAULT_START_HOUR,
-    ...slots.map((s) => Math.floor(toMinutes(s.startTime) / 60)),
-  );
-  const endHour = Math.max(
-    DEFAULT_END_HOUR,
-    ...slots.map((s) => Math.ceil(toMinutes(s.endTime) / 60)),
-  );
-  return {
-    days: DAYS.slice(firstDay, lastDay + 1),
-    // หัวคอลัมน์ 1 ชม. เช่น 8 = "08:00" (ครอบคลุม 08:00–09:00)
-    hours: Array.from({ length: endHour - startHour }, (_, i) => startHour + i),
-  };
-}
+// หัวคอลัมน์ 1 ชม. เช่น 8 = "08:00" (ครอบคลุม 08:00–09:00)
+export const GRID_HOURS = Array.from(
+  { length: GRID_END_HOUR - GRID_START_HOUR },
+  (_, i) => GRID_START_HOUR + i,
+);
 ```

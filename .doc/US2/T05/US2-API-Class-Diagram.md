@@ -79,7 +79,7 @@ Spring ให้ `TimetableDeleteController` กับ `TimetableController` ข
 
 ## เอกสารที่เกี่ยวข้อง
 
-- [DTO & API Spec](./US2-DTO%20&%20API%20Spec.md)
+- [DTO & API Spec](./US2-DTO-API-Spec.md)
 - [DTO Class Diagram](./US2-DTO-Class-Diagram.md)
 - [US1 — API Class Diagram](../../US1/T05/US1-API-Class-Diagram.md)
 - [US1-T06 — Extended API Class Diagram](../../US1/T06/US1-T06-Extended-API-Class-Diagram.md)
