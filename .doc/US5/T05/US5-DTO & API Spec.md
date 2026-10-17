@@ -16,7 +16,7 @@ US5 ส่งออกตารางเรียนจำลองเป็น�
 
 | Method | Path | US5 ใช้ทำอะไร |
 | --- | --- | --- |
-| GET | `/api/timetable?academicYear=2569&semester=2` | ข้อมูลที่วาดอยู่ในกล่องตาราง, ใช้ `academicYear` / `semester` ตั้งชื่อไฟล์ และใช้ `conflicts` ตัดสินว่าบันทึกภาพได้หรือไม่ |
+| GET | `/api/timetable?academicYear=2568&semester=1` | ข้อมูลที่วาดอยู่ในกล่องตาราง, ใช้ `academicYear` / `semester` ตั้งชื่อไฟล์ และใช้ `conflicts` ตัดสินว่าบันทึกภาพได้หรือไม่ |
 
 ตอนกดปุ่ม PNG **ไม่เรียก API ซ้ำ** เพราะ US1 โหลด `Timetable` มาวาดหน้าจอไว้แล้ว ภาพจึงตรงกับสิ่งที่ผู้ใช้เห็นตอนกด (UAT-US5-01 ขั้นที่ 4) ถ้าในอนาคตกดเพิ่ม/ลบวิชาแล้ว US1/US2 อัปเดต state ใหม่ ภาพครั้งถัดไปก็จะตามหน้าจอเอง
 
@@ -28,7 +28,7 @@ US5 ส่งออกตารางเรียนจำลองเป็น�
 | --- | --- |
 | หัวข้อ "ตารางเรียนจำลอง" | — (ข้อความคงที่) |
 | chip รหัสวิชาเหนือ grid | `entries[].courseCode` |
-| หัวแถววัน / หัวคอลัมน์เวลา | ตามช่วงที่ UI ของ US1 กำหนด (UI Prototype ปัจจุบันคือ จ.–ส. 08:00–21:00 คงที่) |
+| หัวแถววัน / หัวคอลัมน์เวลา | จ.–ส. 08:00–21:00 คงที่ ตาม grid ของ US1 |
 | บล็อกวิชา: รหัส, Sec, เวลา, ห้อง | `courseCode`, `sectionNo`, `schedules[].startTime`–`endTime`, `room` |
 | "วิชาในตารางเรียน: N วิชา (X หน่วยกิต)" | `entries.length`, `totalCredits` |
 | ชื่อไฟล์ | `academicYear`, `semester` |
@@ -54,7 +54,7 @@ export type ExportPngButtonProps = {
 // frontend/features/timetable-export/exportPng.ts
 export const EXPORT_IGNORE_ATTR = "data-export-ignore";
 
-/** timetable-2569-2.png */
+/** timetable-2568-1.png */
 export function buildExportFileName(academicYear: number, semester: number): string;
 
 /** ถ่าย element เป็น PNG แล้วสั่ง browser ดาวน์โหลด — throw ถ้าสร้างภาพไม่ได้ */
@@ -97,11 +97,11 @@ export function exportElementToPng(element: HTMLElement, fileName: string): Prom
 
 แถบเตือนเวลาชนไม่อยู่ในภาพ (UI Prototype ไม่มีแถบเตือนหน่วยกิตเกินแล้ว เพราะระบบไม่ยอมให้เพิ่มวิชาจนเกินกำหนด) ถ้าภายหลังย้ายแถบเตือนเข้าไปอยู่ในกล่องตาราง ให้ใส่ `data-export-ignore` ด้วย
 
-grid ใน UI Prototype ปัจจุบันเป็น จ.–ส. 08:00–21:00 ซึ่งกว้างกว่าหน้าจอจนต้องเลื่อนแนวนอน การถ่ายด้วย `scrollWidth` / `scrollHeight` ทำให้ได้ตารางครบไม่ถูกตัด และยังใช้ได้ถ้า US1 เปลี่ยนเป็น grid ที่ขยายตามวิชาในภายหลัง
+grid ของ US1 เป็น จ.–ส. 08:00–21:00 คงที่ ซึ่งกว้างกว่าหน้าจอจนต้องเลื่อนแนวนอน การถ่ายด้วย `scrollWidth` / `scrollHeight` ทำให้ได้ตารางครบไม่ถูกตัด
 
 ### ชื่อไฟล์
 
-`timetable-{academicYear}-{semester}.png` เช่น `timetable-2569-2.png` หรือ `timetable-2568-1.png` ใช้ตัวอักษรอังกฤษล้วน กันปัญหาชื่อไฟล์ภาษาไทยบนบางระบบ ปีและภาคมาจาก `Timetable` ที่แสดงอยู่ (`academicYear`, `semester`) **ไม่ใช่ค่าในตัวกรองของส่วนค้นหารายวิชา** ถ้ากดหลายครั้ง browser จะเติม `(1)`, `(2)` ให้เอง ไม่รวมภาคฤดูร้อน เพราะทีมตกลงว่าจะไม่พัฒนาส่วนภาคฤดูร้อน
+`timetable-{academicYear}-{semester}.png` เช่น `timetable-2568-1.png` หรือ `timetable-2568-2.png` ใช้ตัวอักษรอังกฤษล้วน กันปัญหาชื่อไฟล์ภาษาไทยบนบางระบบ ปีและภาคมาจาก `Timetable` ที่แสดงอยู่ (`academicYear`, `semester`) **ไม่ใช่ค่าในตัวกรองของส่วนค้นหารายวิชา** ถ้ากดหลายครั้ง browser จะเติม `(1)`, `(2)` ให้เอง ไม่รวมภาคฤดูร้อน เพราะทีมตกลงว่าจะไม่พัฒนาส่วนภาคฤดูร้อน
 
 ## Error
 
@@ -123,7 +123,7 @@ grid ใน UI Prototype ปัจจุบันเป็น จ.–ส. 08:00�
 
 ## สิ่งที่ US5-T11 ควรออกแบบเทสต์ (ข้อเสนอ)
 
-- `buildExportFileName(2569, 2)` = `"timetable-2569-2.png"` และ `buildExportFileName(2568, 1)` = `"timetable-2568-1.png"`
+- `buildExportFileName(2568, 1)` = `"timetable-2568-1.png"` และ `buildExportFileName(2568, 2)` = `"timetable-2568-2.png"`
 - ปุ่มกดได้ตอน `entries: []`
 - ปุ่ม disabled เมื่อ `hasConflicts` และไม่เรียก `toPng`
 - ระหว่าง `exporting` ปุ่ม disabled โดยข้อความยังเป็น "PNG"
