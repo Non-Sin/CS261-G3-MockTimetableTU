@@ -1,4 +1,4 @@
-# Unit Test Cases – DAO US2 ลบวิชา
+# US2-T12 Design Unit Test Cases ส่วน DAO: ลบวิชา
 
 Oct 16, 2026 · @Non
 
@@ -8,7 +8,7 @@ US2 (ลบวิชาออกจากตารางเรียน) ทด�
 
 - **Method under test:** `TimetableEntryRepository.deleteAll(entries)` และ `TimetableEntryRepository.findAllById(entryIds)` ทั้งสองสืบทอดจาก `JpaRepository`
 - **ประเภท:** Unit test ชั้น DAO ทดสอบกับ SQL Server จริงผ่าน Testcontainers ไม่ใช้ mock
-- **ไม่อยู่ในขอบเขต:** การตรวจ list ว่างและ ID ซ้ำซึ่งทำที่ Controller รวมถึงการตรวจว่า entry เป็นของนักศึกษาคนนี้ (`entry.timetable.studentId`) การดักจับ null และการตัดสินว่าจะตอบ error แบบใด ซึ่งทดสอบใน Service test
+- **ไม่อยู่ในขอบเขต:** สิ่งที่ `TimetableDeleteService.removeEntries` ทำตามลำดับใน [DTO & API Spec](../T05/US2-DTO-API-Spec.md) ได้แก่ ตอบ 400 เมื่อ `entryIds` ว่าง, ตัด ID ซ้ำ, ตรวจว่า entry เป็นของนักศึกษาคนนี้ (`entry.timetable.studentId`), ตรวจว่าอยู่ตารางเดียวกัน และการดักจับ null ทั้งหมดทดสอบใน Service test
 
 โครงสร้างข้อมูล: `TimetableEntry` หนึ่งแถวคือหนึ่งวิชา (`Section`) ในตารางของนักศึกษา ส่วนคาบเรียน (`schedule_slot`) ผูกกับ `Section` ไม่ได้ผูกกับ entry การลบ entry แถวเดียวจึงทำให้ทุกคาบของวิชานั้นหายจากตาราง โดยที่ข้อมูล Section และคาบเรียนต้องยังอยู่
 
@@ -21,7 +21,9 @@ US2 (ลบวิชาออกจากตารางเรียน) ทด�
 | Framework | Spring Boot, `@DaoTest` (`@DataJpaTest` + `@AutoConfigureTestDatabase(replace = NONE)` + `@Import(TestcontainersConfig.class)`) |
 | ฐานข้อมูลทดสอบ | `MSSQLServerContainer` image `mcr.microsoft.com/mssql/server:2025-latest` รันเฉพาะ `db/migration` ไม่รัน seed |
 | Library | JUnit 5, AssertJ, `TestEntityManager` |
-| คลาสเทส | `TimetableEntryRepositoryTest` |
+| คลาสเทส | `TimetableEntryDeleteRepositoryTest` (คลาสใหม่ใน package `timetable`) |
+
+แยกเป็นคลาสใหม่ ไม่เพิ่มลงใน `TimetableEntryRepositoryTest` ของ US1 เพราะ `@BeforeEach` ของคลาสนั้นเรียก `DaoFixture.persist(em)` ซึ่งเพิ่ม entry 5 แถวและ schedule\_slot 12 แถว ถ้ารวมกัน ค่าที่คาดหวังของ `count()` และจำนวน schedule\_slot ในเคส 01–05 จะไม่ตรง คลาสนี้จึงใช้เฉพาะข้อมูลตั้งต้นของ US2 และไม่ต้องแก้ไฟล์เทสของ US1 ซึ่งช่วยลด merge conflict ตาม CONTRIBUTING
 
 ขั้นตอนเตรียมข้อมูล (ทุกเคส): `@BeforeEach` บันทึกข้อมูลตั้งต้นตามหัวข้อถัดไป แล้วเรียก `em.flush()` และ `em.clear()` ให้ทุกเคสเริ่มจาก persistence context ว่าง หลังจากนี้ตัวแปรใน fixture ใช้อ้างอิง ID เท่านั้น
 
@@ -58,11 +60,11 @@ US2 (ลบวิชาออกจากตารางเรียน) ทด�
 
 รวม schedule\_slot 5 แถว ชื่อ E1–E4, S1–S3, T\_A และ T\_B เป็นชื่อตัวแปรในเทส ส่วน ID จริง DB เป็นคนสร้าง
 
-ข้อมูลชุดนี้ออกแบบให้รวมกับ `DaoFixture` (ภาค 1/2568) ได้โดยไม่ชน unique constraint:
+คลาสนี้ไม่เรียก `DaoFixture` จึงต้องสร้าง `Course` ทั้ง 3 วิชาเอง แต่ข้อมูลยังออกแบบไม่ให้ชน unique constraint กับ `DaoFixture` (ภาค 1/2568) เผื่อภายหลังต้องรวมกัน:
 
 - CS180 และ MA211 กลุ่ม 020001 ใช้รหัสกลุ่มและเวลาตาม seed ภาค 1/2568 ส่วน CS261 กลุ่ม 100001 ไม่มีใน seed และ `DaoFixture` จึงไม่ชนกับข้อมูลเดิม
 - `uq_section_course_term_no`: MA211 ใช้กลุ่ม 020001 ไม่ซ้ำกับกลุ่ม 010001 ที่มีใน `DaoFixture`
-- `course` PK: MA211 มีใน `DaoFixture` แล้ว ต้องใช้ `Course` เดิม ไม่สร้างใหม่
+- `course` PK: MA211 มีใน `DaoFixture` ด้วย ถ้ารวมกันต้องใช้ `Course` เดิม ไม่สร้างใหม่
 - `uq_timetable_student_term`: รหัสนักศึกษา A และ B ไม่ซ้ำกับ `6609000000`, `6609000001`, `6609000003` ที่ `DaoFixture` ใช้ในภาค 1/2568
 - ไม่ใช้ CS223 เพราะ seed เปิดวิชานี้เฉพาะภาค 2/2568
 
@@ -97,7 +99,7 @@ US2 (ลบวิชาออกจากตารางเรียน) ทด�
 - เคส 07 ยืนยันว่า ID ที่หาไม่เจอถูกข้ามไปโดยไม่ throw จำนวน entry ที่คืนจึงอาจน้อยกว่าจำนวน ID ที่ส่งไป ใช้ `Long.MAX_VALUE` เป็น ID ที่ไม่มีอยู่จริง เพราะ `entry_id` เป็น `BIGINT IDENTITY` ที่เริ่มจาก 1 จึงไม่มีทางสร้างถึงค่านี้ และไม่ขึ้นกับข้อมูลใน fixture
 - เคส 08 ยืนยันว่า DAO ไม่กรองเจ้าของ Service จึงต้องเช็ก `entry.timetable.studentId` เองก่อนลบ
 
-list ว่าง (`@NotEmpty`) และ list ที่มี ID ซ้ำถูกปฏิเสธตั้งแต่ Controller จึงไม่ถึง `findAllById` และไม่ทดสอบที่ DAO Controller ต้องปฏิเสธ ID ซ้ำ เพราะ `findAllById([E1.id, E1.id])` คืน E1 รายการเดียว ทำให้ Service เทียบจำนวน entry ที่ได้กับจำนวน ID ที่ส่งไม่ได้
+list ว่างและ ID ซ้ำไม่ทดสอบที่ DAO เพราะ Service จัดการก่อนเรียก `findAllById` ตามลำดับใน DTO & API Spec: `entryIds` ว่างตอบ 400 ทันที ส่วน ID ซ้ำ (เช่น `7,7`) ถูกตัดด้วย `LinkedHashSet` แล้วตอบ 200 เหมือนส่ง `7` ตัวเดียว Service จึงเทียบจำนวน entry ที่ได้กับจำนวน ID หลังตัดซ้ำได้ถูกต้อง ทั้งสองกรณีทดสอบใน Service test
 
 ## Traceability: method ที่ทดสอบแล้วใน US1
 
@@ -119,3 +121,11 @@ list ว่าง (`@NotEmpty`) และ list ที่มี ID ซ้ำถ�
 | Fail |  |
 | ผู้ทดสอบ |  |
 | วันที่ทดสอบ |  |
+
+## เอกสารที่เกี่ยวข้อง
+
+- [DAO Class Diagram](../T06/US2-T06-DAO-Class-Diagram.md) (US2-T06)
+- [Sequence Diagram](../T06/US2-T06-Sequence-Diagram.md) (US2-T06)
+- [ER Diagram (DB)](../T06/US2-T06-ER-Diagram.md) (US2-T06)
+- [DTO & API Spec](../T05/US2-DTO-API-Spec.md) (US2-T05)
+- [US1-T12 Design Unit Test Cases ส่วน DAO](../../US1/T12/US1-T12%20Design%20Unit%20Test%20Cases%20ส่วน%20DAO.md)
