@@ -14,7 +14,7 @@ US1: เพิ่มวิชาเข้าไปในตารางเรี
 > ต้อง login ด้วยบัญชี Google ที่ได้รับสิทธิ์เข้าถึงโปรเจกต์ใน Stitch ก่อนจึงจะเปิดดูได้
 
 ## เอกสารที่เกี่ยวข้อง
-- [DTO & API Spec](./US1%20—%20DTO%20&%20API%20Spec%20เพิ่มวิชาลงตารางเรียนจำลอง.md)
-- [API Class Diagram](./API%20Class%20Diagram.md)
-- [DTO Class Diagram](./DTO%20Class%20Diagram.md)
-- [User Acceptance Test (US1-T16)](./US1-T16-UAT.md)
+- [DTO & API Spec](./US1-DTO%20&%20API%20Spec.md)
+- [API Class Diagram](./US1-API-Class-Diagram.md)
+- [DTO Class Diagram](./US1-DTO-Class-Diagram.md)
+- [User Acceptance Test (US1-T16)](../T16/US1-T16-UAT.md)
