@@ -2,7 +2,7 @@
 
 ลำดับการทำงานระหว่าง UI, API, repository (DAO) และ DB ของ `POST /api/timetable/entries` ต่อจาก US1-T05
 
-ข้อกำหนดที่ใช้ตาม [DTO & API Spec](./US1-DTO-API-Spec.md):
+ข้อกำหนดที่ใช้ตาม [DTO & API Spec](../T05/US1-DTO%20&%20API%20Spec.md):
 
 - ลำดับตรวจใน `addEntry`: ตรวจ body (400) → หา section (404) → วิชาซ้ำ (409) → หน่วยกิต (409) → บันทึก แล้วคำนวณ `conflicts` ใหม่ (201) ซึ่ง Spec ระบุให้ใช้ลำดับนี้แทนลำดับในการ์ด US1-T06
 - เวลาชนไม่ใช่ error ตอบ `201` พร้อม `conflicts` ที่ไม่ว่าง
@@ -89,4 +89,4 @@ sequenceDiagram
 - [DAO Class Diagram](./US1-T06-DAO-Class-Diagram.md)
 - [Extended API Class Diagram](./US1-T06-Extended-API-Class-Diagram.md)
 - [ER Diagram (DB)](./US1-T06-ER-Diagram.md)
-- [DTO & API Spec](./US1-DTO-API-Spec.md) (US1-T05)
+- [DTO & API Spec](../T05/US1-DTO%20&%20API%20Spec.md) (US1-T05)
