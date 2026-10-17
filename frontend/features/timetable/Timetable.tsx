@@ -1,13 +1,20 @@
 "use client"
 
-import { mockTimetable } from "./mockData"
 import { getGridRange } from "./gridRange"
 import type { DayOfWeek } from "../courses/types"
-import type { TimetableEntry, TimeConflict } from "./types";
-import { useRef, useState } from "react";
-import { mockCourses } from "../courses/mockData";
+import type { Timetable as TimetableData } from "./types";
+import { useEffect, useRef, useState } from "react";
 import type { Course, CourseCategory } from "../courses/types";
 import ExportPngButton from "../timetable-export/ExportPngButton";
+import { ApiError } from "@/lib/api";
+import { coursesApi } from "../courses/api";
+import { timetableApi } from "./api";
+
+// ปีการศึกษาและภาคเรียนที่ให้เลือก (ไม่รวมภาคฤดูร้อน) เริ่มที่ 1/2568 ตาม seed ที่ทีมตกลง
+const ACADEMIC_YEARS = [2568];
+const SEMESTERS = [1, 2];
+const DEFAULT_ACADEMIC_YEAR = 2568;
+const DEFAULT_SEMESTER = 1;
 
 // แปลงรหัสวันจากข้อมูลตารางให้เป็นชื่อภาษาไทยสำหรับแสดงในหน้าเว็บ
 const dayNames: Record<DayOfWeek, string> = {
@@ -20,109 +27,110 @@ const dayNames: Record<DayOfWeek, string> = {
   SUNDAY: "อาทิตย์",
 };
 
-// แปลงเวลา HH:mm เป็นจำนวนนาที เพื่อใช้คำนวณช่วงเวลาและตรวจเวลาชน
+// แปลงเวลา HH:mm เป็นจำนวนนาที เพื่อใช้คำนวณตำแหน่งบล็อกบน grid
 const toMinutes = (time: string) => {
   const [hours, minutes] = time.split(":").map(Number);
   return hours * 60 + minutes;
 };
 
-// ตรวจทุกคู่รายวิชา แล้วคืนรายการที่เรียนวันเดียวกันและมีช่วงเวลาทับกัน
-const findConflicts = (entries: TimetableEntry[]): TimeConflict[] =>
-  entries.flatMap((entry, index) =>
-    entries.slice(index + 1).flatMap((otherEntry) =>
-      entry.schedules.flatMap((firstSlot) =>
-        otherEntry.schedules.flatMap((secondSlot) => {
-          const overlaps =
-            firstSlot.dayOfWeek === secondSlot.dayOfWeek &&
-            toMinutes(firstSlot.startTime) < toMinutes(secondSlot.endTime) &&
-            toMinutes(secondSlot.startTime) < toMinutes(firstSlot.endTime);
-
-          if (!overlaps) return [];
-
-          return [{
-            dayOfWeek: firstSlot.dayOfWeek,
-            overlapStart:
-              firstSlot.startTime >= secondSlot.startTime
-                ? firstSlot.startTime
-                : secondSlot.startTime,
-            overlapEnd:
-              firstSlot.endTime <= secondSlot.endTime
-                ? firstSlot.endTime
-                : secondSlot.endTime,
-            courseCodes: [entry.courseCode, otherEntry.courseCode],
-          }];
-        }),
-      ),
-    ),
-  );
-
-// หน้าจัดตารางเรียนจำลอง ใช้ state ฝั่ง frontend ระหว่างที่ backend ยังไม่พร้อม
+// หน้าจัดตารางเรียนจำลอง โหลดและบันทึกตารางผ่าน API ของ US1
 const Timetable = () => {
-  // เก็บวิชาในตาราง ข้อความค้นหา ตัวกรอง และสถานะการแสดงคำเตือน
-  const [entries, setEntries] = useState<TimetableEntry[]>([]);
+  // ตารางจาก GET /api/timetable ของภาคเรียนที่เลือก (null = กำลังโหลด)
+  const [timetable, setTimetable] = useState<TimetableData | null>(null);
+  const [timetableError, setTimetableError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  // รายวิชาจาก GET /api/courses ตามคำค้นและหมวดที่เลือก
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [coursesError, setCoursesError] = useState(false);
+  const [addingSectionId, setAddingSectionId] = useState<number | null>(null);
   const [addError, setAddError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<CourseCategory | "ALL">("ALL");
   const [selectedSectionIds, setSelectedSectionIds] = useState<Record<string, number>>({});
-  const [academicYear, setAcademicYear] = useState(2568);
-  const [semester, setSemester] = useState(1);
+  const [academicYear, setAcademicYear] = useState(DEFAULT_ACADEMIC_YEAR);
+  const [semester, setSemester] = useState(DEFAULT_SEMESTER);
   const [searchInput, setSearchInput] = useState("");
   const [conflictAlertDismissed, setConflictAlertDismissed] = useState(false);
   // กล่องตารางเรียนจำลองที่ปุ่ม PNG (US5) ใช้ถ่ายเป็นภาพ
   const timetableSectionRef = useRef<HTMLElement>(null);
 
-  // กรองรายวิชาตามรหัสหรือชื่อ และหมวดวิชาที่ผู้ใช้เลือก
-  const filteredCourses = mockCourses.filter((course) => {
-    const search = query.trim().toLowerCase();
+  // โหลดตารางใหม่ทุกครั้งที่เปลี่ยนภาคเรียน และไม่ใช้ผลของภาคเก่าที่ตอบกลับมาช้า
+  useEffect(() => {
+    let ignore = false;
 
-    const matchesQuery =
-      course.courseCode.toLowerCase().startsWith(search) ||
-      course.courseName.toLowerCase().includes(search);
+    timetableApi
+      .get(academicYear, semester)
+      .then((data) => {
+        if (ignore) return;
+        setTimetable(data);
+        setTimetableError(false);
+      })
+      .catch(() => {
+        if (!ignore) setTimetableError(true);
+      });
 
-    const matchesCategory =
-      categoryFilter === "ALL" || course.category === categoryFilter;
-
-    return matchesQuery && matchesCategory;
-  });
-
-  // รวมหน่วยกิตจากวิชาที่เพิ่มอยู่ในตารางปัจจุบัน
-  const totalCredits = entries.reduce(
-    (total, entry) => total + entry.credits,
-    0
-  );
-
-  // เพิ่มกลุ่มเรียนที่เลือก ถ้าวิชาไม่ซ้ำและหน่วยกิตไม่เกินกำหนด
-  const handleAddCourse = (course: Course, sectionId: number) => {
-    const section = course.sections.find((item) => item.sectionId === sectionId,);
-
-    if (!section) return;
-
-    if (entries.some((entry) => entry.courseCode === course.courseCode)) {
-      setAddError(`${course.courseCode} อยู่ในตารางแล้ว`);
-      return;
-    }
-
-    if (totalCredits + course.credits > mockTimetable.maxCredits) {
-      setAddError(`เพิ่มแล้วจะเกิน ${mockTimetable.maxCredits} หน่วยกิต`);
-      return;
-    }
-
-    const newEntry: TimetableEntry = {
-      entryId: section.sectionId,
-      courseCode: course.courseCode,
-      courseName: course.courseName,
-      category: course.category,
-      credits: course.credits,
-      sectionId: section.sectionId,
-      sectionNo: section.sectionNo,
-      schedules: section.schedules,
-      conflictWith: [],
+    return () => {
+      ignore = true;
     };
+  }, [academicYear, semester, reloadKey]);
 
+  // ค้นหารายวิชาของภาคเรียนที่เลือก ตามคำค้นและหมวดวิชา (backend เป็นคนกรอง)
+  useEffect(() => {
+    let ignore = false;
+
+    coursesApi
+      .search({
+        academicYear,
+        semester,
+        q: query,
+        category: categoryFilter === "ALL" ? undefined : categoryFilter,
+      })
+      .then((data) => {
+        if (ignore) return;
+        setCourses(data);
+        setCoursesError(false);
+      })
+      .catch(() => {
+        if (!ignore) setCoursesError(true);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [academicYear, semester, query, categoryFilter]);
+
+  const entries = timetable?.entries ?? [];
+  const totalCredits = timetable?.totalCredits ?? 0;
+  const maxCredits = timetable?.maxCredits ?? 22;
+  const conflicts = timetable?.conflicts ?? [];
+
+  // เปลี่ยนภาคเรียน: ล้างตารางเดิมระหว่างโหลดใหม่ ไม่ให้เห็นวิชาของภาคก่อนหน้า
+  const changeTerm = (nextAcademicYear: number, nextSemester: number) => {
+    setTimetable(null);
     setAddError(null);
-    setConflictAlertDismissed(false);
-    setEntries((currentEntries) => [...currentEntries, newEntry]);
-  }
+    setAcademicYear(nextAcademicYear);
+    setSemester(nextSemester);
+  };
+
+  // เพิ่มกลุ่มเรียนที่เลือก แล้วใช้ตารางทั้งก้อนที่ backend ตอบกลับมา (รวมผลตรวจเวลาชน)
+  const handleAddCourse = async (sectionId: number) => {
+    setAddingSectionId(sectionId);
+    setAddError(null);
+
+    try {
+      setTimetable(await timetableApi.addEntry({ sectionId }));
+      setConflictAlertDismissed(false);
+    } catch (error) {
+      // หน่วยกิตเกินหรือวิชาซ้ำ: ไม่แสดงข้อความตามที่ทีมตกลง แค่โหลดตารางล่าสุดให้ปุ่มกลับมาถูกสถานะ
+      if (error instanceof ApiError && error.status === 409) {
+        setReloadKey((key) => key + 1);
+      } else {
+        setAddError("เพิ่มวิชาไม่สำเร็จ กรุณาลองใหม่");
+      }
+    } finally {
+      setAddingSectionId(null);
+    }
+  };
 
   // กำหนดวันและช่วงชั่วโมงที่ grid ต้องแสดงตามวิชาในตาราง
   const { days, hours } = getGridRange(entries);
@@ -134,9 +142,7 @@ const Timetable = () => {
   const timelineStart = hours[0] * 60;
   const timelineMinutes = hours.length * 60;
 
-  // คำนวณเวลาชนจากวิชาในตาราง แล้วจัดกลุ่มผลลัพธ์เพื่อวาดบล็อกบน grid
-  // คำนวณเวลาชนและจัดกลุ่มผลลัพธ์เพื่อใช้แสดงคำเตือนกับบล็อกบน grid
-  const conflicts = findConflicts(entries);
+  // จัดกลุ่มเวลาชนจาก backend เพื่อวาดบล็อกแดงบน grid
   const conflictGroups = conflicts.reduce<
     Array<{
       dayOfWeek: DayOfWeek;
@@ -243,18 +249,37 @@ const Timetable = () => {
                 <h2 className="text-xl font-bold">ตารางเรียนจำลอง</h2>
                 <div className="flex items-start gap-3">
                   <p className="py-2 text-sm text-slate-600">
-                    หน่วยกิต {totalCredits} / {mockTimetable.maxCredits}
+                    หน่วยกิต {totalCredits} / {maxCredits}
                   </p>
                   <ExportPngButton
                     targetRef={timetableSectionRef}
-                    academicYear={mockTimetable.academicYear}
-                    semester={mockTimetable.semester}
+                    academicYear={timetable?.academicYear ?? academicYear}
+                    semester={timetable?.semester ?? semester}
                     hasConflicts={conflicts.length > 0}
                   />
                 </div>
               </div>
 
-              {entries.length === 0 && (
+              {timetableError && (
+                <div role="alert" className="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+                  โหลดตารางเรียนไม่สำเร็จ
+                  <button
+                    type="button"
+                    onClick={() => setReloadKey((key) => key + 1)}
+                    className="rounded-lg bg-white px-3 py-1 font-semibold text-red-700 hover:bg-red-100"
+                  >
+                    ลองใหม่
+                  </button>
+                </div>
+              )}
+
+              {!timetable && !timetableError && (
+                <p className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-500">
+                  กำลังโหลดตารางเรียน…
+                </p>
+              )}
+
+              {timetable && entries.length === 0 && (
                   <p className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-500">
                     ยังไม่มีวิชาในตาราง ค้นหารายวิชาด้านล่างแล้วกด “เพิ่มวิชา” เพื่อเริ่มจัดตาราง
                   </p>
@@ -432,15 +457,12 @@ const Timetable = () => {
                         ))}
                       </div>
 
+                      {/* การลบวิชาเป็นงานของ US2 ยังไม่มี API จึงปิดปุ่มไว้ก่อน กันลบแค่บนหน้าจอแล้วรีเฟรชกลับมา */}
                       <button
                         type="button"
-                        onClick={() => {
-                          setConflictAlertDismissed(false);
-                          setEntries((currentEntries) =>
-                            currentEntries.filter((item) => item.courseCode !== entry.courseCode)
-                          );
-                        }}
-                        className="self-start rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 sm:self-auto"
+                        disabled
+                        title="ลบวิชาจะใช้ได้เมื่อ US2 เชื่อมกับ API"
+                        className="self-start rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
                       >
                         ลบวิชา
                       </button>
@@ -458,20 +480,24 @@ const Timetable = () => {
                 <div className="flex flex-wrap gap-2">
                     <select
                       value={semester}
-                      onChange={(event) => setSemester(Number(event.target.value))}
+                      onChange={(event) => changeTerm(academicYear, Number(event.target.value))}
                       aria-label="ภาคเรียน"
                       className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
                     >
-                      <option value={1}>ภาคเรียน 1</option>
+                      {SEMESTERS.map((value) => (
+                        <option key={value} value={value}>ภาคเรียน {value}</option>
+                      ))}
                     </select>
 
                     <select
                       value={academicYear}
-                      onChange={(event) => setAcademicYear(Number(event.target.value))}
+                      onChange={(event) => changeTerm(Number(event.target.value), semester)}
                       aria-label="ปีการศึกษา"
                       className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
                     >
-                      <option value={2568}>ปีการศึกษา 2568</option>
+                      {ACADEMIC_YEARS.map((value) => (
+                        <option key={value} value={value}>ปีการศึกษา {value}</option>
+                      ))}
                     </select>
                 </div>
               </div>
@@ -516,20 +542,28 @@ const Timetable = () => {
                 </p>
               )}
 
+              {coursesError && (
+                <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                  โหลดรายวิชาไม่สำเร็จ กรุณาลองใหม่
+                </p>
+              )}
+
               <div className="mt-4 space-y-3">
                 <p className="mt-4 text-sm text-slate-500">
-                  พบ {filteredCourses.length} รายวิชา
+                  พบ {courses.length} รายวิชา
                 </p>
-                {filteredCourses.length === 0 ? (
+                {courses.length === 0 ? (
                   <p className="mt-4 rounded-xl bg-slate-50 p-4 text-center text-sm text-slate-500">
                     ไม่พบรายวิชาที่ตรงกับคำที่ค้นหาหรือหมวดที่เลือก
                   </p>
                 ) : (
                   <div className="mt-4 space-y-3">
-                    {filteredCourses.map((course) => {
+                    {courses.map((course) => {
                     const alreadyAdded = entries.some(
                       (entry) => entry.courseCode === course.courseCode,
                     );
+                    // เพิ่มแล้วจะเกินหน่วยกิตสูงสุด: กดเพิ่มไม่ได้ และไม่แสดงข้อความตามที่ทีมตกลง
+                    const exceedsCredits = totalCredits + course.credits > maxCredits;
                     const selectedSectionId = selectedSectionIds[course.courseCode] ?? course.sections[0]?.sectionId;
 
                     const selectedSection = course.sections.find(
@@ -586,13 +620,15 @@ const Timetable = () => {
 
                           <button
                             type="button"
-                            disabled={alreadyAdded}
+                            disabled={alreadyAdded || exceedsCredits || !timetable || addingSectionId !== null}
                             onClick={() => {
                               if (selectedSectionId !== undefined) {
-                                handleAddCourse(course, selectedSectionId);
+                                handleAddCourse(selectedSectionId);
                               }
                             }}
-                            className="rounded-lg bg-rose-500 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-emerald-600"
+                            className={`rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed ${
+                              alreadyAdded ? "bg-emerald-600" : "bg-rose-500 disabled:bg-slate-300"
+                            }`}
                           >
                             {alreadyAdded ? "เพิ่มแล้ว" : "+ เพิ่มวิชา"}
                           </button>

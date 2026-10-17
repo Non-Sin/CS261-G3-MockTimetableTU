@@ -8,17 +8,20 @@ export type ProblemDetail = {
   status: number;
   detail?: string;
   instance?: string;
+  code?: string;
   errors?: Record<string, string>;
 };
 
 export class ApiError extends Error {
   readonly status: number;
+  readonly code: string | undefined;
   readonly fieldErrors: Record<string, string>;
 
   constructor(problem: ProblemDetail) {
     super(problem.detail ?? problem.title ?? `HTTP ${problem.status}`);
     this.name = "ApiError";
     this.status = problem.status;
+    this.code = problem.code;
     this.fieldErrors = problem.errors ?? {};
   }
 }

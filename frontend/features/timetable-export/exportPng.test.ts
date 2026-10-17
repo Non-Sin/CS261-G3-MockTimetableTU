@@ -20,10 +20,9 @@ const setSize = (element: HTMLElement, size: Partial<Record<"scrollWidth" | "cli
 
 describe("[UT-UI-01] buildExportFileName", () => {
   it.each([
-    [2569, 2, "timetable-2569-2.png"],
-    [2569, 1, "timetable-2569-1.png"],
     [2568, 1, "timetable-2568-1.png"],
     [2568, 2, "timetable-2568-2.png"],
+    [2567, 1, "timetable-2567-1.png"],
   ])("(%i, %i) ได้ %s", (academicYear, semester, expected) => {
     const fileName = buildExportFileName(academicYear, semester);
 
@@ -64,7 +63,7 @@ describe("exportElementToPng", () => {
     const box = document.createElement("section");
     setSize(box, { scrollWidth: 1600, scrollHeight: 720 });
 
-    await exportElementToPng(box, "timetable-2569-2.png");
+    await exportElementToPng(box, "timetable-2568-1.png");
 
     expect(toPng).toHaveBeenCalledTimes(1);
     expect(toPng).toHaveBeenCalledWith(box, expect.objectContaining({
@@ -75,7 +74,7 @@ describe("exportElementToPng", () => {
       filter: shouldIncludeInExport,
     }));
     expect(clickedLinks).toHaveLength(1);
-    expect(clickedLinks[0].download).toBe("timetable-2569-2.png");
+    expect(clickedLinks[0].download).toBe("timetable-2568-1.png");
     expect(clickedLinks[0].href).toBe(DATA_URL);
   });
 
@@ -116,7 +115,7 @@ describe("exportElementToPng", () => {
     const ready = new Promise<void>((resolve) => { fontsLoaded = resolve; });
     Object.defineProperty(document, "fonts", { configurable: true, value: { ready } });
 
-    const exporting = exportElementToPng(document.createElement("section"), "timetable-2569-2.png");
+    const exporting = exportElementToPng(document.createElement("section"), "timetable-2568-1.png");
     await Promise.resolve();
     expect(toPng).not.toHaveBeenCalled();
 
@@ -132,7 +131,7 @@ describe("exportElementToPng", () => {
     box.append(scroller);
     setSize(scroller, { scrollWidth: 800, clientWidth: 320 });
 
-    await expect(exportElementToPng(box, "timetable-2569-2.png")).rejects.toThrow("render failed");
+    await expect(exportElementToPng(box, "timetable-2568-1.png")).rejects.toThrow("render failed");
     expect(clickedLinks).toHaveLength(0);
     expect(box.style.width).toBe("");
   });

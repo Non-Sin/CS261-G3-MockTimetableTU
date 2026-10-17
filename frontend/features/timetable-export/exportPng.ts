@@ -3,7 +3,7 @@ import { toPng } from "html-to-image";
 // ใส่ attribute นี้ให้ element ที่ไม่ต้องการให้อยู่ในภาพ เช่น ปุ่มต่าง ๆ
 export const EXPORT_IGNORE_ATTR = "data-export-ignore";
 
-// ชื่อไฟล์ใช้ภาษาอังกฤษล้วน เช่น timetable-2569-2.png
+// ชื่อไฟล์ใช้ภาษาอังกฤษล้วน เช่น timetable-2568-1.png
 export const buildExportFileName = (academicYear: number, semester: number) =>
   `timetable-${academicYear}-${semester}.png`;
 
