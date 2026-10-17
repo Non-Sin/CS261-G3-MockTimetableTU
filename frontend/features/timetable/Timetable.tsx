@@ -4,9 +4,10 @@ import { mockTimetable } from "./mockData"
 import { getGridRange } from "./gridRange"
 import type { DayOfWeek } from "../courses/types"
 import type { TimetableEntry, TimeConflict } from "./types";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { mockCourses } from "../courses/mockData";
 import type { Course, CourseCategory } from "../courses/types";
+import ExportPngButton from "../timetable-export/ExportPngButton";
 
 // แปลงรหัสวันจากข้อมูลตารางให้เป็นชื่อภาษาไทยสำหรับแสดงในหน้าเว็บ
 const dayNames: Record<DayOfWeek, string> = {
@@ -67,6 +68,8 @@ const Timetable = () => {
   const [semester, setSemester] = useState(1);
   const [searchInput, setSearchInput] = useState("");
   const [conflictAlertDismissed, setConflictAlertDismissed] = useState(false);
+  // กล่องตารางเรียนจำลองที่ปุ่ม PNG (US5) ใช้ถ่ายเป็นภาพ
+  const timetableSectionRef = useRef<HTMLElement>(null);
 
   // กรองรายวิชาตามรหัสหรือชื่อ และหมวดวิชาที่ผู้ใช้เลือก
   const filteredCourses = mockCourses.filter((course) => {
@@ -235,12 +238,20 @@ const Timetable = () => {
               )}
 
             {/* ตารางรายสัปดาห์ แถบรายวิชา และสรุปจำนวนวิชากับหน่วยกิต */}
-            <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+            <section ref={timetableSectionRef} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-xl font-bold">ตารางเรียนจำลอง</h2>
-                <p className="text-sm text-slate-600">
-                  หน่วยกิต {totalCredits} / {mockTimetable.maxCredits}
-                </p>
+                <div className="flex items-start gap-3">
+                  <p className="py-2 text-sm text-slate-600">
+                    หน่วยกิต {totalCredits} / {mockTimetable.maxCredits}
+                  </p>
+                  <ExportPngButton
+                    targetRef={timetableSectionRef}
+                    academicYear={mockTimetable.academicYear}
+                    semester={mockTimetable.semester}
+                    hasConflicts={conflicts.length > 0}
+                  />
+                </div>
               </div>
 
               {entries.length === 0 && (
