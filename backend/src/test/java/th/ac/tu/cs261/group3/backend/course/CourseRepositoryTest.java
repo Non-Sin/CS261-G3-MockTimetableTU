@@ -35,7 +35,11 @@ class CourseRepositoryTest {
     /** UT-DAO-01 */
     @Test
     void search_byTermOnly_returnsOfferedCoursesSortedByCode() {
+<<<<<<< HEAD
         List<String> expected = List.of("CS111", "FE001", "LAS101", "MA211", "TU109");
+=======
+        List<String> expected = List.of("CS111", "FE001", "LAS101", "MA211", "TU107", "TU109");
+>>>>>>> fd86cedd0ffad13cf9368433c71a1cc2ce15e4a9
 
         // CS111 มี 2 กลุ่ม 4 คาบในภาคนี้ แต่ต้องได้ครั้งเดียว และไม่มี CS213 ที่เปิดเฉพาะ 2568/2
         assertEquals(expected, search(null, null));
@@ -65,7 +69,11 @@ class CourseRepositoryTest {
     /** UT-DAO-04 */
     @Test
     void search_byCategory_returnsOnlyThatCategory() {
+<<<<<<< HEAD
         assertEquals(List.of("LAS101", "TU109"), search(null, CourseCategory.GENERAL_EDUCATION));
+=======
+        assertEquals(List.of("LAS101", "TU107", "TU109"), search(null, CourseCategory.GENERAL_EDUCATION));
+>>>>>>> fd86cedd0ffad13cf9368433c71a1cc2ce15e4a9
         assertEquals(List.of("FE001"), search(null, CourseCategory.FREE_ELECTIVE));
         // CS111 ไม่ใช่หมวดศึกษาทั่วไป
         assertEquals(List.of(), search("cs", CourseCategory.GENERAL_EDUCATION));

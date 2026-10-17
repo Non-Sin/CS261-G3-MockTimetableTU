@@ -37,7 +37,11 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     @Query("""
             select s from Section s
             join fetch s.course c
+<<<<<<< HEAD
             join fetch s.slots
+=======
+            left join fetch s.slots
+>>>>>>> fd86cedd0ffad13cf9368433c71a1cc2ce15e4a9
             where c.courseCode in :courseCodes
               and s.academicYear = :academicYear and s.semester = :semester
             order by c.courseCode, s.sectionNo""")

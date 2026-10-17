@@ -19,7 +19,11 @@ public interface TimetableEntryRepository extends JpaRepository<TimetableEntry, 
             select e from TimetableEntry e
             join fetch e.section s
             join fetch s.course
+<<<<<<< HEAD
             join fetch s.slots
+=======
+            left join fetch s.slots
+>>>>>>> fd86cedd0ffad13cf9368433c71a1cc2ce15e4a9
             where e.timetable.timetableId = :timetableId
             order by e.entryId""")
     List<TimetableEntry> findByTimetableId(@Param("timetableId") Long timetableId);

@@ -6,6 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+<<<<<<< HEAD
+=======
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+>>>>>>> fd86cedd0ffad13cf9368433c71a1cc2ce15e4a9
 
 /**
  * ตารางเรียนจำลองของนักศึกษา 1 คนต่อ 1 ภาคเรียน
@@ -42,7 +47,13 @@ public class Timetable {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
+<<<<<<< HEAD
     public void touch() {
         this.updatedAt = OffsetDateTime.now();
+=======
+    /** ตัดเหลือวินาที ให้ JSON เป็น "2026-10-13T11:20:05+07:00" ตาม Spec ไม่มีเศษวินาที 7 หลัก */
+    public void touch() {
+        this.updatedAt = OffsetDateTime.now(ZoneId.of("Asia/Bangkok")).truncatedTo(ChronoUnit.SECONDS);
+>>>>>>> fd86cedd0ffad13cf9368433c71a1cc2ce15e4a9
     }
 }

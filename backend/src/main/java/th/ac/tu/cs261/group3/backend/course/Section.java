@@ -37,7 +37,11 @@ public class Section {
     @Column(nullable = false)
     private int semester;
 
+<<<<<<< HEAD
     /** Section "1" *-- "1..*" ScheduleSlot ใน DAO Class Diagram */
+=======
+    /** Section "1" *-- "0..*" ScheduleSlot ใน DAO Class Diagram (กลุ่มเรียน e-learning ไม่มีคาบ) */
+>>>>>>> fd86cedd0ffad13cf9368433c71a1cc2ce15e4a9
     @OneToMany(mappedBy = "section")
     private List<ScheduleSlot> slots = new ArrayList<>();
 }
