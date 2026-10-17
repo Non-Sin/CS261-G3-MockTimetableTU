@@ -1,6 +1,6 @@
 # US1-T06 — Extended API Class Diagram
 
-ขยายจาก [API Class Diagram](./US1-API-Class-Diagram.md) ของ US1-T05
+ขยายจาก [API Class Diagram](../T05/US1-API-Class-Diagram.md) ของ US1-T05
 
 ขยายจาก API Class Diagram ของ US1-T05 โดยเพิ่ม field `repository` ใน service (ที่เดิมเขียนว่า "ออกแบบใน US1-T06") controller, `CurrentStudentProvider`, `DemoStudentProvider` และ `GlobalExceptionHandler` ไม่เปลี่ยน จึงไม่วาดซ้ำ
 
@@ -9,6 +9,7 @@ classDiagram
     class CourseService {
         <<Service>>
         -courseRepository CourseRepository
+        -sectionRepository SectionRepository
         +search(academicYear, semester, q, category) List~CourseResponse~
     }
     class TimetableService {
@@ -42,6 +43,7 @@ classDiagram
     }
 
     CourseService --> CourseRepository
+    CourseService --> SectionRepository
     TimetableService --> SectionRepository
     TimetableService --> TimetableRepository
     TimetableService --> TimetableEntryRepository
@@ -57,4 +59,4 @@ classDiagram
 - [DAO Class Diagram](./US1-T06-DAO-Class-Diagram.md)
 - [Extended API Class Diagram](./US1-T06-Extended-API-Class-Diagram.md)
 - [ER Diagram (DB)](./US1-T06-ER-Diagram.md)
-- [DTO & API Spec](./US1-DTO-API-Spec.md) (US1-T05)
+- [DTO & API Spec](../T05/US1-DTO%20&%20API%20Spec.md) (US1-T05)

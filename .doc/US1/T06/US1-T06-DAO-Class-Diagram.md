@@ -13,6 +13,7 @@ classDiagram
     class SectionRepository {
         <<interface>>
         +findById(Long sectionId) Optional~Section~
+        +findByCourseCodesAndTerm(Collection~String~ courseCodes, int academicYear, int semester) List~Section~
     }
     class TimetableRepository {
         <<interface>>
@@ -66,7 +67,7 @@ classDiagram
     TimetableEntryRepository ..> TimetableEntry : คืน
 
     Course "1" *-- "1..*" Section : มีกลุ่มเรียน
-    Section "1" *-- "1..*" ScheduleSlot : มีคาบเรียน
+    Section "1" *-- "0..*" ScheduleSlot : มีคาบเรียน
     Timetable "1" *-- "0..*" TimetableEntry : มีวิชา
     TimetableEntry "0..*" --> "1" Section : เลือกกลุ่ม
     Course ..> CourseCategory
@@ -76,6 +77,9 @@ classDiagram
 | --- | --- | --- | --- |
 | `CourseRepository` | `search(...)` | `CourseService.search` | `GET /api/courses` |
 | `SectionRepository` | `findById` | `TimetableService.addEntry` | `POST /api/timetable/entries` |
+| `SectionRepository` | `findByCourseCodesAndTerm` | `CourseService.search` | `GET /api/courses` |
+
+`CourseRepository.search` คืนแค่วิชา `CourseService.search` จึงส่งรหัสวิชาที่ได้ต่อให้ `findByCourseCodesAndTerm` เพื่อดึงกลุ่มเรียนของภาคนั้นพร้อมคาบเรียนมาประกอบ `CourseResponse.sections` ทั้งหมดใช้ 2 query ต่อ request ไม่ใส่ collection `sections` ใน `Course` เพราะต้องกรองตามภาคทุกครั้งอยู่แล้ว
 | `TimetableRepository` | `findByStudentIdAndAcademicYearAndSemester` | `getTimetable`, `addEntry` | `GET /api/timetable`, `POST` |
 | `TimetableEntryRepository` | `findByTimetableId` | `getTimetable`, `addEntry` | `GET /api/timetable`, `POST` |
 
@@ -85,4 +89,4 @@ classDiagram
 - [DAO Class Diagram](./US1-T06-DAO-Class-Diagram.md)
 - [Extended API Class Diagram](./US1-T06-Extended-API-Class-Diagram.md)
 - [ER Diagram (DB)](./US1-T06-ER-Diagram.md)
-- [DTO & API Spec](./US1-DTO-API-Spec.md) (US1-T05)
+- [DTO & API Spec](../T05/US1-DTO%20&%20API%20Spec.md) (US1-T05)
