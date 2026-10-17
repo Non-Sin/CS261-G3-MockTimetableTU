@@ -64,4 +64,4 @@ erDiagram
 - [DAO Class Diagram](./US1-T06-DAO-Class-Diagram.md)
 - [Extended API Class Diagram](./US1-T06-Extended-API-Class-Diagram.md)
 - [ER Diagram (DB)](./US1-T06-ER-Diagram.md)
-- [DTO & API Spec](./US1-DTO-API-Spec.md) (US1-T05)
+- [DTO & API Spec](../T05/US1-DTO%20&%20API%20Spec.md) (US1-T05)
