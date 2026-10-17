@@ -11,7 +11,7 @@ const DATA_URL = "data:image/png;base64,TEST";
 const ERROR_TEXT = "ส่งออกภาพไม่สำเร็จ กรุณาลองใหม่";
 
 // กล่องตารางจำลองที่มีปุ่ม PNG อยู่ข้างใน เหมือนที่ US1 วางไว้
-const TimetableBox = ({ academicYear = 2569, semester = 2, hasConflicts = false }) => {
+const TimetableBox = ({ academicYear = 2568, semester = 1, hasConflicts = false }) => {
   const ref = useRef<HTMLElement>(null);
 
   return (
@@ -36,12 +36,15 @@ describe("ExportPngButton", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
-  it("[UT-UI-03] กดแล้วถ่ายกล่องตารางของ targetRef และดาวน์โหลด timetable-2569-2.png", async () => {
-    render(<TimetableBox />);
+  it.each([
+    [2568, 1, "timetable-2568-1.png"],
+    [2568, 2, "timetable-2568-2.png"],
+  ])("[UT-UI-03] ภาค %i/%i กดแล้วถ่ายกล่องตารางของ targetRef และดาวน์โหลด %s", async (academicYear, semester, fileName) => {
+    render(<TimetableBox academicYear={academicYear} semester={semester} />);
 
     await userEvent.click(pngButton());
 
-    await waitFor(() => expect(downloads).toEqual(["timetable-2569-2.png"]));
+    await waitFor(() => expect(downloads).toEqual([fileName]));
     expect(toPng).toHaveBeenCalledTimes(1);
     expect(vi.mocked(toPng).mock.calls[0][0]).toBe(screen.getByRole("region", { name: "ตารางเรียนจำลอง" }));
     expect(screen.queryByText(ERROR_TEXT)).not.toBeInTheDocument();
@@ -63,7 +66,7 @@ describe("ExportPngButton", () => {
 
     await waitFor(() => expect(pngButton()).toBeEnabled());
     expect(toPng).toHaveBeenCalledTimes(1);
-    expect(downloads).toEqual(["timetable-2569-2.png"]);
+    expect(downloads).toEqual(["timetable-2568-1.png"]);
   });
 
   it("[UT-UI-08] สร้างภาพไม่สำเร็จ แสดงข้อความ error แล้วกดใหม่ได้", async () => {
@@ -76,12 +79,12 @@ describe("ExportPngButton", () => {
     expect(pngButton()).toBeEnabled();
 
     await userEvent.click(pngButton());
-    await waitFor(() => expect(downloads).toEqual(["timetable-2569-2.png"]));
+    await waitFor(() => expect(downloads).toEqual(["timetable-2568-1.png"]));
     expect(screen.queryByText(ERROR_TEXT)).not.toBeInTheDocument();
   });
 
   it("[UT-UI-09] กล่องตารางยังไม่ render แสดงข้อความ error และไม่ดาวน์โหลด", async () => {
-    render(<ExportPngButton targetRef={createRef<HTMLElement>()} academicYear={2569} semester={2} hasConflicts={false} />);
+    render(<ExportPngButton targetRef={createRef<HTMLElement>()} academicYear={2568} semester={1} hasConflicts={false} />);
 
     await userEvent.click(pngButton());
 
