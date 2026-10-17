@@ -104,7 +104,7 @@ Id ทุกตัวเป็น `IDENTITY` ให้ test เก็บ id ท�
 
 ## Test Cases: CourseRepository.search
 
-ใช้กับ `GET /api/courses` กติกาตาม API Spec: `q` ตรงกับรหัสวิชาที่ขึ้นต้นด้วย `q` หรือชื่อวิชาที่มี `q` ไม่สนตัวพิมพ์ และผลเรียงตาม `courseCode`
+ใช้กับ `GET /api/courses` กติกาตาม API Spec: `q` ตรงกับรหัสวิชาที่ขึ้นต้นด้วย `q` หรือชื่อวิชาที่มีคำขึ้นต้นด้วย `q` (คำคั่นด้วยช่องว่างหรือ `-`) ไม่สนตัวพิมพ์ และผลเรียงตาม `courseCode`
 
 ### &#91;UT-DAO-01\] ค้นด้วยปีและภาคอย่างเดียว ได้ทุกวิชาที่เปิดในภาคนั้น
 
@@ -135,19 +135,21 @@ Id ทุกตัวเป็น `IDENTITY` ให้ test เก็บ id ท�
 - ข้อ 1 ได้ \[CS111\]
 - ข้อ 2 ได้ list ว่าง เพราะรหัสต้องขึ้นต้นด้วย `q` ไม่ใช่มี `q` อยู่กลางรหัส
 
-### &#91;UT-DAO-03\] q ตรงกับบางส่วนของชื่อวิชา ไม่สนตัวพิมพ์ รวมภาษาไทย
+### &#91;UT-DAO-03\] q ตรงกับคำที่ขึ้นต้นในชื่อวิชา ไม่สนตัวพิมพ์ รวมภาษาไทย
 
-**Related CoS:** Test case 1 · **Test method:** `search_nameContainsIgnoreCase_returnsMatchingCourses`
+**Related CoS:** Test case 1 · **Test method:** `search_nameWordPrefixIgnoreCase_returnsMatchingCourses`
 
 **Test Steps:**
 
 1. เรียก `search(2568, 1, "thinking", null)`
-2. เรียก `search(2568, 1, "ถ่ายภาพ", null)`
+2. เรียก `search(2568, 1, "การถ่าย", null)`
+3. เรียก `search(2568, 1, "ถ่ายภาพ", null)`
 
 **Expected Result:**
 
 - ข้อ 1 ได้ \[LAS101\]
 - ข้อ 2 ได้ \[FE001\] ยืนยันว่า parameter ภาษาไทยส่งเป็น `NVARCHAR` ไม่กลายเป็น `?`
+- ข้อ 3 ได้ list ว่าง เพราะ "ถ่ายภาพ" อยู่กลางคำ "การถ่ายภาพเบื้องต้น" ภาษาไทยไม่เว้นวรรคระหว่างคำ จึงไม่ใช่คำที่ขึ้นต้นด้วย `q`
 
 ### &#91;UT-DAO-04\] กรองตามหมวดวิชา และใช้ร่วมกับ q แบบ AND
 

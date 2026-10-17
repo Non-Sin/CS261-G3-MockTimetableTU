@@ -26,8 +26,7 @@ US1: เพิ่มวิชาเข้าไปในตารางเรี
 
 ## Test Approach
 - System Test ใช้ระบบจริงทั้งชุด ไม่ mock: หน้าเว็บ (Next.js) + backend (Spring Boot) + SQL Server รันด้วย `docker compose up -d --build` ตาม README
-- ใช้ข้อมูลรายวิชาภาคเรียน 2/2569 ตาม UI Prototype ซึ่งเป็นภาคเรียนที่ทีมตกลงใช้ ไม่รวมภาคฤดูร้อน
-- **ก่อนรันจริงใน US1-T19:** seed บน main ตอนนี้ยังเป็นภาคเรียน 1/2568 (`db/seed/V20261014_2010__seed_courses_2568_1.sql` จาก US1-T09) ต้องมี seed ภาคเรียน 2/2569 ที่มีรายวิชาใน "ข้อมูลทดสอบ" ก่อน
+- ใช้ข้อมูลรายวิชาภาคเรียน 1/2568 ตาม seed `db/seed/V20261014_2010__seed_courses_2568_1.sql` (US1-T09) ซึ่งเป็นภาคเรียนที่ทีมตกลงใช้ ไม่รวมภาคฤดูร้อน
 - การแจ้งเตือนบนหน้าเว็บมีเฉพาะกรณีเวลาชน (ST-04) ส่วนหน่วยกิตเกินไม่มีข้อความแจ้งเตือน แต่ระบบไม่อนุญาตให้เพิ่มวิชา (ST-06) ตามข้อสรุปการประชุมทีม
 - ผู้ใช้คือนักศึกษา demo `6609000000` จาก `app.timetable.demo-student-id` (ระหว่างที่ US3 ยังไม่มี login)
 - Test case ต่อเนื่องกันตามลำดับ ST-01 ถึง ST-09 เพราะสถานะตารางสะสมไปเรื่อย ๆ ต้องล้างตารางก่อนเริ่มทุกครั้ง
@@ -42,7 +41,7 @@ US1: เพิ่มวิชาเข้าไปในตารางเรี
 | เปิดระบบ | `cp .env.example .env` แล้ว `docker compose up -d --build` |
 | หน้าเว็บ | http://localhost:3000 |
 | API | http://localhost:8080 |
-| ภาคเรียน | ปีการศึกษา 2569 ภาคเรียน 2 |
+| ภาคเรียน | ปีการศึกษา 2568 ภาคเรียน 1 |
 | นักศึกษา | `6609000000` (demo) |
 
 **ล้างตารางก่อนเริ่ม** (ลบ `timetable` แล้ว `timetable_entry` ถูกลบตามด้วย ON DELETE CASCADE):
@@ -54,7 +53,7 @@ docker exec sqlserver bash -c '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa 
 **หา `sectionId`** ของแต่ละกลุ่มเรียน (ค่า id ขึ้นกับลำดับที่ seed ถูก insert):
 
 ```
-GET http://localhost:8080/api/courses?academicYear=2569&semester=2&q=CS111
+GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=CS111
 ```
 
 **คำสั่งตรวจ DB** (ใช้ในหลาย test case):
@@ -64,11 +63,11 @@ SELECT t.timetable_id, t.updated_at, s.course_code, s.section_no
 FROM timetable t
 LEFT JOIN timetable_entry e ON e.timetable_id = t.timetable_id
 LEFT JOIN section s ON s.section_id = e.section_id
-WHERE t.student_id = N'6609000000' AND t.academic_year = 2569 AND t.semester = 2
+WHERE t.student_id = N'6609000000' AND t.academic_year = 2568 AND t.semester = 1
 ORDER BY e.entry_id;
 ```
 
-**ข้อมูลทดสอบ** (ภาคเรียน 2/2569 ทุกวิชา 3 หน่วยกิต):
+**ข้อมูลทดสอบ** (ตาม seed ภาคเรียน 1/2568 ทุกวิชา 3 หน่วยกิต):
 
 | รหัสวิชา | Sec | วัน | เวลา | ใช้ใน |
 | --- | --- | --- | --- | --- |
@@ -80,7 +79,7 @@ ORDER BY e.entry_id;
 | CS180 | 820001 | จันทร์ | 13:30 - 16:30 | ST-05 |
 | TU101 | 900001 | พุธ | 13:30 - 16:30 | ST-05 |
 | TU106 | 540001 | พฤหัสบดี | 13:30 - 16:30 | ST-05 |
-| ST216 | 040001 | อังคาร, พฤหัสบดี | 13:00 - 15:00 | ST-06 (เกิน 22 หน่วยกิต) |
+| ST216 | 040001 | อังคาร | 13:30 - 16:30 | ST-06 (เกิน 22 หน่วยกิต) |
 
 ## Test Cases
 
@@ -92,10 +91,10 @@ ORDER BY e.entry_id;
 
 **Preconditions:**
 - ล้างตารางของนักศึกษา `6609000000` แล้ว
-- เปิดหน้าเว็บ เลือกภาคเรียน 2 ปีการศึกษา 2569
+- เปิดหน้าเว็บ เลือกภาคเรียน 1 ปีการศึกษา 2568
 
 **Test Steps:**
-1. ตรวจว่าตารางว่าง และ `GET /api/timetable?academicYear=2569&semester=2` ได้ `entries: []`, `updatedAt: null`
+1. ตรวจว่าตารางว่าง และ `GET /api/timetable?academicYear=2568&semester=1` ได้ `entries: []`, `updatedAt: null`
 2. ค้นหา "CS111" แล้วกด "+ เพิ่มวิชา" ที่ Sec 030001
 3. ตรวจหน้าเว็บ, API response และ DB
 
@@ -246,13 +245,13 @@ ORDER BY e.entry_id;
 - ผ่าน ST-08 (มี 7 วิชา 21 หน่วยกิต)
 
 **Test Steps:**
-1. รีเฟรชหน้าเว็บ (ภาคเรียน 2/2569)
-2. เปลี่ยนตัวเลือกเป็นภาคเรียน 1 ปีการศึกษา 2569
-3. เปลี่ยนกลับเป็นภาคเรียน 2/2569
+1. รีเฟรชหน้าเว็บ (ภาคเรียน 1/2568)
+2. เปลี่ยนตัวเลือกเป็นภาคเรียน 2 ปีการศึกษา 2568
+3. เปลี่ยนกลับเป็นภาคเรียน 1/2568
 
 **Expected Result:**
-- ข้อ 1: ตารางแสดง 7 วิชาเหมือนก่อนรีเฟรช แถบเตือนเวลาชน TU109/LAS101 ยังอยู่ `GET /api/timetable?academicYear=2569&semester=2` ได้ `entries` 7 รายการ
-- ข้อ 2: ตารางว่าง `GET /api/timetable?academicYear=2569&semester=1` ได้ `entries: []`, `updatedAt: null`
+- ข้อ 1: ตารางแสดง 7 วิชาเหมือนก่อนรีเฟรช แถบเตือนเวลาชน TU109/LAS101 ยังอยู่ `GET /api/timetable?academicYear=2568&semester=1` ได้ `entries` 7 รายการ
+- ข้อ 2: ตารางว่าง `GET /api/timetable?academicYear=2568&semester=2` ได้ `entries: []`, `updatedAt: null`
 - ข้อ 3: กลับมาเห็น 7 วิชาเหมือนเดิม
 
 ## สรุปความครอบคลุม

@@ -5,7 +5,7 @@ US2 **ไม่เปลี่ยน schema และไม่มี migration �
 ```mermaid
 erDiagram
     COURSE ||--|{ SECTION : "มีกลุ่มเรียน"
-    SECTION ||--|{ SCHEDULE_SLOT : "มีคาบเรียน"
+    SECTION ||--o{ SCHEDULE_SLOT : "มีคาบเรียน"
     TIMETABLE ||--o{ TIMETABLE_ENTRY : "มีวิชา"
     SECTION ||--o{ TIMETABLE_ENTRY : "ถูกเลือก"
 
