@@ -2,7 +2,7 @@
 
 ลำดับการทำงานระหว่าง UI, API, repository (DAO) และ DB ของ `DELETE /api/timetable/entries?entryIds=` และ `DELETE /api/timetable/entries/{entryId}` ต่อจาก US2-T05
 
-ข้อกำหนดที่ใช้ตาม [DTO & API Spec](../T05/US2-DTO%20&%20API%20Spec.md):
+ข้อกำหนดที่ใช้ตาม [DTO & API Spec](../T05/US2-DTO-API-Spec.md):
 
 - ลำดับตรวจใน `removeEntries`: `entryIds` ว่าง (400) → ตัด id ซ้ำ → หา entry ของนักศึกษาคนนี้ (404) → อยู่ตารางเดียวกัน (400) → ลบ, `touch()` ตาราง แล้วคืนตาราง (200)
 - `removeEntry(studentId, entryId)` เรียก `removeEntries(studentId, List.of(entryId))` ทั้งสอง endpoint จึงใช้ flow เดียวกันในแผนภาพนี้
@@ -96,5 +96,5 @@ sequenceDiagram
 - [DAO Class Diagram](./US2-T06-DAO-Class-Diagram.md)
 - [Extended API Class Diagram](./US2-T06-Extended-API-Class-Diagram.md)
 - [ER Diagram (DB)](./US2-T06-ER-Diagram.md)
-- [DTO & API Spec](../T05/US2-DTO%20&%20API%20Spec.md) (US2-T05)
+- [DTO & API Spec](../T05/US2-DTO-API-Spec.md) (US2-T05)
 - [US1-T06 — Sequence Diagram](../../US1/T06/US1-T06-Sequence-Diagram.md)
