@@ -25,7 +25,19 @@ spring:
         format_sql: true
         use_nationalized_character_data: true   # String → NVARCHAR รองรับภาษาไทย
 
+  # --- Flyway ---
+  # db/seed เป็นข้อมูลรายวิชาสำหรับ dev/Postman แยกจาก schema เพื่อให้ DAO test ใช้แค่ db/migration
+  flyway:
+    locations:
+      - classpath:db/migration
+      - classpath:db/seed
+
 # --- CORS ---
 app:
   cors:
     allowed-origins: "http://localhost:3000"
+
+  # --- Timetable ---
+  timetable:
+    max-credits: 22                    # หน่วยกิตสูงสุดต่อภาคเรียน (CREDIT_LIMIT_EXCEEDED)
+    demo-student-id: "6609000000"      # ใช้จนกว่า US3 จะมี login

@@ -1,5 +1,11 @@
-import { ItemsPage } from "@/features/items/components/ItemsPage";
+import Timetable from "@/features/timetable/Timetable"
 
-export default function Home() {
-  return <ItemsPage />;
+
+const page = () => {
+  return (
+    <div>
+      <Timetable/>
+    </div>
+  )
 }
+export default page
