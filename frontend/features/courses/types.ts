@@ -14,7 +14,8 @@ export type CourseCategory =
   | "GENERAL_EDUCATION"
   | "FREE_ELECTIVE";
 
-// คาบเรียนหนึ่งช่วง พร้อมวัน เวลา และห้องเรียน
+// รูปแบบข้อมูลหนึ่งคาบจาก Course/Timetable API; startTime/endTime ใช้รูป HH:mm
+// รายการนี้ถูกใช้ทั้งแสดงรายละเอียดใน CourseCard และวางตำแหน่งใน TimetableGrid
 export type ScheduleSlot = {
   dayOfWeek: DayOfWeek;
   startTime: string;
@@ -22,7 +23,8 @@ export type ScheduleSlot = {
   room: string;
 };
 
-// กลุ่มเรียนของรายวิชา ซึ่งอาจมีหลายคาบในสัปดาห์
+// Section ที่ผู้ใช้เลือกเพิ่ม: หนึ่ง section อาจมีหลาย ScheduleSlot หลายวัน
+// CourseCard ส่ง sectionId กลับไปยัง hook; hook นำ schedules ของ section นี้ลงตาราง
 export type Section = {
   sectionId: number;
   sectionNo: string;
@@ -30,7 +32,7 @@ export type Section = {
   schedules: ScheduleSlot[];
 };
 
-// ข้อมูลรายวิชาและกลุ่มเรียนที่เปิดสอน
+// รูปแบบกลางของข้อมูลวิชา ใช้ร่วมกันได้ทั้งข้อมูลจำลองและ response จาก courses API
 export type Course = {
   courseCode: string;
   courseName: string;
