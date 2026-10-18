@@ -30,4 +30,4 @@ US4 ทำอะไรกับแต่ละตาราง
 - [DAO Class Diagram](./US4-T06-DAO-Class-Diagram.md)
 - [Extended API Class Diagram](./US4-T06-Extended-API-Class-Diagram.md)
 - [ER Diagram (DB)](./US4-T06-ER-Diagram.md)
-- [DTO & API Spec](../US4-DTO-&-API-Spec.md)
+- [DTO & API Spec](../T05/US4-DTO%20%26%20API%20Spec.md) (US4-T05)
