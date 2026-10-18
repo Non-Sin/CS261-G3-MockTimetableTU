@@ -7,6 +7,12 @@ import CourseCard from "./CourseCard";
 type CourseSearchPanelProps = {
   addedCourseCodes: string[];
   addError: string | null;
+  totalCredits: number;
+  maxCredits: number;
+  academicYear: number;
+  semester: number;
+  onAcademicYearChange: (academicYear: number) => void;
+  onSemesterChange: (semester: number) => void;
   onAddCourse: (course: Course, sectionId: number) => void;
 };
 
@@ -16,18 +22,21 @@ type CourseSearchPanelProps = {
 const CourseSearchPanel = ({
   addedCourseCodes,
   addError,
+  totalCredits,
+  maxCredits,
+  academicYear,
+  semester,
+  onAcademicYearChange,
+  onSemesterChange,
   onAddCourse,
 }: CourseSearchPanelProps) => {
   // searchInput คือข้อความที่กำลังพิมพ์ ส่วน query คือคำค้นที่ส่งใช้หลัง submit
   // แยกกันเพื่อให้ผู้ใช้พิมพ์ได้ก่อน และค้นหาเมื่อกดปุ่ม/Enter เท่านั้น
   const [query, setQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  // state เหล่านี้ควบคุมตัวกรองและกลุ่มเรียนที่เลือก; academicYear/semester
-  // แสดงตัวเลือกสำหรับ API query ในอนาคต แม้ข้อมูล mock ตอนนี้มีชุดเดียว
+  // state เหล่านี้เป็นค่าที่ใช้กรองรายการและเลือกกลุ่มเรียนภายใน panel
   const [categoryFilter, setCategoryFilter] = useState<CourseCategory | "ALL">("ALL");
   const [selectedSectionIds, setSelectedSectionIds] = useState<Record<string, number>>({});
-  const [academicYear, setAcademicYear] = useState(2568);
-  const [semester, setSemester] = useState(1);
 
   // กรองข้อมูลต้นทางในฝั่ง client ด้วยกฎค้นหาและหมวด ก่อนส่งผลไปวาดเป็น CourseCard
   const filteredCourses = mockCourses.filter((course) => {
@@ -46,7 +55,7 @@ const CourseSearchPanel = ({
         <div className="flex flex-wrap gap-2">
           <select
             value={semester}
-            onChange={(event) => setSemester(Number(event.target.value))}
+            onChange={(event) => onSemesterChange(Number(event.target.value))}
             aria-label="ภาคเรียน"
             className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
           >
@@ -55,7 +64,7 @@ const CourseSearchPanel = ({
 
           <select
             value={academicYear}
-            onChange={(event) => setAcademicYear(Number(event.target.value))}
+            onChange={(event) => onAcademicYearChange(Number(event.target.value))}
             aria-label="ปีการศึกษา"
             className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
           >
@@ -123,6 +132,9 @@ const CourseSearchPanel = ({
                 key={course.courseCode}
                 course={course}
                 alreadyAdded={addedCourseCodes.includes(course.courseCode)}
+                wouldExceedCreditLimit={
+                  totalCredits + course.credits > maxCredits
+                }
                 selectedSectionId={
                   selectedSectionIds[course.courseCode] ?? course.sections[0]?.sectionId
                 }

@@ -4,6 +4,7 @@ import { DAY_NAMES } from "../dayNames";
 type CourseCardProps = {
   course: Course;
   alreadyAdded: boolean;
+  wouldExceedCreditLimit: boolean;
   selectedSectionId?: number;
   onSectionChange: (courseCode: string, sectionId: number) => void;
   onAdd: (course: Course, sectionId: number) => void;
@@ -14,6 +15,7 @@ type CourseCardProps = {
 const CourseCard = ({
   course,
   alreadyAdded,
+  wouldExceedCreditLimit,
   selectedSectionId,
   onSectionChange,
   onAdd,
@@ -68,14 +70,16 @@ const CourseCard = ({
 
         <button
           type="button"
-          disabled={alreadyAdded}
+          disabled={alreadyAdded || wouldExceedCreditLimit}
           onClick={() => {
             if (selectedSectionId !== undefined) {
               // ส่งทั้งวิชาและ sectionId ให้ panel แล้วต่อถึง reducer ใน useTimetable
               onAdd(course, selectedSectionId);
             }
           }}
-          className="rounded-lg bg-rose-500 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-emerald-600"
+          className={`rounded-lg bg-rose-500 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed ${
+            alreadyAdded ? "disabled:bg-emerald-600" : "disabled:bg-slate-300"
+          }`}
         >
           {alreadyAdded ? "เพิ่มแล้ว" : "+ เพิ่มวิชา"}
         </button>

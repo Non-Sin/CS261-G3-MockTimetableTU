@@ -15,10 +15,14 @@ const Timetable = () => {
     conflictAlertDismissed,
     totalCredits,
     maxCredits,
+    academicYear,
+    semester,
     conflicts,
     addCourse,
     removeCourse,
     dismissConflictAlert,
+    setAcademicYear,
+    setSemester,
   } = useTimetable();
 
   return (
@@ -65,6 +69,12 @@ const Timetable = () => {
         <CourseSearchPanel
           addedCourseCodes={entries.map((entry) => entry.courseCode)}
           addError={addError}
+          totalCredits={totalCredits}
+          maxCredits={maxCredits}
+          academicYear={academicYear}
+          semester={semester}
+          onAcademicYearChange={setAcademicYear}
+          onSemesterChange={setSemester}
           onAddCourse={addCourse}
         />
       </div>

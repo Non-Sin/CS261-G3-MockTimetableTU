@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import type { Course } from "../../courses/types";
 import { findConflicts } from "../utils/conflicts";
 import { mockTimetable } from "../mockData";
@@ -98,6 +98,10 @@ const timetableReducer = (
 // Hook นี้เป็นขอบเขตเชื่อม state กับ UI: Timetable เรียกใช้ แล้วส่งค่าที่คืนให้ลูกแต่ละส่วน
 export const useTimetable = () => {
   const [state, dispatch] = useReducer(timetableReducer, initialState);
+  // เก็บภาคเรียนไว้ข้าง state ของตาราง เพื่อให้ Timetable และส่วนค้นหาวิชา
+  // ใช้ค่าเดียวกันตอนเลือกข้อมูลและตอนเชื่อม GET /api/timetable ในภายหลัง
+  const [academicYear, setAcademicYear] = useState(2568);
+  const [semester, setSemester] = useState(1);
   // หน่วยกิตเป็นค่าที่คำนวณจาก entries เสมอ จึงไม่เก็บซ้ำใน state ให้เสี่ยงไม่ตรงกัน
   const totalCredits = state.entries.reduce(
     (total, entry) => total + entry.credits,
@@ -110,6 +114,10 @@ export const useTimetable = () => {
     conflictAlertDismissed: state.conflictAlertDismissed,
     totalCredits,
     maxCredits: mockTimetable.maxCredits,
+    academicYear,
+    semester,
+    setAcademicYear,
+    setSemester,
     // ตรวจเวลาชนจากตารางปัจจุบัน; ผลนี้ถูกส่งไปทั้ง ConflictAlert และ TimetableGrid
     conflicts: findConflicts(state.entries),
     // ฟังก์ชันเหล่านี้แปลง event จาก component เป็น action ให้ reducer จัดการ
