@@ -51,7 +51,7 @@ classDiagram
 
     TimetableResponse "1" *-- "0..*" TimetableEntryResponse
     TimetableResponse "1" *-- "0..*" TimeConflictResponse
-    TimetableEntryResponse "1" *-- "1..*" ScheduleSlotResponse
+    TimetableEntryResponse "1" *-- "0..*" ScheduleSlotResponse
 ```
 
 | Type | เจ้าของ | US2 ใช้อย่างไร |
@@ -69,6 +69,6 @@ classDiagram
 
 ## เอกสารที่เกี่ยวข้อง
 
-- [DTO & API Spec](./US2-DTO%20&%20API%20Spec.md)
+- [DTO & API Spec](./US2-DTO-API-Spec.md)
 - [API Class Diagram](./US2-API-Class-Diagram.md)
 - [US1 — DTO Class Diagram](../../US1/T05/US1-DTO-Class-Diagram.md)
