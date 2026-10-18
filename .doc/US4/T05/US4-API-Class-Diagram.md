@@ -1,45 +1,27 @@
 # US4 — API Class Diagram
 
-US4 เพิ่มการ Logout ฝั่ง backend โดยใช้ Authentication / Session ที่มีอยู่จาก US3 ไม่สร้างระบบ Authentication ใหม่ และเพิ่ม API สำหรับให้ผู้ใช้ยุติการเข้าสู่ระบบ
+US4 เพิ่มการ Logout โดยใช้ Authentication / Session ที่มีอยู่จาก US3 ไม่สร้างระบบ Authentication ใหม่ การออกจากระบบเป็นแบบ **stateless** คือ backend ไม่เก็บและไม่ยกเลิก token ฝั่ง server ส่วน Frontend เป็นฝ่ายล้าง token และ authentication state
 
 ```mermaid
 classDiagram
     direction TB
 
     class AuthController {
-        <<US3 RestController>>
+        <<US3 RestController, extended in US4>>
         -authService: AuthService
         +login(request: LoginRequest) LoginResponse
         +logout() void
     }
 
     class AuthService {
-        <<US3 Service>>
-        -tuApiClient: TuApiClient
-        -userRepository: UserRepository
-        -loginAttemptService: LoginAttemptService
+        <<US3 Service, extended in US4>>
         +authenticate(request: LoginRequest) LoginResponse
         +logout() void
-        -verifyTuStudentStatus(tuResponse: TuAuthDto) void
-    }
-
-    class CurrentStudentProvider {
-        <<US1 interface>>
-        +currentStudentId() String
-    }
-
-    class GlobalExceptionHandler {
-        <<มีอยู่แล้ว ไม่แก้>>
-        +handleBusinessRule(ex: BusinessRuleException) ProblemDetail
-    }
-
-    class BusinessRuleException {
-        <<มีอยู่แล้ว>>
-        +BusinessRuleException(status: HttpStatus, code: String, detail: String, properties: Map)
     }
 
     class authApi {
-        <<US4 frontend module>>
+        <<US3 frontend module, extended in US4>>
+        +login(req: LoginRequest) Promise~LoginResponse~
         +logout() Promise~void~
     }
 
@@ -49,38 +31,32 @@ classDiagram
     }
 
     class SessionProvider {
-        <<US3 Authentication>>
+        <<US4 frontend>>
         +clearSession() void
     }
 
     authApi ..> apiFetch : เรียก
     apiFetch ..> AuthController : POST /api/auth/logout
     AuthController --> AuthService : logout()
-    AuthService ..> SessionProvider : ยุติ Session
-    authApi --> SessionProvider : clearSession()
-    AuthController ..> BusinessRuleException : throws
-    GlobalExceptionHandler ..> BusinessRuleException : จัดการ
+    authApi --> SessionProvider : clearSession() หลัง Logout สำเร็จ
+    apiFetch --> SessionProvider : clearSession() เมื่อได้ 401
 ```
 
 ## ส่วนประกอบ
 
-| ส่วน | หน้าที่ |
-| --- | --- |
-| AuthController | `@RestController @RequestMapping("/api/auth")` · เพิ่ม `logout = POST /logout` เพื่อรับคำขอออกจากระบบจาก Frontend |
-| AuthService | จัดการกระบวนการ Logout โดยใช้ Authentication / Session ที่มีอยู่จาก US3 และยุติ Session ของผู้ใช้ปัจจุบัน |
-| SessionProvider | ส่วนที่จัดการ Session / Authentication ของผู้ใช้ปัจจุบัน ใช้สำหรับยุติ Session เมื่อ Logout |
-| authApi | frontend module สำหรับเรียก `POST /api/auth/logout` และจัดการผลลัพธ์หลัง Logout |
-| apiFetch | (`lib/api.ts` มีอยู่แล้ว) ฟังก์ชันกลางสำหรับเรียก API และจัดการ Authentication / HTTP Error |
-| GlobalExceptionHandler | (มีอยู่แล้ว) จัดการ `BusinessRuleException` |
-| BusinessRuleException | (มีอยู่แล้ว) ใช้สำหรับ Error ที่เกิดจากกฎของระบบ |
+| ส่วน | ฝั่ง | หน้าที่ |
+| --- | --- | --- |
+| AuthController | Backend | `@RestController @RequestMapping("/api/auth")` เพิ่ม `logout = POST /logout` ตอบ `204 No Content` |
+| AuthService | Backend | เพิ่ม `logout()` ซึ่งไม่ยกเลิก token และไม่เข้าถึง DB เพราะ US4 เป็น stateless token ยังใช้ได้จนหมดอายุเอง |
+| authApi | Frontend | เพิ่ม `logout()` เรียก `POST /api/auth/logout` แล้วสั่ง `SessionProvider.clearSession()` |
+| apiFetch | Frontend | (`lib/api.ts` มีอยู่แล้ว) ส่ง `Authorization: Bearer <token>` และเมื่อได้ `401` ให้ล้าง Session แล้วกลับหน้า Login |
+| SessionProvider | **Frontend เท่านั้น** | เก็บ token และ authentication state ฝั่ง Client มี `clearSession()` ล้างค่าและพากลับหน้า Login |
 
 ## ความสัมพันธ์
 
-- `authApi` เรียก `apiFetch`
-- `apiFetch` เรียก `AuthController` ผ่าน `POST /api/auth/logout`
+- `authApi` เรียก `apiFetch` และ `apiFetch` เรียก `AuthController` ผ่าน `POST /api/auth/logout`
 - `AuthController` เรียก `AuthService.logout()`
-- `AuthService` ใช้ `SessionProvider` เพื่อยุติ Session
-- หลัง Logout สำเร็จ `authApi` สั่ง `SessionProvider.clearSession()` เพื่อล้าง Authentication ฝั่ง Client
-- `GlobalExceptionHandler` จัดการ `BusinessRuleException`
+- **`SessionProvider` อยู่ฝั่ง Frontend เท่านั้น** ถูกเรียกโดย `authApi` และ `apiFetch` ส่วน `AuthService` (backend) ไม่เกี่ยวข้องกับ `SessionProvider`
+- Session หมดอายุ: `apiFetch` ได้ `401` จาก API ใดๆ แล้วเรียก `clearSession()` ไม่ต้องเรียก Logout API
 
-**หมายเหตุ:** `AuthController`, `AuthService`, `apiFetch` และระบบ Authentication หลักเป็นส่วนที่ต่อยอดจาก US3; US4 เพิ่มเฉพาะความสามารถ Logout ไม่สร้าง Authentication ใหม่
+**หมายเหตุ:** `AuthController`, `AuthService`, `apiFetch` และระบบ Authentication หลักต่อยอดจาก US3 US4 เพิ่มเฉพาะความสามารถ Logout ไม่สร้าง Authentication ใหม่ และไม่วาด `CurrentStudentProvider`, `BusinessRuleException`, `GlobalExceptionHandler` เพราะ Logout ไม่ใช้ (`401` มาจาก Authentication ของ US3)
