@@ -1,6 +1,6 @@
 # US4 — DTO Class Diagram
 
-UUS4 ไม่เพิ่ม DTO ใหม่ เนื่องจาก Logout ไม่มีข้อมูลที่ต้องรับหรือส่งใน Request / Response Body
+US4 ไม่มี Request DTO หรือ Response DTO ใหม่สำหรับการ Logout เนื่องจาก `POST /api/auth/logout` ไม่รับ Request Body และตอบกลับด้วย `204 No Content` (ไม่มี Response Body)
 
 ```mermaid
 classDiagram
