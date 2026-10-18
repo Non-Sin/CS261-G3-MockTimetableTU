@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Course, CourseCategory } from "../types";
-import { matchesCourseQuery } from "../courseSearch";
-import { mockCourses } from "../mockData";
+import { fetchCourses } from "../api";
 import CourseCard from "./CourseCard";
 
 type CourseSearchPanelProps = {
   addedCourseCodes: string[];
   addError: string | null;
+  // กดเพิ่มไม่ได้ชั่วคราว เช่น ตารางยังโหลดไม่เสร็จหรือกำลังบันทึกวิชาก่อนหน้า
+  addDisabled: boolean;
   totalCredits: number;
   maxCredits: number;
   academicYear: number;
@@ -17,11 +18,11 @@ type CourseSearchPanelProps = {
 };
 
 // รับรหัสวิชาที่อยู่ในตารางและ callback สำหรับเพิ่มจากหน้าหลัก Timetable
-// แหล่งข้อมูลรายการในปัจจุบันคือ mockCourses ใน mockData.ts; เมื่อ backend พร้อม
-// จุดนี้เปลี่ยนไปโหลดผ่าน features/courses/api.ts โดย CourseCard ยังรับ Course รูปแบบเดิมได้
+// รายการวิชาโหลดผ่าน GET /api/courses (features/courses/api.ts) ตามภาคเรียน คำค้น และหมวดที่เลือก
 const CourseSearchPanel = ({
   addedCourseCodes,
   addError,
+  addDisabled,
   totalCredits,
   maxCredits,
   academicYear,
@@ -38,14 +39,48 @@ const CourseSearchPanel = ({
   const [categoryFilter, setCategoryFilter] = useState<CourseCategory | "ALL">("ALL");
   const [selectedSectionIds, setSelectedSectionIds] = useState<Record<string, number>>({});
 
-  // กรองข้อมูลต้นทางในฝั่ง client ด้วยกฎค้นหาและหมวด ก่อนส่งผลไปวาดเป็น CourseCard
-  const filteredCourses = mockCourses.filter((course) => {
-    const matchesQuery = matchesCourseQuery(course, query);
-    const matchesCategory =
-      categoryFilter === "ALL" || course.category === categoryFilter;
+  // เก็บรายวิชาคู่กับภาคเรียนที่โหลดมา แสดงเฉพาะของภาคที่เลือกอยู่
+  // ตอนเปลี่ยนภาค รายวิชาของภาคเก่าจะไม่ถูกแสดงให้กดเพิ่ม ระหว่างรอหรือเมื่อโหลดภาคใหม่ไม่สำเร็จ
+  const termKey = `${academicYear}/${semester}`;
+  const [loadedCourses, setLoadedCourses] = useState<{ termKey: string; courses: Course[] } | null>(null);
+  const [errorTermKey, setErrorTermKey] = useState<string | null>(null);
+  const courses = loadedCourses?.termKey === termKey ? loadedCourses.courses : [];
+  const coursesError = errorTermKey === termKey;
+  const coursesLoading = loadedCourses?.termKey !== termKey && !coursesError;
 
-    return matchesQuery && matchesCategory;
-  });
+  // ค้นหารายวิชาของภาคเรียนที่เลือก ตามคำค้นและหมวดวิชา (backend เป็นคนกรองแบบคำขึ้นต้น)
+  // ไม่ใช้ผลของคำค้นเก่าที่ตอบกลับมาช้า
+  useEffect(() => {
+    let ignore = false;
+
+    fetchCourses({
+      academicYear,
+      semester,
+      q: query,
+      category: categoryFilter === "ALL" ? undefined : categoryFilter,
+    })
+      .then((data) => {
+        if (ignore) return;
+        setLoadedCourses({ termKey: `${academicYear}/${semester}`, courses: data });
+        setErrorTermKey(null);
+      })
+      .catch(() => {
+        if (!ignore) setErrorTermKey(`${academicYear}/${semester}`);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [academicYear, semester, query, categoryFilter]);
+
+  // กลุ่มที่เลือกไว้ต้องอยู่ในรายวิชาของภาคปัจจุบัน ไม่งั้นใช้กลุ่มแรก
+  // (sectionId ของแต่ละภาคต่างกัน ค่าที่เลือกไว้ในภาคเก่าจึงใช้กับภาคใหม่ไม่ได้)
+  const validSectionId = (course: Course) => {
+    const selected = selectedSectionIds[course.courseCode];
+    return course.sections.some((section) => section.sectionId === selected)
+      ? selected
+      : course.sections[0]?.sectionId;
+  };
 
   return (
     <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
@@ -59,7 +94,9 @@ const CourseSearchPanel = ({
             aria-label="ภาคเรียน"
             className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
           >
+            {/* ภาค 1 และ 2 ตาม seed (ไม่รวมภาคฤดูร้อน) */}
             <option value={1}>ภาคเรียน 1</option>
+            <option value={2}>ภาคเรียน 2</option>
           </select>
 
           <select
@@ -77,7 +114,7 @@ const CourseSearchPanel = ({
         className="mt-4 flex flex-col gap-2 sm:flex-row"
         onSubmit={(event) => {
           event.preventDefault();
-          // เก็บคำค้นที่ submit เพื่อให้ผลกรองอัปเดตจาก filteredCourses
+          // เก็บคำค้นที่ submit แล้วโหลดรายการใหม่จาก API
           setQuery(searchInput);
         }}
       >
@@ -110,6 +147,12 @@ const CourseSearchPanel = ({
         <option value="FREE_ELECTIVE">วิชาเลือกเสรี</option>
       </select>
 
+      {coursesError && (
+        <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+          โหลดรายวิชาไม่สำเร็จ กรุณาลองใหม่
+        </p>
+      )}
+
       {addError && (
         <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">
           {addError}
@@ -117,17 +160,21 @@ const CourseSearchPanel = ({
       )}
 
       <div className="mt-4 space-y-3">
-        <p className="mt-4 text-sm text-slate-500">
-          พบ {filteredCourses.length} รายวิชา
-        </p>
-        {filteredCourses.length === 0 ? (
+        {coursesLoading ? (
+          <p className="mt-4 text-sm text-slate-500">กำลังโหลดรายวิชา…</p>
+        ) : (
+          <p className="mt-4 text-sm text-slate-500">
+            พบ {courses.length} รายวิชา
+          </p>
+        )}
+        {coursesLoading || coursesError ? null : courses.length === 0 ? (
           <p className="mt-4 rounded-xl bg-slate-50 p-4 text-center text-sm text-slate-500">
             ไม่พบรายวิชาที่ตรงกับคำที่ค้นหาหรือหมวดที่เลือก
           </p>
         ) : (
           <div className="mt-4 space-y-3">
             {/* ส่งข้อมูลวิชาและ section ที่ผู้ใช้เลือกให้การ์ดแสดง/เพิ่มเข้าตาราง */}
-            {filteredCourses.map((course) => (
+            {courses.map((course) => (
               <CourseCard
                 key={course.courseCode}
                 course={course}
@@ -135,9 +182,8 @@ const CourseSearchPanel = ({
                 wouldExceedCreditLimit={
                   totalCredits + course.credits > maxCredits
                 }
-                selectedSectionId={
-                  selectedSectionIds[course.courseCode] ?? course.sections[0]?.sectionId
-                }
+                addDisabled={addDisabled}
+                selectedSectionId={validSectionId(course)}
                 onSectionChange={(courseCode, sectionId) =>
                   setSelectedSectionIds((current) => ({
                     ...current,

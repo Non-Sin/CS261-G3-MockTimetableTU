@@ -10,6 +10,9 @@ import { useTimetable } from "./hooks/useTimetable";
 const Timetable = () => {
   // useTimetable รวม state และการคำนวณไว้; ค่าที่ได้ด้านล่างถูกส่งเป็น props ให้ส่วนแสดงผล
   const {
+    timetable,
+    loadError,
+    reload,
     entries,
     addError,
     conflictAlertDismissed,
@@ -17,9 +20,11 @@ const Timetable = () => {
     maxCredits,
     academicYear,
     semester,
+    selectedAcademicYear,
+    selectedSemester,
     conflicts,
+    addDisabled,
     addCourse,
-    removeCourse,
     dismissConflictAlert,
     setAcademicYear,
     setSemester,
@@ -47,6 +52,23 @@ const Timetable = () => {
           </span>
         </header>
 
+        {/* สถานะการโหลดตารางจาก GET /api/timetable */}
+        {loadError && (
+          <div role="alert" className="flex flex-wrap items-center gap-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+            โหลดตารางเรียนไม่สำเร็จ
+            <button
+              type="button"
+              onClick={reload}
+              className="rounded-lg bg-white px-3 py-1 font-semibold text-red-700 hover:bg-red-100"
+            >
+              ลองใหม่
+            </button>
+          </div>
+        )}
+        {!timetable && !loadError && (
+          <p className="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">กำลังโหลดตารางเรียน…</p>
+        )}
+
         {/* conflicts ใช้แสดงคำเตือน; ปุ่มปิดส่ง callback กลับไปเปลี่ยน state ใน hook */}
         <ConflictAlert
           conflicts={conflicts}
@@ -64,17 +86,18 @@ const Timetable = () => {
           semester={semester}
         />
 
-        {/* รายการวิชาที่เลือกแล้วส่งรหัสกลับผ่าน removeCourse เมื่อต้องการลบ */}
-        <AddedCoursesList entries={entries} onRemove={removeCourse} />
+        {/* การลบวิชาเป็นงานของ US2 ยังไม่มี API จึงไม่ส่ง onRemove ปุ่มลบจะกดไม่ได้ */}
+        <AddedCoursesList entries={entries} />
 
         {/* รหัสที่อยู่ในตารางทำให้ปุ่มของวิชานั้นแสดงสถานะเพิ่มแล้ว; การเพิ่มส่งกลับเข้า hook */}
         <CourseSearchPanel
           addedCourseCodes={entries.map((entry) => entry.courseCode)}
           addError={addError}
+          addDisabled={addDisabled}
           totalCredits={totalCredits}
           maxCredits={maxCredits}
-          academicYear={academicYear}
-          semester={semester}
+          academicYear={selectedAcademicYear}
+          semester={selectedSemester}
           onAcademicYearChange={setAcademicYear}
           onSemesterChange={setSemester}
           onAddCourse={addCourse}

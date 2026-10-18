@@ -3,7 +3,8 @@ import type { TimetableEntry } from "../types";
 
 type AddedCoursesListProps = {
   entries: TimetableEntry[];
-  onRemove: (courseCode: string) => void;
+  // ไม่ส่งมา = ยังลบไม่ได้ (รอ API ลบวิชาของ US2) ปุ่มลบจะเป็น disabled
+  onRemove?: (courseCode: string) => void;
 };
 
 // entries ถูกส่งมาจาก hook ผ่าน Timetable; รายการนี้แสดง section และคาบที่เลือกไว้
@@ -44,8 +45,10 @@ const AddedCoursesList = ({ entries, onRemove }: AddedCoursesListProps) => (
 
             <button
               type="button"
-              onClick={() => onRemove(entry.courseCode)}
-              className="self-start rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 sm:self-auto"
+              onClick={() => onRemove?.(entry.courseCode)}
+              disabled={!onRemove}
+              title={onRemove ? undefined : "ลบวิชาจะใช้ได้เมื่อ US2 เชื่อมกับ API"}
+              className="self-start rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
             >
               ลบวิชา
             </button>

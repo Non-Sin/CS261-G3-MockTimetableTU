@@ -5,6 +5,8 @@ type CourseCardProps = {
   course: Course;
   alreadyAdded: boolean;
   wouldExceedCreditLimit: boolean;
+  // ปิดปุ่มเพิ่มชั่วคราว (ตารางยังโหลดไม่เสร็จหรือกำลังบันทึกวิชาก่อนหน้า)
+  addDisabled?: boolean;
   selectedSectionId?: number;
   onSectionChange: (courseCode: string, sectionId: number) => void;
   onAdd: (course: Course, sectionId: number) => void;
@@ -16,6 +18,7 @@ const CourseCard = ({
   course,
   alreadyAdded,
   wouldExceedCreditLimit,
+  addDisabled = false,
   selectedSectionId,
   onSectionChange,
   onAdd,
@@ -70,7 +73,7 @@ const CourseCard = ({
 
         <button
           type="button"
-          disabled={alreadyAdded || wouldExceedCreditLimit}
+          disabled={alreadyAdded || wouldExceedCreditLimit || addDisabled}
           onClick={() => {
             if (selectedSectionId !== undefined) {
               // ส่งทั้งวิชาและ sectionId ให้ panel แล้วต่อถึง reducer ใน useTimetable

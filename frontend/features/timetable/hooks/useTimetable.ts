@@ -1,130 +1,108 @@
-import { useReducer, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ApiError } from "@/lib/api";
 import type { Course } from "../../courses/types";
-import { findConflicts } from "../utils/conflicts";
-import { mockTimetable } from "../mockData";
-import type { TimetableEntry } from "../types";
+import { addTimetableEntry, fetchTimetable } from "../api";
+import type { Timetable } from "../types";
 
-type TimetableState = {
-  entries: TimetableEntry[];
-  addError: string | null;
-  conflictAlertDismissed: boolean;
-};
-
-type TimetableAction =
-  | { type: "add-course"; course: Course; sectionId: number }
-  | { type: "remove-course"; courseCode: string }
-  | { type: "dismiss-conflict-alert" };
-
-const initialState: TimetableState = {
-  entries: [],
-  addError: null,
-  conflictAlertDismissed: false,
-};
-
-// Reducer เป็นจุดเดียวที่เปลี่ยน state ของตาราง: รับ state เดิมกับ action จาก UI
-// แล้วคืน state ชุดใหม่ เพื่อให้การเพิ่ม/ลบวิชาและการปิดคำเตือนเปลี่ยนอย่างเป็นระบบ
-const timetableReducer = (
-  state: TimetableState,
-  action: TimetableAction,
-): TimetableState => {
-  switch (action.type) {
-    case "add-course": {
-      // action ได้ Course และ sectionId มาจาก CourseCard ผ่าน CourseSearchPanel
-      // หา section ก่อน เพราะตารางต้องเก็บเวลา ห้อง และผู้สอนของกลุ่มที่ผู้ใช้เลือกจริง
-      const section = action.course.sections.find(
-        (item) => item.sectionId === action.sectionId,
-      );
-
-      if (!section) return state;
-
-      // หนึ่งรหัสวิชาเพิ่มลงตารางได้ครั้งเดียว จึงตรวจจาก entries ปัจจุบันก่อนสร้างรายการ
-      if (state.entries.some((entry) => entry.courseCode === action.course.courseCode)) {
-        return {
-          ...state,
-          addError: `${action.course.courseCode} อยู่ในตารางแล้ว`,
-        };
-      }
-
-      // คำนวณหน่วยกิตจากรายการปัจจุบันเพื่อเปรียบเทียบกับเพดานใน mockTimetable
-      const totalCredits = state.entries.reduce(
-        (total, entry) => total + entry.credits,
-        0,
-      );
-
-      // ตาม API Spec: ไม่เพิ่มวิชาและไม่แสดงข้อความเมื่อหน่วยกิตเกินกำหนด
-      if (totalCredits + action.course.credits > mockTimetable.maxCredits) {
-        return { ...state, addError: null };
-      }
-
-      const newEntry: TimetableEntry = {
-        entryId: section.sectionId,
-        courseCode: action.course.courseCode,
-        courseName: action.course.courseName,
-        category: action.course.category,
-        credits: action.course.credits,
-        sectionId: section.sectionId,
-        sectionNo: section.sectionNo,
-        schedules: section.schedules,
-        conflictWith: [],
-      };
-
-      // สร้าง state ใหม่แทนการแก้ array เดิม เพื่อให้ React ตรวจพบการเปลี่ยนแปลง
-      // และคำนวณผลชนใหม่จากรายการที่เพิ่มแล้วใน useTimetable
-      return {
-        entries: [...state.entries, newEntry],
-        addError: null,
-        conflictAlertDismissed: false,
-      };
-    }
-
-    case "remove-course":
-      // กรองรหัสวิชาที่ผู้ใช้ลบออก ส่วนรายการอื่นยังอยู่เหมือนเดิม
-      return {
-        ...state,
-        entries: state.entries.filter(
-          (entry) => entry.courseCode !== action.courseCode,
-        ),
-        conflictAlertDismissed: false,
-      };
-
-    case "dismiss-conflict-alert":
-      return { ...state, conflictAlertDismissed: true };
-
-    default:
-      return state;
-  }
-};
+// ภาคเรียนเริ่มต้นตาม seed ที่ทีมตกลง (1/2568) ไม่รวมภาคฤดูร้อน
+const DEFAULT_ACADEMIC_YEAR = 2568;
+const DEFAULT_SEMESTER = 1;
+// ใช้ระหว่างที่ตารางยังโหลดไม่เสร็จ ค่าจริงมาจาก maxCredits ใน response
+const DEFAULT_MAX_CREDITS = 22;
 
 // Hook นี้เป็นขอบเขตเชื่อม state กับ UI: Timetable เรียกใช้ แล้วส่งค่าที่คืนให้ลูกแต่ละส่วน
+// ตารางมาจาก GET /api/timetable ของภาคเรียนที่เลือก และการเพิ่มวิชาบันทึกผ่าน POST /api/timetable/entries
 export const useTimetable = () => {
-  const [state, dispatch] = useReducer(timetableReducer, initialState);
-  // เก็บภาคเรียนไว้ข้าง state ของตาราง เพื่อให้ Timetable และส่วนค้นหาวิชา
-  // ใช้ค่าเดียวกันตอนเลือกข้อมูลและตอนเชื่อม GET /api/timetable ในภายหลัง
-  const [academicYear, setAcademicYear] = useState(2568);
-  const [semester, setSemester] = useState(1);
-  // หน่วยกิตเป็นค่าที่คำนวณจาก entries เสมอ จึงไม่เก็บซ้ำใน state ให้เสี่ยงไม่ตรงกัน
-  const totalCredits = state.entries.reduce(
-    (total, entry) => total + entry.credits,
-    0,
-  );
+  const [academicYear, setAcademicYearState] = useState(DEFAULT_ACADEMIC_YEAR);
+  const [semester, setSemesterState] = useState(DEFAULT_SEMESTER);
+  // null = กำลังโหลดตารางของภาคเรียนที่เลือก
+  const [timetable, setTimetable] = useState<Timetable | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [addingSectionId, setAddingSectionId] = useState<number | null>(null);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [conflictAlertDismissed, setConflictAlertDismissed] = useState(false);
+  // ภาคเรียนที่เลือกล่าสุด ใช้ตรวจผล POST ที่ตอบกลับหลังผู้ใช้เปลี่ยนภาคไปแล้ว
+  const selectedTermRef = useRef({ academicYear: DEFAULT_ACADEMIC_YEAR, semester: DEFAULT_SEMESTER });
+
+  // โหลดตารางใหม่ทุกครั้งที่เปลี่ยนภาคเรียน และไม่ใช้ผลของภาคเก่าที่ตอบกลับมาช้า
+  useEffect(() => {
+    let ignore = false;
+
+    fetchTimetable({ academicYear, semester })
+      .then((data) => {
+        if (ignore) return;
+        setTimetable(data);
+        setLoadError(false);
+      })
+      .catch(() => {
+        if (!ignore) setLoadError(true);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [academicYear, semester, reloadKey]);
+
+  // เปลี่ยนภาคเรียน: ล้างตารางเดิมระหว่างโหลดใหม่ ไม่ให้เห็นวิชาของภาคก่อนหน้า
+  // เลือกค่าเดิมซ้ำไม่ต้องทำอะไร ไม่งั้นตารางจะถูกล้างแต่ไม่มีการโหลดใหม่ (ค่าใน useEffect ไม่เปลี่ยน)
+  const changeTerm = (nextAcademicYear: number, nextSemester: number) => {
+    if (nextAcademicYear === academicYear && nextSemester === semester) return;
+    selectedTermRef.current = { academicYear: nextAcademicYear, semester: nextSemester };
+    setTimetable(null);
+    setAddError(null);
+    setAcademicYearState(nextAcademicYear);
+    setSemesterState(nextSemester);
+  };
+
+  const reload = () => setReloadKey((key) => key + 1);
+
+  // เพิ่มกลุ่มเรียนที่เลือก แล้วใช้ตารางทั้งก้อนที่ backend ตอบกลับมา (รวมผลตรวจเวลาชน)
+  const addCourse = async (_course: Course, sectionId: number) => {
+    setAddingSectionId(sectionId);
+    setAddError(null);
+
+    try {
+      const updated = await addTimetableEntry({ sectionId });
+      // ผู้ใช้เปลี่ยนภาคไปแล้วระหว่างรอ: วิชาถูกบันทึกในภาคเดิมแล้ว แต่ไม่เอาตารางภาคเดิมมาทับหน้าจอ
+      const { academicYear: currentYear, semester: currentSemester } = selectedTermRef.current;
+      if (updated.academicYear !== currentYear || updated.semester !== currentSemester) return;
+
+      setTimetable(updated);
+      setConflictAlertDismissed(false);
+    } catch (error) {
+      // หน่วยกิตเกินหรือวิชาซ้ำ: ไม่แสดงข้อความตามที่ทีมตกลง แค่โหลดตารางล่าสุดให้ปุ่มกลับมาถูกสถานะ
+      if (error instanceof ApiError && error.status === 409) {
+        reload();
+      } else {
+        setAddError("เพิ่มวิชาไม่สำเร็จ กรุณาลองใหม่");
+      }
+    } finally {
+      setAddingSectionId(null);
+    }
+  };
 
   return {
-    entries: state.entries,
-    addError: state.addError,
-    conflictAlertDismissed: state.conflictAlertDismissed,
-    totalCredits,
-    maxCredits: mockTimetable.maxCredits,
-    academicYear,
-    semester,
-    setAcademicYear,
-    setSemester,
-    // ตรวจเวลาชนจากตารางปัจจุบัน; ผลนี้ถูกส่งไปทั้ง ConflictAlert และ TimetableGrid
-    conflicts: findConflicts(state.entries),
-    // ฟังก์ชันเหล่านี้แปลง event จาก component เป็น action ให้ reducer จัดการ
-    addCourse: (course: Course, sectionId: number) =>
-      dispatch({ type: "add-course", course, sectionId }),
-    removeCourse: (courseCode: string) =>
-      dispatch({ type: "remove-course", courseCode }),
-    dismissConflictAlert: () => dispatch({ type: "dismiss-conflict-alert" }),
+    timetable,
+    loadError,
+    reload,
+    entries: timetable?.entries ?? [],
+    addError,
+    conflictAlertDismissed,
+    totalCredits: timetable?.totalCredits ?? 0,
+    maxCredits: timetable?.maxCredits ?? DEFAULT_MAX_CREDITS,
+    // ปีและภาคในชื่อไฟล์ PNG มาจากตารางที่แสดงอยู่ ไม่ใช่ค่าที่กำลังเลือก
+    academicYear: timetable?.academicYear ?? academicYear,
+    semester: timetable?.semester ?? semester,
+    selectedAcademicYear: academicYear,
+    selectedSemester: semester,
+    setAcademicYear: (value: number) => changeTerm(value, semester),
+    setSemester: (value: number) => changeTerm(academicYear, value),
+    // ผลตรวจเวลาชนมาจาก backend ส่งต่อให้ทั้ง ConflictAlert และ TimetableGrid
+    conflicts: timetable?.conflicts ?? [],
+    // กดเพิ่มไม่ได้ระหว่างโหลดตารางหรือระหว่างรอผลการเพิ่มวิชาก่อนหน้า
+    addDisabled: timetable === null || addingSectionId !== null,
+    addCourse,
+    dismissConflictAlert: () => setConflictAlertDismissed(true),
   };
 };
