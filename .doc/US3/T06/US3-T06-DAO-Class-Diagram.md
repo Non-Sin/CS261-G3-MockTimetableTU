@@ -35,7 +35,6 @@ classDiagram
         -OffsetDateTime lockedUntil
         -OffsetDateTime updatedAt
         +incrementFailedAttempts(int maxAttempts, long lockSeconds) void
-        +reset() void
         +isLocked(OffsetDateTime now) boolean
         +remainingLockSeconds(OffsetDateTime now) long
     }
@@ -51,11 +50,13 @@ classDiagram
 | `User` | `updateProfile(...)` | entity ของ US3 | `AuthService.authenticate` | อัปเดตชื่อ-นามสกุล สาขา ภาค และ `updatedAt` จากข้อมูลล่าสุดของ TU API |
 | `LoginAttemptRepository` | `findById(username)` | สืบทอดจาก `JpaRepository<LoginAttempt, String>` | `LoginAttemptService.isLocked`, `loginFailed`, `getWaitTime` | `POST /api/auth/login` |
 | `LoginAttemptRepository` | `save(attempt)` | สืบทอดจาก `JpaRepository<LoginAttempt, String>` | `LoginAttemptService.loginFailed` | บันทึกจำนวนครั้งที่รหัสผิดและเวลา `lockedUntil` |
-| `LoginAttemptRepository` | `deleteById(username)` | สืบทอดจาก `JpaRepository<LoginAttempt, String>` | `LoginAttemptService.loginSucceeded` | ล้างประวัติการใส่รหัสผิดเมื่อเข้าสู่ระบบสำเร็จ |
-| `LoginAttempt` | `incrementFailedAttempts`, `reset`, `isLocked`, `remainingLockSeconds` | entity ของ US3 | `LoginAttemptService` | คำนวณสถานะการล็อก 15 นาทีเมื่อผิดครบ 5 ครั้ง และคำนวณวินาทีที่เหลือ (`retryAfterSeconds`) |
+| `LoginAttemptRepository` | `deleteById(username)` | สืบทอดจาก `JpaRepository<LoginAttempt, String>` | `LoginAttemptService.loginSucceeded` | ล้างประวัติการใส่รหัสผิดเมื่อเข้าสู่ระบบสำเร็จ (ลบแถวออกจาก DB โดยตรง) |
+| `LoginAttempt` | `incrementFailedAttempts`, `isLocked`, `remainingLockSeconds` | entity ของ US3 | `LoginAttemptService` | คำนวณสถานะการล็อก 15 นาทีเมื่อผิดครบ 5 ครั้ง และคำนวณวินาทีที่เหลือ (`retryAfterSeconds`) |
 
 **เหตุผลการออกแบบ**
 
+- **เลือกแนวทาง `deleteById(username)` แบบเดียวในการล้างจำนวนครั้งที่ผิด:** เมื่อเข้าสู่ระบบสำเร็จ (`TU Login API` ยืนยันว่ารหัสถูกต้อง) ระบบจะเรียก `loginAttemptRepository.deleteById(username)` เพื่อลบแถวออกจากตาราง `login_attempt` ทันที จึงไม่มีความจำเป็นต้องมี method `reset()` ใน Entity `LoginAttempt` ช่วยลดความซ้ำซ้อนและลดขนาดข้อมูลในฐานข้อมูล
+- **การแยก Transaction ด้วย `@Transactional(propagation = Propagation.REQUIRES_NEW)`:** เนื่องจาก `AuthService` ถูกกำหนด `@Transactional` ในระดับ class (ตาม US3-T05) หาก `loginSucceeded` หรือ `loginFailed` อยู่ใน Transaction เดียวกัน เมื่อ `AuthService` โยน `BusinessRuleException` (เช่น `403 ACCOUNT_INACTIVE`, `403 NOT_CS_STUDENT`, หรือ `401 INVALID_CREDENTIALS`) Transaction จะถูก Rollback ส่งผลให้การลบหรือการบันทึกจำนวนครั้งที่ผิดไม่ถูกบันทึกลง DB ดังนั้นใน `LoginAttemptService` เมธอด `loginSucceeded` และ `loginFailed` จึงต้องประกาศ `@Transactional(propagation = Propagation.REQUIRES_NEW)` เพื่อเปิด Transaction ใหม่แยกต่างหากและ Commit ทันที ไม่ถูก Rollback ตาม Exception ของ `AuthService`
 - **ใช้ method มาตรฐานของ `JpaRepository` ทั้งหมด:** ทั้ง `User` (PK = `studentId`) และ `LoginAttempt` (PK = `username`) ค้นหาด้วย Primary Key โดยตรง จึงใช้ `findById`, `save`, `deleteById` ที่สืบทอดจาก `JpaRepository` ได้ทันทีโดยไม่ต้องเขียน custom `@Query` (วาดไว้ในแผนภาพเหมือน US2-T06 เพื่อให้เห็นชัดเจนว่า Service เรียก method ใด)
 - **ทำไมเก็บ `LoginAttempt` ลงฐานข้อมูล (`login_attempt`):**
   1. ตรงตามข้อกำหนดของการ์ด US3-T06 ที่ระบุให้มีส่วนการนับ login ผิดใน ER Diagram และสามารถทดสอบระดับ DAO ใน US3-T09 / US3-T12 ได้ด้วย `@DataJpaTest` เหมือน US1 และ US2

@@ -1,6 +1,6 @@
 # US3-T06 — Extended API Class Diagram
 
-ขยายจาก [API Class Diagram](../T05/US3-API-Class-Diagram.md) ของ US3-T05 โดยเพิ่มความสัมพันธ์ระหว่างชั้น Service (`AuthService`, `UserService`, `LoginAttemptService`) กับชั้น Repository (`UserRepository`, `LoginAttemptRepository`), DTO จากระบบภายนอก (`TuAuthDto`), และการเชื่อมต่อ `SecurityContextStudentProvider` เข้ากับ `CurrentStudentProvider` เดิมของ US1 ส่วน Controller, `GlobalExceptionHandler` และโมดูลฝั่ง frontend ไม่เปลี่ยนจาก T05 จึงวาดเฉพาะส่วนที่ขยายในชั้น Backend
+ขยายจาก [API Class Diagram](../T05/US3-API-Class-Diagram.md) ของ US3-T05 โดยเพิ่มสถาปัตยกรรมชั้น Security / JWT (`SecurityConfig`, `JwtAuthenticationFilter`, `JwtService`, `SecurityContextHolder`), ความสัมพันธ์ระหว่างชั้น Service (`AuthService`, `UserService`, `LoginAttemptService`) กับชั้น Repository (`UserRepository`, `LoginAttemptRepository`), DTO จากระบบภายนอก (`TuAuthDto`), และการเชื่อมต่อ `SecurityContextStudentProvider` เข้ากับ `CurrentStudentProvider` เดิมของ US1
 
 ## แผนภาพ Extended API Class Diagram (Mermaid)
 
@@ -8,6 +8,20 @@
 classDiagram
     direction TB
 
+    class SecurityConfig {
+        <<US3 Configuration>>
+        -jwtAuthenticationFilter: JwtAuthenticationFilter
+        +securityFilterChain(http: HttpSecurity) SecurityFilterChain
+    }
+    class JwtAuthenticationFilter {
+        <<US3 Filter>>
+        -jwtService: JwtService
+        +doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) void
+    }
+    class SecurityContextHolder {
+        <<Spring Security>>
+        +getContext() SecurityContext
+    }
     class AuthService {
         <<US3 Service>>
         -tuApiClient: TuApiClient
@@ -78,29 +92,37 @@ classDiagram
         <<มีอยู่แล้ว>>
     }
 
+    SecurityConfig --> JwtAuthenticationFilter : register in filter chain
+    JwtAuthenticationFilter --> JwtService : validate & extract studentId
+    JwtAuthenticationFilter ..> SecurityContextHolder : set Authentication
+    SecurityContextStudentProvider ..> SecurityContextHolder : get Authentication (studentId)
+    SecurityContextStudentProvider ..|> CurrentStudentProvider
     AuthService --> TuApiClient
     AuthService --> UserRepository
     AuthService --> LoginAttemptService
-    AuthService --> JwtService
+    AuthService --> JwtService : generateToken()
     TuApiClient ..> TuAuthDto : คืน
     UserService --> UserRepository
     LoginAttemptService --> LoginAttemptRepository
-    SecurityContextStudentProvider ..|> CurrentStudentProvider
     AuthService ..> BusinessRuleException : throws 401, 403, 429
     UserService ..> ResourceNotFoundException : throws 404
 ```
+
 **รายละเอียดเพิ่มเติม**
 
+- **ชั้น Security & JWT Architecture (Spring Security Filter Chain):**
+  - **`SecurityConfig`:** กำหนด Bean `SecurityFilterChain` แบบ Stateless (`SessionCreationPolicy.STATELESS`), ปิด CSRF (เนื่องจากใช้ Bearer Token), กำหนด White-list สำหรับ Public Endpoint เช่น `POST /api/auth/**`, `/v3/api-docs/**`, `/swagger-ui/**` และบังคับ Authenticate ทุก Request อื่นๆ (รวมถึง `GET /api/users/me` และ `/api/timetables/**`) โดยแทรก `JwtAuthenticationFilter` ก่อน `UsernamePasswordAuthenticationFilter`
+  - **`JwtAuthenticationFilter`:** สืบทอดจาก `OncePerRequestFilter` ทำหน้าที่ดึง Header `Authorization: Bearer <token>` หากมี Token จะเรียก `jwtService.extractStudentId(token)` และ `jwtService.isTokenValid(token)` หากถูกต้องจะสร้าง `UsernamePasswordAuthenticationToken` ใส่ลงใน `SecurityContextHolder.getContext().setAuthentication(...)` ก่อนส่งต่อ Request ตาม Filter Chain
+  - **`JwtService`:** รับผิดชอบสร้าง Token (`generateToken`), ถอดรหัสอ่านรหัสนักศึกษา (`extractStudentId`), และตรวจสอบความถูกต้องและวันหมดอายุของ Token (`isTokenValid`)
+  - **`SecurityContextStudentProvider`:** Implement `CurrentStudentProvider` ของ US1 โดยดึง `studentId` จาก `SecurityContextHolder.getContext().getAuthentication().getName()` ทำให้ทั้ง `TimetableController` (US1), `TimetableDeleteController` (US2) และ `UserController` (US3) ใช้ interface เดียวกันได้อย่างสมบูรณ์โดยไม่ต้องแก้โค้ดของ US1/US2
 - **`AuthService`:**
   - `upsertUser(tuResponse)` ค้นหา `User` จาก `userRepository.findById(studentId)` ถ้ามีแล้วให้อัปเดตชื่อ-นามสกุล สาขา และภาค (`updateProfile`) ถ้ายังไม่มีให้สร้าง `User` ใหม่ แล้ว `save` ลงตาราง `users`
   - เรียก `jwtService.generateToken(studentId)` เพื่อออก JWT Token ห่อด้วย `LoginResponse.of(token)`
 - **`UserService`:**
   - รับ `studentId` ที่ `UserController` อ่านมาจาก `CurrentStudentProvider.currentStudentId()` แล้วเรียก `userRepository.findById(studentId)` แปลงเป็น `UserProfileResponse.from(user)` หากไม่พบโยน `ResourceNotFoundException` (404)
-- **`LoginAttemptService`:**
-  - `MAX_ATTEMPTS = 5` และ `LOCK_TIME_DURATION = 900` วินาที (15 นาที) อ่านจาก config (หรือค่า default)
-  - เชื่อมกับ `LoginAttemptRepository` เพื่อบันทึกจำนวนครั้งที่ผิดลงตาราง `login_attempt` โดย `loginFailed` แยก transaction (`Propagation.REQUIRES_NEW`) เพื่อไม่ให้ถูก rollback เมื่อ `AuthService` โยน `BusinessRuleException`
-- **`SecurityContextStudentProvider`:**
-  - Implement `CurrentStudentProvider` ของ US1 โดยอ่าน `studentId` จาก JWT / Spring Security Context แทน `DemoStudentProvider` ทำให้ `TimetableController` (US1), `TimetableDeleteController` (US2) และ `UserController` (US3) ใช้งาน `CurrentStudentProvider` ตัวเดียวกันได้โดยไม่ต้องแก้โค้ดของ US1 และ US2
+- **`LoginAttemptService` (Transaction Isolation):**
+  - `MAX_ATTEMPTS = 5` และ `LOCK_TIME_DURATION = 900` วินาที (15 นาที) อ่านจาก configuration
+  - เมธอด `loginSucceeded` และ `loginFailed` กำหนด `@Transactional(propagation = Propagation.REQUIRES_NEW)` เพื่อแยก Transaction อิสระจาก `AuthService` เมื่อ `AuthService` ตรวจสอบสถานะแล้วโยน `BusinessRuleException` (401/403/429) การล้างประวัติ (`deleteById`) หรือการนับจำนวนครั้งที่ผิด (`save`) จะไม่ถูก Rollback
 - Method ของแต่ละ Repository และ Entity อยู่ใน [DAO Class Diagram](./US3-T06-DAO-Class-Diagram.md) ส่วน field ทุกตัวเป็น `private final` ฉีดผ่าน constructor ด้วย `@RequiredArgsConstructor` ตามมาตรฐานของโปรเจกต์
 
 ## เอกสารที่เกี่ยวข้อง
