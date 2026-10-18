@@ -4,7 +4,8 @@ import type {
   ScheduleSlot,
 } from "@/features/courses/types";
 
-// ข้อมูลรายวิชาและกลุ่มเรียนหนึ่งรายการที่ถูกเพิ่มลงในตาราง
+// Snapshot ของวิชา/section ที่ผู้ใช้เพิ่มลงตาราง; schedules มาจาก section ที่เลือก
+// UI ใช้ข้อมูลนี้วาด Grid และรายการวิชา โดยไม่ต้องกลับไปค้นรายละเอียดจาก Course อีกครั้ง
 export type TimetableEntry = {
   entryId: number;
   courseCode: string;
@@ -17,7 +18,7 @@ export type TimetableEntry = {
   conflictWith: string[];
 };
 
-// รายละเอียดช่วงเวลาที่รายวิชาอย่างน้อยสองวิชาเรียนทับกันในวันเดียวกัน
+// ผลลัพธ์จากการตรวจเวลาชน มีรูปแบบเดียวกับ conflicts ใน Timetable API response
 export type TimeConflict = {
   dayOfWeek: DayOfWeek;
   overlapStart: string;
@@ -25,7 +26,7 @@ export type TimeConflict = {
   courseCodes: string[];
 };
 
-// ข้อมูลตารางเรียนรวมวิชา หน่วยกิต และผลตรวจเวลาชน
+// รูปแบบ response หลักของตารางจาก backend; ใช้เป็นแหล่งข้อมูลให้ Grid/สรุปหน่วยกิต/คำเตือน
 export type Timetable = {
   academicYear: number;
   semester: number;
@@ -36,12 +37,12 @@ export type Timetable = {
   updatedAt: string | null;
 };
 
-// Body สำหรับเพิ่มกลุ่มเรียนลงในตารางตาม API Spec
+// Body ที่ frontend ส่งไป endpoint เพิ่มรายการตาราง; backend ระบุวิชาจาก sectionId
 export type AddTimetableEntryRequest  = {
   sectionId: number;
 };
 
-// รหัสข้อผิดพลาดที่ frontend ใช้แยกข้อความตอบกลับจาก API
+// รหัสข้อผิดพลาดตาม API ที่ frontend ใช้เลือกข้อความหรือพฤติกรรมตอบสนองเฉพาะกรณี
 export type TimetableErrorCode =
   | "COURSE_ALREADY_IN_TIMETABLE"
   | "CREDIT_LIMIT_EXCEEDED";

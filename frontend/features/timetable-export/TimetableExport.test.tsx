@@ -106,8 +106,8 @@ describe("ปุ่ม PNG บนหน้าตารางเรียนจ�
 
   it("[UT-UI-10] มีเวลาชน ปุ่มยังแสดงแต่ disabled และไม่สร้างภาพ", async () => {
     render(<Timetable />);
-    // CS102 Sec 030001 เรียนอังคาร/พฤหัสบดี 11:00-12:30 ชนกับ CS111
-    await addCourses([...SIX_COURSES, "CS102"]);
+    // TU109 เรียนพุธ 09:30-12:30 ชนกับ LAS101 ในข้อมูลจำลองภาค 1/2568
+    await addCourses([...SIX_COURSES, "TU109"]);
 
     expect(screen.getByText("ตรวจพบเวลาเรียนซ้อนทับกัน")).toBeInTheDocument();
     expect(within(timetableBox()).getByRole("button", { name: "PNG" })).toBeDisabled();
