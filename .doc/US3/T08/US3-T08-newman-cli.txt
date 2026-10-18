@@ -1,0 +1,106 @@
+newman
+
+US3-T08 Login API
+
+→ 00 GET /api/users/me ไม่มี token → 401
+  GET http://localhost:8080/api/users/me [401 Unauthorized, 596B, 148ms]
+  √  401 ProblemDetail ให้กลับไป login
+
+→ 01 TC1a POST login นักศึกษา CS ภาคปกติ active
+  POST http://localhost:8080/api/auth/login [200 OK, 635B, 361ms]
+  √  200 ได้ token เป็น JWT
+
+→ 02 TC7 GET /api/users/me ด้วย token
+  GET http://localhost:8080/api/users/me [200 OK, 497B, 33ms]
+  √  200 รหัสนักศึกษาและชื่อ-นามสกุลภาษาไทย แยกจาก displayname_th
+
+→ 03 GET /api/timetable ของ US1 ด้วย token
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 528B, 144ms]
+  √  200 API ของ US1 ใช้ studentId จาก token ได้
+
+→ 04 GET /api/timetable ไม่มี token → 401
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [401 Unauthorized, 596B, 4ms]
+  √  401 API อื่นต้อง login เหมือนกัน
+
+→ 05 GET /api/users/me token ถูกแก้ → 401
+  GET http://localhost:8080/api/users/me [401 Unauthorized, 596B, 5ms]
+  √  401 ลายเซ็นไม่ตรง
+
+→ 06 TC5 รหัสผ่านผิด → 401
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 88ms]
+  √  401 ProblemDetail code INVALID_CREDENTIALS
+  √  ไม่มี retryAfterSeconds
+
+→ 07 TC5 username ไม่มีอยู่จริง → 401
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 53ms]
+  √  401 ProblemDetail code INVALID_CREDENTIALS
+  √  ตอบเหมือนรหัสผิด ไม่บอกว่าไม่มีบัญชี
+
+→ 08 TC1a login ซ้ำด้วยรหัสถูก (ล้าง attempt และ upsert ผู้ใช้เดิม)
+  POST http://localhost:8080/api/auth/login [200 OK, 635B, 62ms]
+  √  200 ได้ token ใหม่
+
+→ 09 TC1b บัญชีไม่ active (พักการศึกษา) → 403
+  POST http://localhost:8080/api/auth/login [403 Forbidden, 647B, 33ms]
+  √  403 ProblemDetail code ACCOUNT_INACTIVE
+
+→ 10 TC2 นักศึกษาสาขาอื่น → 403
+  POST http://localhost:8080/api/auth/login [403 Forbidden, 727B, 32ms]
+  √  403 ProblemDetail code NOT_CS_STUDENT
+  √  detail แจ้งว่าเปิดให้เฉพาะนักศึกษา CS ภาคปกติ
+
+→ 11 TC2 บุคลากร (type employee) → 403
+  POST http://localhost:8080/api/auth/login [403 Forbidden, 727B, 32ms]
+  √  403 ProblemDetail code NOT_CS_STUDENT
+
+→ 12 TC6 รหัสผิดครั้งที่ 1 → 401
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 50ms]
+  √  401 ProblemDetail code INVALID_CREDENTIALS
+
+→ 13 TC6 รหัสผิดครั้งที่ 2 → 401
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 43ms]
+  √  401 ProblemDetail code INVALID_CREDENTIALS
+
+→ 14 TC6 รหัสผิดครั้งที่ 3 → 401
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 40ms]
+  √  401 ProblemDetail code INVALID_CREDENTIALS
+
+→ 15 TC6 รหัสผิดครั้งที่ 4 → 401
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 49ms]
+  √  401 ProblemDetail code INVALID_CREDENTIALS
+
+→ 16 TC6 รหัสผิดครั้งที่ 5 → 429 ล็อก 15 นาที
+  POST http://localhost:8080/api/auth/login [429 Too Many Requests, 862B, 64ms]
+  √  429 ACCOUNT_LOCKED พร้อม retryAfterSeconds 900
+
+→ 17 TC6 รหัสถูกระหว่างถูกล็อก → ยัง 429
+  POST http://localhost:8080/api/auth/login [429 Too Many Requests, 862B, 31ms]
+  √  429 ไม่เรียก TU API และบอกเวลาที่เหลือ
+
+→ 18 POST login ไม่ส่ง password → 400
+  POST http://localhost:8080/api/auth/login [400 Bad Request, 547B, 27ms]
+  √  400 พร้อม errors.password
+
+→ 19 TU API ใช้งานไม่ได้ → 503
+  POST http://localhost:8080/api/auth/login [503 Service Unavailable, 734B, 24ms]
+  √  503 ProblemDetail code TU_API_UNAVAILABLE
+
+┌─────────────────────────┬───────────────────┬──────────────────┐
+│                         │          executed │           failed │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              iterations │                 1 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│                requests │                20 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│            test-scripts │                20 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│      prerequest-scripts │                 1 │                0 │
+├─────────────────────────┼───────────────────┼──────────────────┤
+│              assertions │                23 │                0 │
+├─────────────────────────┴───────────────────┴──────────────────┤
+│ total run duration: 2.9s                                       │
+├────────────────────────────────────────────────────────────────┤
+│ total data received: 4.42kB (approx)                           │
+├────────────────────────────────────────────────────────────────┤
+│ average response time: 66ms [min: 4ms, max: 361ms, s.d.: 77ms] │
+└────────────────────────────────────────────────────────────────┘

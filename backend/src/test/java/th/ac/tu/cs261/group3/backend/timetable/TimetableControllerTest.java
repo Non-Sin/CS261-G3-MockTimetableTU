@@ -3,6 +3,7 @@ package th.ac.tu.cs261.group3.backend.timetable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Controller test แบบไม่ต้องใช้ฐานข้อมูล (mock TimetableService) ตาม US1-T05 DTO & API Spec
  */
 @WebMvcTest(TimetableController.class)
+@AutoConfigureMockMvc(addFilters = false)   // ทดสอบเฉพาะ controller การตรวจ token อยู่ใน SecurityConfigTest
 class TimetableControllerTest {
 
     private static final String STUDENT = "6609000000";

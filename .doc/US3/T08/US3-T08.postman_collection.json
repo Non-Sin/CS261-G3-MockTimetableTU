@@ -1,0 +1,708 @@
+{
+  "info": {
+    "name": "US3-T08 Login API",
+    "description": "ทดสอบ API ของ US3 ตาม US3-T05 DTO & API Spec และ Test case ของการ์ด US3\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย profile stub-tu (StubTuApiClient แทน TU Login API จริง)\n- บัญชี {{lockUser}} ยังไม่ถูกล็อก (ไม่มีแถวใน login_attempt)\n\nต้องรันตามลำดับ (Run collection) เพราะ request 02–05 ใช้ token จาก request 01",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 GET /api/users/me ไม่มี token → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail ให้กลับไป login', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().detail).to.eql('กรุณาเข้าสู่ระบบก่อนใช้งาน');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/users/me"
+      }
+    },
+    {
+      "name": "01 TC1a POST login นักศึกษา CS ภาคปกติ active",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ได้ token เป็น JWT', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const body = pm.response.json();",
+              "  pm.expect(Object.keys(body)).to.eql(['token']);",
+              "  pm.expect(body.token.split('.')).to.have.lengthOf(3);",
+              "  pm.collectionVariables.set('token', body.token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{csUser}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "02 TC7 GET /api/users/me ด้วย token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 รหัสนักศึกษาและชื่อ-นามสกุลภาษาไทย แยกจาก displayname_th', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json()).to.eql({",
+              "    studentId: pm.collectionVariables.get('csUser'),",
+              "    firstName: 'สมชาย',",
+              "    lastName: 'ใจดี'",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/users/me"
+      }
+    },
+    {
+      "name": "03 GET /api/timetable ของ US1 ด้วย token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 API ของ US1 ใช้ studentId จาก token ได้', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json()).to.have.property('entries');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear=2568&semester=1"
+      }
+    },
+    {
+      "name": "04 GET /api/timetable ไม่มี token → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 API อื่นต้อง login เหมือนกัน', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().detail).to.eql('กรุณาเข้าสู่ระบบก่อนใช้งาน');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/timetable?academicYear=2568&semester=1"
+      }
+    },
+    {
+      "name": "05 GET /api/users/me token ถูกแก้ → 401",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// เปลี่ยนตัวอักษรท้ายลายเซ็น token จึงไม่ถูกต้อง",
+              "const t = pm.collectionVariables.get('token');",
+              "const last = t.slice(-1) === 'A' ? 'B' : 'A';",
+              "pm.collectionVariables.set('tamperedToken', t.slice(0, -2) + last + last);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ลายเซ็นไม่ตรง', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().detail).to.eql('กรุณาเข้าสู่ระบบก่อนใช้งาน');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tamperedToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/users/me"
+      }
+    },
+    {
+      "name": "06 TC5 รหัสผ่านผิด → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail code INVALID_CREDENTIALS', () => {",
+              "  pm.response.to.have.status(401);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(401);",
+              "  pm.expect(p.code).to.eql('INVALID_CREDENTIALS');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test('ไม่มี retryAfterSeconds', () => {",
+              "  pm.expect(pm.response.json()).to.not.have.property('retryAfterSeconds');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{csUser}}\", \"password\": \"wrong-pass\"}"
+        }
+      }
+    },
+    {
+      "name": "07 TC5 username ไม่มีอยู่จริง → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail code INVALID_CREDENTIALS', () => {",
+              "  pm.response.to.have.status(401);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(401);",
+              "  pm.expect(p.code).to.eql('INVALID_CREDENTIALS');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test('ตอบเหมือนรหัสผิด ไม่บอกว่าไม่มีบัญชี', () => {",
+              "  pm.expect(pm.response.json()).to.not.have.property('retryAfterSeconds');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"0000000000\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "08 TC1a login ซ้ำด้วยรหัสถูก (ล้าง attempt และ upsert ผู้ใช้เดิม)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ได้ token ใหม่', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().token).to.be.a('string');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{csUser}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "09 TC1b บัญชีไม่ active (พักการศึกษา) → 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('403 ProblemDetail code ACCOUNT_INACTIVE', () => {",
+              "  pm.response.to.have.status(403);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(403);",
+              "  pm.expect(p.code).to.eql('ACCOUNT_INACTIVE');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{inactiveUser}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "10 TC2 นักศึกษาสาขาอื่น → 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('403 ProblemDetail code NOT_CS_STUDENT', () => {",
+              "  pm.response.to.have.status(403);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(403);",
+              "  pm.expect(p.code).to.eql('NOT_CS_STUDENT');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});",
+              "pm.test('detail แจ้งว่าเปิดให้เฉพาะนักศึกษา CS ภาคปกติ', () => {",
+              "  pm.expect(pm.response.json().detail).to.include('วิทยาการคอมพิวเตอร์').and.include('ภาคปกติ');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{otherDeptUser}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "11 TC2 บุคลากร (type employee) → 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('403 ProblemDetail code NOT_CS_STUDENT', () => {",
+              "  pm.response.to.have.status(403);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(403);",
+              "  pm.expect(p.code).to.eql('NOT_CS_STUDENT');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{staffUser}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "12 TC6 รหัสผิดครั้งที่ 1 → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail code INVALID_CREDENTIALS', () => {",
+              "  pm.response.to.have.status(401);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(401);",
+              "  pm.expect(p.code).to.eql('INVALID_CREDENTIALS');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{lockUser}}\", \"password\": \"wrong-pass\"}"
+        }
+      }
+    },
+    {
+      "name": "13 TC6 รหัสผิดครั้งที่ 2 → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail code INVALID_CREDENTIALS', () => {",
+              "  pm.response.to.have.status(401);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(401);",
+              "  pm.expect(p.code).to.eql('INVALID_CREDENTIALS');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{lockUser}}\", \"password\": \"wrong-pass\"}"
+        }
+      }
+    },
+    {
+      "name": "14 TC6 รหัสผิดครั้งที่ 3 → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail code INVALID_CREDENTIALS', () => {",
+              "  pm.response.to.have.status(401);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(401);",
+              "  pm.expect(p.code).to.eql('INVALID_CREDENTIALS');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{lockUser}}\", \"password\": \"wrong-pass\"}"
+        }
+      }
+    },
+    {
+      "name": "15 TC6 รหัสผิดครั้งที่ 4 → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail code INVALID_CREDENTIALS', () => {",
+              "  pm.response.to.have.status(401);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(401);",
+              "  pm.expect(p.code).to.eql('INVALID_CREDENTIALS');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{lockUser}}\", \"password\": \"wrong-pass\"}"
+        }
+      }
+    },
+    {
+      "name": "16 TC6 รหัสผิดครั้งที่ 5 → 429 ล็อก 15 นาที",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('429 ACCOUNT_LOCKED พร้อม retryAfterSeconds 900', () => {",
+              "  pm.response.to.have.status(429);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.code).to.eql('ACCOUNT_LOCKED');",
+              "  // ปัดเศษวินาทีขึ้น ตอบช้ากว่า 1 วินาทีได้ 899",
+              "  pm.expect(p.retryAfterSeconds).to.be.within(899, 900);",
+              "  pm.expect(p.detail).to.include('15 นาที');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{lockUser}}\", \"password\": \"wrong-pass\"}"
+        }
+      }
+    },
+    {
+      "name": "17 TC6 รหัสถูกระหว่างถูกล็อก → ยัง 429",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('429 ไม่เรียก TU API และบอกเวลาที่เหลือ', () => {",
+              "  pm.response.to.have.status(429);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.code).to.eql('ACCOUNT_LOCKED');",
+              "  pm.expect(p.retryAfterSeconds).to.be.within(1, 900);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{lockUser}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "18 POST login ไม่ส่ง password → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 พร้อม errors.password', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.json().errors).to.have.property('password');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{csUser}}\"}"
+        }
+      }
+    },
+    {
+      "name": "19 TU API ใช้งานไม่ได้ → 503",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('503 ProblemDetail code TU_API_UNAVAILABLE', () => {",
+              "  pm.response.to.have.status(503);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(503);",
+              "  pm.expect(p.code).to.eql('TU_API_UNAVAILABLE');",
+              "  pm.expect(p.detail).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{unavailableUser}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "password",
+      "value": "Passw0rd!"
+    },
+    {
+      "key": "csUser",
+      "value": "6609000001"
+    },
+    {
+      "key": "otherDeptUser",
+      "value": "6609000002"
+    },
+    {
+      "key": "inactiveUser",
+      "value": "6609000003"
+    },
+    {
+      "key": "lockUser",
+      "value": "6609000004"
+    },
+    {
+      "key": "staffUser",
+      "value": "staff01"
+    },
+    {
+      "key": "unavailableUser",
+      "value": "6609000099"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tamperedToken",
+      "value": ""
+    }
+  ]
+}
