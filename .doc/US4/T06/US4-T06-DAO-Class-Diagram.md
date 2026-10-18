@@ -41,6 +41,6 @@ classDiagram
 - [DAO Class Diagram](./US4-T06-DAO-Class-Diagram.md)
 - [Extended API Class Diagram](./US4-T06-Extended-API-Class-Diagram.md)
 - [ER Diagram (DB)](./US4-T06-ER-Diagram.md)
-- [US4-T05 — API Class Diagram](../US4-API-Class-Diagram.md)
-- [US4-T05 — DTO & API Spec](../US4-DTO-&-API-Spec.md)
+- [US4-T05 — API Class Diagram](../T05/US4-API-Class-Diagram.md)
+- [US4-T05 — DTO & API Spec](../T05/US4-DTO%20%26%20API%20Spec.md)
 - [US3 — API Class Diagram](../../US3/T05/US3-API-Class-Diagram.md)
