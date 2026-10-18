@@ -1,34 +1,8 @@
 import type { Course } from "./types";
 
-// รายวิชาและกลุ่มเรียนตัวอย่างสำหรับพัฒนาหน้า frontend ระหว่างรอเชื่อม API
+// ข้อมูลตัวอย่างของภาคเรียน 1/2568 ให้ตรงกับ seed ของ backend
+// ใช้ sectionId จำลองที่ไม่ซ้ำกันระหว่างรอโหลด ID จริงจาก API
 export const mockCourses: Course[] = [
-  {
-    courseCode: "CS111",
-    courseName: "OBJECT-ORIENTED CONCEPTS",
-    category: "MAJOR",
-    credits: 3,
-    sections: [
-      {
-        sectionId: 101,
-        sectionNo: "030001",
-        instructor: "ผศ.ดร.ทรงศักดิ์ รองวิริยะพานิช",
-        schedules: [
-          {
-            dayOfWeek: "TUESDAY",
-            startTime: "11:00",
-            endTime: "12:30",
-            room: "LC3-121"
-          },
-          {
-            dayOfWeek: "THURSDAY",
-            startTime: "11:00",
-            endTime: "12:30",
-            room: "LC3-121"
-          },
-        ],
-      },
-    ],
-  },
   {
     courseCode: "CS180",
     courseName: "INTRODUCTION TO USER INTERFACE AND USER EXPERIENCE",
@@ -36,15 +10,15 @@ export const mockCourses: Course[] = [
     credits: 3,
     sections: [
       {
-        sectionId: 102,
+        sectionId: 101,
         sectionNo: "820001",
-        instructor: "ผศ.ดร.ลัมพาพรรณ พันธ์ชูจิตร์",
+        instructor: "อ.ดร.ปวีณา เลิศวิไล",
         schedules: [
           {
             dayOfWeek: "MONDAY",
             startTime: "13:30",
             endTime: "16:30",
-            room: "LC5-S202"
+            room: "LC5-S202",
           },
         ],
       },
@@ -57,21 +31,48 @@ export const mockCourses: Course[] = [
     credits: 3,
     sections: [
       {
-        sectionId: 103,
-        sectionNo: "070001",
-        instructor: "ผศ.ดร.วิชัยรัตน์ จันที",
+        sectionId: 102,
+        sectionNo: "020001",
+        instructor: "รศ.ดร.ประเสริฐ มั่นคง",
         schedules: [
           {
             dayOfWeek: "TUESDAY",
             startTime: "09:30",
             endTime: "11:00",
-            room: "SC-3015"
+            room: "SC-3015",
           },
           {
             dayOfWeek: "THURSDAY",
             startTime: "09:30",
             endTime: "11:00",
-            room: "SC-3015"
+            room: "SC-3015",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    courseCode: "CS111",
+    courseName: "OBJECT-ORIENTED CONCEPTS",
+    category: "MAJOR",
+    credits: 3,
+    sections: [
+      {
+        sectionId: 103,
+        sectionNo: "030001",
+        instructor: "ผศ.ดร.สมชาย ใจดี",
+        schedules: [
+          {
+            dayOfWeek: "TUESDAY",
+            startTime: "11:00",
+            endTime: "12:30",
+            room: "LC3-121",
+          },
+          {
+            dayOfWeek: "THURSDAY",
+            startTime: "11:00",
+            endTime: "12:30",
+            room: "LC3-121",
           },
         ],
       },
@@ -86,38 +87,17 @@ export const mockCourses: Course[] = [
       {
         sectionId: 104,
         sectionNo: "780004",
-        instructor: "ผศ.ดร.วรางคณา ศรีกำเหนิด",
+        instructor: "อ.พิมพ์ชนก บุญมา",
         schedules: [
           {
             dayOfWeek: "WEDNESDAY",
             startTime: "09:30",
             endTime: "12:30",
-            room: "SC-1026"
+            room: "SC-1026",
           },
         ],
       },
     ],
-  },
-  {
-   courseCode: "TU106",
-   courseName: "CREATIVITY AND COMMUNICATION",
-   category: "GENERAL_EDUCATION",
-   credits: 3,
-   sections: [
-    {
-      sectionId: 105,
-      sectionNo: "540001",
-      instructor: "อ.สมศักดิ์ กัณหา",
-      schedules: [
-        {
-          dayOfWeek: "THURSDAY",
-          startTime: "13:30",
-          endTime: "16:30",
-          room: "LC2-203"
-        },
-      ],
-    },
-   ],
   },
   {
     courseCode: "TU101",
@@ -126,88 +106,99 @@ export const mockCourses: Course[] = [
     credits: 3,
     sections: [
       {
-        sectionId: 106,
+        sectionId: 105,
         sectionNo: "900001",
-        instructor: "ผศ.อดิศร หมวกพิมาย",
+        instructor: "อ.สุภาพร ทองดี",
         schedules: [
           {
             dayOfWeek: "WEDNESDAY",
             startTime: "13:30",
             endTime: "16:30",
-            room: "SC-1058"
+            room: "SC-1058",
           },
         ],
       },
     ],
   },
   {
-    courseCode: "CS102",
-    courseName: "PROBLEM SOLVING BASICS AND COMPUTER PROGRAMMING",
-    category: "MAJOR",
+    courseCode: "TU106",
+    courseName: "CREATIVITY AND COMMUNICATION",
+    category: "GENERAL_EDUCATION",
+    credits: 3,
+    sections: [
+      {
+        sectionId: 106,
+        sectionNo: "540001",
+        instructor: "อ.ดร.กมลชนก ศิลปชัย",
+        schedules: [
+          {
+            dayOfWeek: "THURSDAY",
+            startTime: "13:30",
+            endTime: "16:30",
+            room: "LC2-203",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    courseCode: "TU109",
+    courseName: "INNOVATION AND ENTREPRENEURIAL MINDSET",
+    category: "GENERAL_EDUCATION",
     credits: 3,
     sections: [
       {
         sectionId: 107,
-        sectionNo: "030001",
-        instructor: "ผศ.ดร.เสาวลักษณ์ วรรธนาภา",
+        sectionNo: "780001",
+        instructor: "อ.ดร.ธนวัฒน์ รุ่งเรือง",
         schedules: [
           {
-            dayOfWeek: "TUESDAY",
-            startTime: "11:00",
+            dayOfWeek: "WEDNESDAY",
+            startTime: "09:30",
             endTime: "12:30",
-            room: "LC3-121"
-          },
-          {
-            dayOfWeek: "THURSDAY",
-            startTime: "11:00",
-            endTime: "12:30",
-            room: "LC3-121"
-          }
-        ]
-      },
-      {
-        sectionId: 108,
-        sectionNo: "030002",
-        instructor: "ผศ.ดร.ฐาปนา บุญชู",
-        schedules: [
-          {
-            dayOfWeek: "TUESDAY",
-            startTime: "11:00",
-            endTime: "12:30",
-            room: "LC3-122"
-          },
-          {
-            dayOfWeek: "THURSDAY",
-            startTime: "11:00",
-            endTime: "12:30",
-            room: "LC3-122"
+            room: "SC3-413",
           },
         ],
       },
     ],
   },
   {
-    courseCode: "CS101",
-    courseName: "DISCRETE STRUCTURES",
+    courseCode: "ST216",
+    courseName: "STATISTICS FOR SOCIAL SCIENCE 1",
     category: "MAJOR",
     credits: 3,
     sections: [
       {
-        sectionId: 109,
-        sectionNo: "020001",
-        instructor: "ผศ.ดร.ศาตนาฏ กิจศิรานุวัตร",
+        sectionId: 108,
+        sectionNo: "040001",
+        instructor: "ผศ.ณัฐธิดา พรหมวงศ์",
         schedules: [
           {
             dayOfWeek: "TUESDAY",
-            startTime: "09:30",
-            endTime: "11:00",
-            room: "LC3-122"
+            startTime: "13:30",
+            endTime: "16:30",
+            room: "SC2-105",
           },
+        ],
+      },
+    ],
+  },
+  {
+    courseCode: "JP171",
+    courseName: "JAPANESE 1",
+    category: "FREE_ELECTIVE",
+    credits: 3,
+    sections: [
+      {
+        sectionId: 109,
+        sectionNo: "920001",
+        instructor: "อ.ยูกิ ทานากะ",
+        schedules: [
           {
-            dayOfWeek: "THURSDAY",
-            startTime: "09:30",
-            endTime: "11:00",
-            room: "LC3-122"
+            dayOfWeek: "FRIDAY",
+            startTime: "13:30",
+            endTime: "16:30",
+            room: "LC2-204",
           },
         ],
       },
