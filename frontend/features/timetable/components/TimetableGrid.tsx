@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { DAY_NAMES } from "../../courses/dayNames";
+import ExportPngButton from "../../timetable-export/ExportPngButton";
 import {
   GRID_DAYS,
   GRID_END_HOUR,
@@ -14,6 +16,8 @@ type TimetableGridProps = {
   conflicts: TimeConflict[];
   totalCredits: number;
   maxCredits: number;
+  academicYear: number;
+  semester: number;
 };
 
 // รับข้อมูลที่ hook คำนวณแล้วผ่าน props: entries เป็นคาบที่จะวาด, conflicts เป็นผลตรวจเวลาชน
@@ -23,7 +27,11 @@ const TimetableGrid = ({
   conflicts,
   totalCredits,
   maxCredits,
+  academicYear,
+  semester,
 }: TimetableGridProps) => {
+  // ใช้ section นี้เป็นขอบเขตภาพที่ ExportPngButton จะจับไปบันทึกเป็น PNG
+  const timetableSectionRef = useRef<HTMLElement>(null);
   // รวมคู่เวลาชนที่ช่วงตรงกันพอดีให้เป็นกลุ่มเดียวสำหรับวาดแถบสีแดงทับบล็อกวิชา
   const conflictGroups = groupConflicts(entries, conflicts);
   // คอลัมน์พื้นหลังและหัวชั่วโมงใช้จำนวนช่องเดียวกัน เพื่อให้แนวเส้นเวลาเรียงตรงกัน
@@ -34,12 +42,20 @@ const TimetableGrid = ({
   const timelineMinutes = (GRID_END_HOUR - GRID_START_HOUR) * 60;
 
   return (
-    <section className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
+    <section ref={timetableSectionRef} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-bold">ตารางเรียนจำลอง</h2>
-        <p className="text-sm text-slate-600">
-          หน่วยกิต {totalCredits} / {maxCredits}
-        </p>
+        <div className="flex items-start gap-3">
+          <p className="py-2 text-sm text-slate-600">
+            หน่วยกิต {totalCredits} / {maxCredits}
+          </p>
+          <ExportPngButton
+            targetRef={timetableSectionRef}
+            academicYear={academicYear}
+            semester={semester}
+            hasConflicts={conflicts.length > 0}
+          />
+        </div>
       </div>
 
       {entries.length === 0 && (

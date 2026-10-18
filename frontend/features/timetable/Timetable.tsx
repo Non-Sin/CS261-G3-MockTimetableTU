@@ -60,6 +60,8 @@ const Timetable = () => {
           conflicts={conflicts}
           totalCredits={totalCredits}
           maxCredits={maxCredits}
+          academicYear={academicYear}
+          semester={semester}
         />
 
         {/* รายการวิชาที่เลือกแล้วส่งรหัสกลับผ่าน removeCourse เมื่อต้องการลบ */}
