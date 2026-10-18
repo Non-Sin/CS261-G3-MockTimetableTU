@@ -1,4 +1,5 @@
 import { mockCourses } from "../courses/mockData";
+import type { Course } from "../courses/types";
 import type { TimeConflict, Timetable, TimetableEntry } from "./types";
 
 // ข้อมูลตารางสำหรับ unit test สร้างจากรายวิชาจำลองของ US1 (กลุ่มเรียนแรกของแต่ละวิชา)
@@ -6,10 +7,9 @@ import type { TimeConflict, Timetable, TimetableEntry } from "./types";
 // 6 วิชา 18 หน่วยกิต ตามหน้า "ตารางเรียนจำลอง" ใน UI Prototype
 export const SIX_COURSES = ["CS180", "MA211", "CS111", "LAS101", "TU101", "TU106"];
 
-// CS102 Sec 030001 เรียนอังคาร/พฤหัสบดี 11:00-12:30 ชนกับ CS111
-export const CS111_CS102_CONFLICTS: TimeConflict[] = [
-  { dayOfWeek: "TUESDAY", overlapStart: "11:00", overlapEnd: "12:30", courseCodes: ["CS111", "CS102"] },
-  { dayOfWeek: "THURSDAY", overlapStart: "11:00", overlapEnd: "12:30", courseCodes: ["CS111", "CS102"] },
+// TU109 Sec 780001 เรียนพุธ 09:30-12:30 ชนกับ LAS101 (คู่เวลาชนใน seed 1/2568)
+export const LAS101_TU109_CONFLICTS: TimeConflict[] = [
+  { dayOfWeek: "WEDNESDAY", overlapStart: "09:30", overlapEnd: "12:30", courseCodes: ["LAS101", "TU109"] },
 ];
 
 export const findCourse = (courseCode: string) => {
@@ -18,7 +18,28 @@ export const findCourse = (courseCode: string) => {
   return course;
 };
 
-const toEntry = (courseCode: string, index: number): TimetableEntry => {
+// CS111 2 กลุ่มตาม seed 1/2568 (ข้อมูลจำลองมีแค่ 030001) ใช้ทดสอบการเลือกกลุ่มเรียนก่อนเพิ่ม
+export const cs111WithTwoSections = (): Course => {
+  const course = findCourse("CS111");
+
+  return {
+    ...course,
+    sections: [
+      ...course.sections,
+      {
+        sectionId: 9030002,
+        sectionNo: "030002",
+        instructor: "อ.ดร.วิไลวรรณ ศรีสุข",
+        schedules: [
+          { dayOfWeek: "MONDAY", startTime: "09:30", endTime: "11:00", room: "LC3-122" },
+          { dayOfWeek: "FRIDAY", startTime: "09:30", endTime: "11:00", room: "LC3-122" },
+        ],
+      },
+    ],
+  };
+};
+
+const toEntry =(courseCode: string, index: number): TimetableEntry => {
   const course = findCourse(courseCode);
   const section = course.sections[0];
 

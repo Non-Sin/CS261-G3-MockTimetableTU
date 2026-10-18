@@ -2,16 +2,16 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toPng } from "html-to-image";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { coursesApi } from "../courses/api";
-import { timetableApi } from "../timetable/api";
+import { fetchCourses } from "../courses/api";
+import { fetchTimetable } from "../timetable/api";
 import Timetable from "../timetable/Timetable";
-import { buildTimetable, CS111_CS102_CONFLICTS, SIX_COURSES } from "../timetable/testFixtures";
+import { buildTimetable, LAS101_TU109_CONFLICTS, SIX_COURSES } from "../timetable/testFixtures";
 import type { Timetable as TimetableData } from "../timetable/types";
 import { EXPORT_IGNORE_ATTR } from "./exportPng";
 
 vi.mock("html-to-image", () => ({ toPng: vi.fn() }));
-vi.mock("../timetable/api", () => ({ timetableApi: { get: vi.fn(), addEntry: vi.fn() } }));
-vi.mock("../courses/api", () => ({ coursesApi: { search: vi.fn() } }));
+vi.mock("../timetable/api", () => ({ fetchTimetable: vi.fn(), addTimetableEntry: vi.fn() }));
+vi.mock("../courses/api", () => ({ fetchCourses: vi.fn() }));
 
 const DATA_URL = "data:image/png;base64,TEST";
 const ERROR_TEXT = "ส่งออกภาพไม่สำเร็จ กรุณาลองใหม่";
@@ -21,7 +21,7 @@ const timetableBox = () => screen.getByRole("heading", { name: "ตาราง�
 
 // แสดงหน้าตารางของ US1 โดยให้ GET /api/timetable ตอบตารางที่กำหนด แล้วรอโหลดเสร็จ
 const renderTimetable = async (timetable: TimetableData) => {
-  vi.mocked(timetableApi.get).mockResolvedValue(timetable);
+  vi.mocked(fetchTimetable).mockResolvedValue(timetable);
   render(<Timetable />);
   await waitFor(() => expect(screen.queryByText("กำลังโหลดตารางเรียน…")).not.toBeInTheDocument());
 };
@@ -31,8 +31,8 @@ describe("ปุ่ม PNG บนหน้าตารางเรียนจ�
 
   beforeEach(() => {
     vi.mocked(toPng).mockReset().mockResolvedValue(DATA_URL);
-    vi.mocked(coursesApi.search).mockReset().mockResolvedValue([]);
-    vi.mocked(timetableApi.get).mockReset();
+    vi.mocked(fetchCourses).mockReset().mockResolvedValue([]);
+    vi.mocked(fetchTimetable).mockReset();
     downloads = [];
     vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) {
       downloads.push(this);
@@ -106,7 +106,7 @@ describe("ปุ่ม PNG บนหน้าตารางเรียนจ�
   });
 
   it("[UT-UI-10] มีเวลาชน ปุ่มยังแสดงแต่ disabled และไม่สร้างภาพ", async () => {
-    await renderTimetable(buildTimetable([...SIX_COURSES, "CS102"], { conflicts: CS111_CS102_CONFLICTS }));
+    await renderTimetable(buildTimetable([...SIX_COURSES, "TU109"], { conflicts: LAS101_TU109_CONFLICTS }));
 
     expect(screen.getByText("ตรวจพบเวลาเรียนซ้อนทับกัน")).toBeInTheDocument();
     expect(within(timetableBox()).getByRole("button", { name: "PNG" })).toBeDisabled();

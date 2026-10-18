@@ -8,16 +8,19 @@ export type CourseSearchParams = {
   category?: CourseCategory;
 };
 
-// ค้นหารายวิชาที่เปิดสอนในภาคเรียนที่เลือก ไม่ส่ง q หรือ category ถ้าไม่ได้กรอง
-export const coursesApi = {
-  search: ({ academicYear, semester, q, category }: CourseSearchParams) => {
-    const params = new URLSearchParams({
-      academicYear: String(academicYear),
-      semester: String(semester),
-    });
-    if (q?.trim()) params.set("q", q.trim());
-    if (category) params.set("category", category);
+// Service สำหรับเชื่อม endpoint ค้นหารายวิชาตาม API Spec เมื่อ backend พร้อม
+// รับ filters จากหน้าค้นหา, แปลงเป็น query string แล้วส่งผ่าน apiFetch กลาง
+// ผลลัพธ์ที่ resolve กลับมาคือ Course[] ซึ่งใช้รูปแบบเดียวกับข้อมูล mock
+export const fetchCourses = (filters: CourseSearchParams) => {
+  const params = new URLSearchParams({
+    academicYear: String(filters.academicYear),
+    semester: String(filters.semester),
+  });
+  const query = filters.q?.trim();
 
-    return apiFetch<Course[]>(`/api/courses?${params}`);
-  },
+  // ไม่ส่ง q ว่าง; ส่ง category เฉพาะเมื่อเลือกหมวด ไม่เช่นนั้น backend ใช้ค่าทั้งหมด
+  if (query) params.set("q", query);
+  if (filters.category) params.set("category", filters.category);
+
+  return apiFetch<Course[]>(`/api/courses?${params.toString()}`);
 };
