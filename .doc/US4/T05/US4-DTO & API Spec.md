@@ -68,12 +68,11 @@ US4 เพิ่ม Endpoint ใหม่ภายใต้ `/api/auth` ซึ�
   "type": "about:blank",
   "title": "Unauthorized",
   "status": 401,
-  "detail": "...",
-  "instance": "/api/auth/logout"
+  "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
 }
 ```
 
-> `detail` และโครงสร้างจริงของ `401` ขึ้นกับ Authentication ของ US3 ให้ตรวจกับ implementation อีกครั้ง
+> Body ของ `401` มาจาก `AuthenticationEntryPoint` ใน `SecurityConfig` ของ US3 ซึ่งใช้ร่วมกับทุก `/api/**` จึงไม่มี `instance` (ตรวจกับ implementation ของ US3-T08 แล้ว)
 
 ## พฤติกรรมฝั่ง Frontend
 

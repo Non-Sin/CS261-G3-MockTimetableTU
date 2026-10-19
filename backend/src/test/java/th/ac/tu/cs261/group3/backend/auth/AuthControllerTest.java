@@ -18,14 +18,17 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Controller test แบบไม่ต้องใช้ฐานข้อมูล (mock AuthService) ตาม POST /api/auth/login ใน US3-T05 DTO & API Spec
+ * และ POST /api/auth/logout ใน US4-T05 DTO & API Spec
  */
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)   // ทดสอบเฉพาะ controller การตรวจ token อยู่ใน SecurityConfigTest
@@ -128,5 +131,16 @@ class AuthControllerTest {
         login(VALID_BODY)
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.code").value("TU_API_UNAVAILABLE"));
+    }
+
+    // ---------- logout (US4) ----------
+
+    @Test
+    void logout_returns204WithoutBody() throws Exception {
+        mockMvc.perform(post("/api/auth/logout"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+        verify(authService, times(1)).logout();
     }
 }

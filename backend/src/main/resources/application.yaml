@@ -47,7 +47,7 @@ app:
     lock-seconds: 900                  # ล็อก 15 นาที
     jwt:
       secret: "${JWT_SECRET}"          # อย่างน้อย 32 ตัวอักษร (HS256)
-      expiration-ms: 28800000          # token อายุ 8 ชั่วโมง
+      expiration-ms: 10800000          # token อายุ 3 ชั่วโมง
 
   # --- TU Login API ---
   # รัน profile stub-tu (Postman/dev) จะใช้ StubTuApiClient แทน ไม่ต้องมี key

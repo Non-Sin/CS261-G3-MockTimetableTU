@@ -24,6 +24,8 @@ public class StubTuApiClient implements TuApiClient {
     private static final String SCI_TECH = "คณะวิทยาศาสตร์และเทคโนโลยี";
 
     private static final Map<String, TuAuthDto> ACCOUNTS = Map.of(
+            // demo: active, CS ภาคปกติ รหัสเดียวกับนักศึกษา demo ของ US1 (ตารางเรียนใน DaoFixture / System Test)
+            "6609000000", student("6609000000", "ปกติ", "10", "สมพร ตัวอย่าง", "somporn tuayang", CS),
             // A: active, CS ภาคปกติ (TC1a, 3, 4, 5, 7)
             "6609000001", student("6609000001", "ปกติ", "10", "สมชาย ใจดี", "somchai jaidee", CS),
             // B: สาขาอื่น (TC2)

@@ -1,0 +1,330 @@
+{
+  "info": {
+    "name": "US4-T08 Logout API",
+    "description": "ทดสอบ POST /api/auth/logout ตาม US4-T05 DTO & API Spec, US4-T06 Sequence Diagram และ IT ของ US4-T13\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย profile stub-tu (StubTuApiClient แทน TU Login API จริง)\n- บัญชี {{csUser}} ยังไม่ถูกล็อก\n\nต้องรันตามลำดับ (Run collection) เพราะ request 02–07, 09 ใช้ token จาก request 01",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 POST /api/auth/logout ไม่มี token → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail ตาม US4-T05 (logout ต้องผ่าน Authentication)', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.title).to.eql('Unauthorized');",
+              "  pm.expect(body.status).to.eql(401);",
+              "  pm.expect(body.detail).to.eql('กรุณาเข้าสู่ระบบก่อนใช้งาน');",
+              "});",
+              "pm.test('body ไม่มี instance ตาม Spec ที่แก้แล้ว', () => {",
+              "  pm.expect(pm.response.json()).to.not.have.property('instance');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/api/auth/logout"
+      }
+    },
+    {
+      "name": "01 POST login นักศึกษา CS (เตรียม token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ได้ token เป็น JWT', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const token = pm.response.json().token;",
+              "  pm.expect(token.split('.')).to.have.lengthOf(3);",
+              "  pm.collectionVariables.set('token', token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{csUser}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "02 IT-06 GET /api/users/me ก่อน Logout → 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 API ใช้งานได้ก่อน Logout', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().studentId).to.eql(pm.collectionVariables.get('csUser'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/users/me"
+      }
+    },
+    {
+      "name": "03 IT-01/IT-02 POST /api/auth/logout ด้วย token → 204",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('204 No Content ไม่มี Response Body', () => {",
+              "  pm.response.to.have.status(204);",
+              "  pm.expect(pm.response.text()).to.eql('');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/logout"
+      }
+    },
+    {
+      "name": "04 IT-07 GET /api/users/me หลัง Logout ไม่ส่ง token → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 Client ล้าง token แล้วเรียก API ไม่ได้', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.title).to.eql('Unauthorized');",
+              "  pm.expect(body.status).to.eql(401);",
+              "  pm.expect(body.detail).to.eql('กรุณาเข้าสู่ระบบก่อนใช้งาน');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/users/me"
+      }
+    },
+    {
+      "name": "05 IT-08 GET /api/users/me ด้วย token เดิมหลัง Logout → 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 stateless JWT ไม่มี denylist token เดิมยังใช้ได้จนหมดอายุ (ข้อจำกัดตามการออกแบบ)', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().studentId).to.eql(pm.collectionVariables.get('csUser'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/users/me"
+      }
+    },
+    {
+      "name": "06 POST /api/auth/logout ซ้ำด้วย token เดิม → 204",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('204 backend ไม่เก็บสถานะ Logout ซ้ำได้', () => {",
+              "  pm.response.to.have.status(204);",
+              "  pm.expect(pm.response.text()).to.eql('');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/logout"
+      }
+    },
+    {
+      "name": "07 POST /api/auth/logout token ถูกแก้ลายเซ็น → 401",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const t = pm.collectionVariables.get('token');",
+              "pm.collectionVariables.set('tamperedToken', t.slice(0, -4) + (t.slice(-4) === 'AAAA' ? 'BBBB' : 'AAAA'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 token ไม่ถูกต้อง', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.title).to.eql('Unauthorized');",
+              "  pm.expect(body.status).to.eql(401);",
+              "  pm.expect(body.detail).to.eql('กรุณาเข้าสู่ระบบก่อนใช้งาน');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tamperedToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/logout"
+      }
+    },
+    {
+      "name": "08 POST /api/auth/logout token ไม่ใช่ JWT → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 token ไม่ถูกต้อง', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.title).to.eql('Unauthorized');",
+              "  pm.expect(body.status).to.eql(401);",
+              "  pm.expect(body.detail).to.eql('กรุณาเข้าสู่ระบบก่อนใช้งาน');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer not-a-jwt"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/logout"
+      }
+    },
+    {
+      "name": "09 POST /api/auth/logout ใช้ scheme Basic → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ต้องเป็น Authorization: Bearer', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.title).to.eql('Unauthorized');",
+              "  pm.expect(body.status).to.eql(401);",
+              "  pm.expect(body.detail).to.eql('กรุณาเข้าสู่ระบบก่อนใช้งาน');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Basic {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/logout"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "csUser",
+      "value": "6609000001"
+    },
+    {
+      "key": "password",
+      "value": "Passw0rd!"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tamperedToken",
+      "value": ""
+    }
+  ]
+}

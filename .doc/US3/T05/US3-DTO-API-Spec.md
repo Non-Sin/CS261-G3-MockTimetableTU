@@ -95,7 +95,7 @@ POST /api/auth/login ปฏิเสธได้ 5 แบบ ตอบเป็�
 
 ชื่อ-นามสกุลเป็นภาษาไทยจาก `displayname_th` ของ TU API
 
-ไม่มี token, token ผิด หรือหมดอายุ (อายุ 8 ชั่วโมง) ตอบ `401` ทั้ง endpoint นี้และ `/api/**` อื่นทุกตัว ยกเว้น `POST /api/auth/login` (UI ควรพากลับหน้า Login)
+ไม่มี token, token ผิด หรือหมดอายุ (อายุ 3 ชั่วโมง) ตอบ `401` ทั้ง endpoint นี้และ `/api/**` อื่นทุกตัว ยกเว้น `POST /api/auth/login` (UI ควรพากลับหน้า Login)
 ```json
 {
   "type": "about:blank",

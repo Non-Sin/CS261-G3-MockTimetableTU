@@ -22,6 +22,18 @@ class StubTuApiClientTest {
     }
 
     @Test
+    void demoStudent_correctPassword_isActiveCsStudent() {
+        TuAuthDto result = stub.verifyCredentials("6609000000", StubTuApiClient.PASSWORD);
+
+        assertThat(result.status()).isTrue();
+        assertThat(result.username()).isEqualTo("6609000000");
+        assertThat(result.type()).isEqualTo("student");
+        assertThat(result.tuStatus()).isEqualTo("ปกติ");
+        assertThat(result.department()).isEqualTo("ภาควิชาวิทยาการคอมพิวเตอร์");
+        assertThat(result.displaynameTh()).isEqualTo("สมพร ตัวอย่าง");
+    }
+
+    @Test
     void otherAccounts_matchTheirTestCase() {
         assertThat(stub.verifyCredentials("6609000002", StubTuApiClient.PASSWORD).department())
                 .isNotEqualTo("ภาควิชาวิทยาการคอมพิวเตอร์");

@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -290,5 +291,15 @@ class AuthServiceTest {
         assertThat(ex.getCode()).isEqualTo("TU_API_UNAVAILABLE");
         verify(loginAttemptService, never()).loginFailed(anyString());
         verify(loginAttemptService, never()).loginSucceeded(anyString());
+    }
+
+    // ---------- logout (US4 แบบ stateless) ----------
+
+    @Test
+    void logout_doesNotTouchAnyDependency() {
+        authService.logout();
+
+        // ไม่ invalidate token ไม่เรียก DAO และไม่เรียก TU API
+        verifyNoInteractions(tuApiClient, userRepository, loginAttemptService, jwtService);
     }
 }
