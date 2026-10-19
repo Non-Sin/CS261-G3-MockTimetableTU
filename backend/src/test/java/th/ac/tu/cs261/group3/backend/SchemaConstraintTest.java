@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.dao.DataIntegrityViolationException;
+import th.ac.tu.cs261.group3.backend.auth.LoginAttempt;
+import th.ac.tu.cs261.group3.backend.auth.LoginAttemptRepository;
 import th.ac.tu.cs261.group3.backend.course.Course;
 import th.ac.tu.cs261.group3.backend.course.Section;
 import th.ac.tu.cs261.group3.backend.course.SectionRepository;
@@ -25,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * US1-T12 UT-DAO-17 – 21: Flyway migration และ constraint ตาม US1-T06 ER Diagram
+ * และ US3-T12 UT-DAO-US3-11: constraint ของ login_attempt ตาม US3-T06 ER Diagram
  * <p>
  * กรณีที่คาดว่า throw อยู่ขั้นสุดท้ายของ test เพราะ session ใช้ต่อไม่ได้หลัง constraint ล้ม
  */
@@ -43,6 +46,9 @@ class SchemaConstraintTest {
     @Autowired
     private SectionRepository sectionRepository;
 
+    @Autowired
+    private LoginAttemptRepository loginAttemptRepository;
+
     private DaoFixture fixture;
 
     @BeforeEach
@@ -50,7 +56,7 @@ class SchemaConstraintTest {
         fixture = DaoFixture.persist(em);
     }
 
-    /** UT-DAO-17 context start ได้แปลว่า Hibernate validate ผ่านกับ entity ทั้ง 5 ตัว */
+    /** UT-DAO-17 context start ได้แปลว่า Hibernate validate ผ่านกับ entity ทุกตัว */
     @Test
     void contextLoads_flywayMigrationMatchesEntities() throws IOException {
         int migrationFiles = new PathMatchingResourcePatternResolver()
@@ -103,6 +109,16 @@ class SchemaConstraintTest {
         duplicate.setSemester(1);
 
         assertThrows(DataIntegrityViolationException.class, () -> sectionRepository.saveAndFlush(duplicate));
+    }
+
+    /** US3-T12 UT-DAO-US3-11 */
+    @Test
+    void saveAndFlush_negativeFailedAttempts_throwsConstraintViolation() {
+        LoginAttempt attempt = new LoginAttempt("negative_user");
+        attempt.setFailedAttempts(-1);
+        attempt.setUpdatedAt(DaoFixture.UPDATED_AT);
+
+        assertThrows(DataIntegrityViolationException.class, () -> loginAttemptRepository.saveAndFlush(attempt));
     }
 
     /** UT-DAO-21 */
