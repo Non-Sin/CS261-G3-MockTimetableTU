@@ -289,11 +289,13 @@ describe("US1-T10 หน้าตารางเรียนจำลองเ�
     expect(await screen.findByText("โหลดรายวิชาไม่สำเร็จ กรุณาลองใหม่")).toBeInTheDocument();
   });
 
-  it("ปุ่มลบวิชาปิดไว้จนกว่า US2 จะเชื่อม API", async () => {
+  it("ปุ่มลบวิชาเปิดใช้งานเมื่อมีวิชาในตาราง และปิดไว้เมื่อตารางว่าง (US2)", async () => {
     vi.mocked(fetchTimetable).mockResolvedValue(buildTimetable(["CS111"]));
     render(<Timetable />);
     await waitForTimetable();
 
-    expect(screen.getByRole("button", { name: "ลบวิชา" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "ลบวิชา" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "ลบทั้งหมด" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: /^ลบที่เลือก/ })).toBeDisabled();
   });
 });
