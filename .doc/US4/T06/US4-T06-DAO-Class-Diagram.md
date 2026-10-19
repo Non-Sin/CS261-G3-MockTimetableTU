@@ -1,0 +1,46 @@
+# US4-T06 — DAO Class Diagram
+
+US4 **ไม่มี entity หรือ repository ใหม่ และไม่เพิ่ม method ใน repository** ใช้ของ US3 ทั้งหมด แผนภาพนี้วาดเฉพาะ DAO ที่ `AuthService` มีอยู่จาก US3 เพื่อให้เห็นว่า US4 reuse DAO เดิมและไม่มี DAO ใหม่ ดู flow ใน [Sequence Diagram](./US4-T06-Sequence-Diagram.md)
+
+`AuthService.logout()` ไม่เรียก `UserRepository` เลย `UserRepository` ยังอยู่ในแผนภาพเพราะเป็น dependency เดิมของ `AuthService`
+
+```mermaid
+classDiagram
+    direction TB
+
+    class UserRepository {
+        <<US3 Repository>>
+    }
+
+    class AuthService {
+        <<US3 Service, extended in US4>>
+        -userRepository: UserRepository
+        +authenticate(request: LoginRequest) LoginResponse
+        +logout() void
+    }
+
+    AuthService --> UserRepository : dependency เดิมจาก US3
+```
+
+| Repository | ที่มา | ใช้โดย | ใช้ใน US4-T06 |
+| --- | --- | --- | --- |
+| `UserRepository` | US3 | `AuthService` | ไม่ถูกเรียกโดย `logout()` และไม่มี method ใหม่ |
+
+**ทำไมไม่มี DAO ใหม่**
+
+- Logout ใช้ `POST /api/auth/logout` ไม่มี Request Body ใช้ Authentication (JWT) ของ US3 และไม่ invalidate token ฝั่ง server (stateless) จึงไม่มีข้อมูลให้บันทึก
+- token หมดอายุตรวจที่ `JwtService.isTokenValid()` ของ US3 จาก `exp` ใน token ส่วน inactivity timeout จับเวลาฝั่ง Client ทั้งสองกรณีไม่มีการอ่านหรือเขียนข้อมูลผ่าน DAO
+- ไม่มีตารางใหม่ จึงไม่มี Entity หรือ Repository ใหม่ ดู [ER Diagram](./US4-T06-ER-Diagram.md)
+- ไม่ควรสร้าง Repository หรือ method เพียงเพื่อให้แผนภาพมีองค์ประกอบเพิ่ม
+
+รายละเอียดของ `UserRepository` และ Entity `User` (ตาราง `users`) ให้ยึดตาม [DAO Class Diagram ของ US3-T06](../../US3/T06/US3-T06-DAO-Class-Diagram.md)
+
+## เอกสารที่เกี่ยวข้อง
+
+- [Sequence Diagram](./US4-T06-Sequence-Diagram.md)
+- [DAO Class Diagram](./US4-T06-DAO-Class-Diagram.md)
+- [Extended API Class Diagram](./US4-T06-Extended-API-Class-Diagram.md)
+- [ER Diagram (DB)](./US4-T06-ER-Diagram.md)
+- [US4-T05 — API Class Diagram](../T05/US4-API-Class-Diagram.md)
+- [US4-T05 — DTO & API Spec](../T05/US4-DTO%20%26%20API%20Spec.md)
+- [US3 — DAO Class Diagram](../../US3/T06/US3-T06-DAO-Class-Diagram.md)
