@@ -394,6 +394,43 @@
       }
     },
     {
+      "name": "11a TC2 นักศึกษา CS ภาคพิเศษ (รหัสหลักที่ 5–6 เป็น 65) → 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('403 ProblemDetail code NOT_CS_STUDENT', () => {",
+              "  pm.response.to.have.status(403);",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.status).to.eql(403);",
+              "  pm.expect(p.code).to.eql('NOT_CS_STUDENT');",
+              "  pm.expect(p.token).to.be.undefined;",
+              "});",
+              "pm.test('detail แจ้งว่าเปิดให้เฉพาะนักศึกษา CS ภาคปกติ', () => {",
+              "  pm.expect(pm.response.json().detail).to.include('วิทยาการคอมพิวเตอร์').and.include('ภาคปกติ');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{specialTrackUser}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
       "name": "12 TC6 รหัสผิดครั้งที่ 1 → 401",
       "event": [
         {
@@ -691,6 +728,10 @@
     {
       "key": "staffUser",
       "value": "staff01"
+    },
+    {
+      "key": "specialTrackUser",
+      "value": "6609650001"
     },
     {
       "key": "unavailableUser",

@@ -6,8 +6,8 @@ Oct 19, 2026 · @Non
 
 | ชุดทดสอบ | ผล |
 | --- | --- |
-| Unit test backend (`./mvnw clean test`) | **ผ่าน 147/147** (28 test class) เป็นของ US3-T08 ใหม่ 62 test ใน 12 class |
-| Postman (newman) 20 request | **ผ่าน 23/23 assertion** ไม่มี request ล้ม |
+| Unit test backend (`./mvnw clean test`) | **ผ่าน 150/150** (28 test class) เป็นของ US3-T08 ใหม่ 65 test ใน 12 class |
+| Postman (newman) 21 request | **ผ่าน 25/25 assertion** ไม่มี request ล้ม |
 | Test case ของการ์ด US3 ที่ทดสอบผ่าน API | TC1a, TC1b, TC2, TC5, TC6, TC7 ผ่าน · TC3, TC4 ต้องใช้บัญชี มธ. จริง (ดู "การจับคู่กับ UAT") |
 
 **User story:** US3 Login เข้าสู่ระบบด้วย user name และ password ของสำนักทะเบียน · branch `feature/US3-T08-develop-api-dto` (ต่อจาก `feature/US3-T09` DAO และ entity)
@@ -19,7 +19,7 @@ Oct 19, 2026 · @Non
 | วันที่รัน | 2026-10-19 |
 | Java / Spring Boot / Spring Security | 21.0.10 / 4.1.1 / 7.1.1 |
 | Unit test DB | DAO test ใช้ Testcontainers `mcr.microsoft.com/mssql/server:2025-latest` · `BackendApplicationTests` ใช้ SQL Server จาก `docker compose` |
-| Postman | newman 6.2.1 (`npx -y newman@6.2.1`) · Node 24.21.0 |
+| Postman | newman 6.2.3 (`npx -y newman`) · Node 24.21.0 |
 | Backend ตอนรัน Postman | `./mvnw spring-boot:run -Dspring-boot.run.profiles=stub-tu` ที่ `http://localhost:8080` กับ DB ของ `docker compose` ตาราง `login_attempt` ว่าง |
 | TU Login API | **stub** (`StubTuApiClient`) ค่า `type`, `tu_status`, `department`, `faculty` สะกดตาม response จริงของ TU API ส่วนรหัสนักศึกษาและชื่อเป็นค่าสมมติ |
 | ค่า config | `JWT_SECRET` จาก `.env` (ยาว ≥ 32 ตัวอักษร) · `app.auth.max-attempts=5` · `app.auth.lock-seconds=900` · token อายุ 8 ชั่วโมง |
@@ -33,6 +33,7 @@ Oct 19, 2026 · @Non
 | `6609000003` | B ไม่ active | `tu_status: พักการศึกษา` | 1b |
 | `6609000004` | D สำรองทดสอบการล็อก | เหมือน `6609000001` | 6 |
 | `staff01` | บุคลากร | `type: employee` | 2 |
+| `6609650001` | B2 CS ภาคพิเศษ (หลักที่ 5–6 เป็น `65`) | เหมือน `6609000001` ต่างแค่รหัสนักศึกษา ชื่อ "สมปอง พิเศษ" | 2 |
 | `6609000099` | — | โยน 503 เหมือน TU API ใช้งานไม่ได้ | — |
 | อื่น ๆ หรือรหัสผิด | — | `status: false`, `message: "Users or Password Invalid!"` เหมือน TU API ตอบ 400 | 5, 6 |
 
@@ -45,7 +46,7 @@ Oct 19, 2026 · @Non
 | `auth.AuthControllerTest` | Controller (US3) | 8 | 8 | 4.607 |
 | `user.UserControllerTest` | Controller (US3) | 2 | 2 | 0.281 |
 | `config.SecurityConfigTest` | Security filter chain + JWT จริง (US3) | 6 | 6 | 0.499 |
-| `auth.AuthServiceTest` | Service (US3) | 12 | 12 | 0.573 |
+| `auth.AuthServiceTest` | Service (US3) | 15 | 15 | 0.589 |
 | `auth.LoginAttemptServiceTest` | Service (US3) | 8 | 8 | 0.100 |
 | `auth.JwtServiceTest` | Service (US3) | 5 | 5 | 0.151 |
 | `user.UserServiceTest` | Service (US3) | 2 | 2 | 0.005 |
@@ -70,7 +71,7 @@ Oct 19, 2026 · @Non
 | `common.exception.GlobalExceptionHandlerTest` | common | 2 | 2 | 0.034 |
 | `item.ItemControllerTest` | ตัวอย่างเดิม | 6 | 6 | 0.453 |
 | `BackendApplicationTests` | context | 1 | 1 | 2.158 |
-| **รวม** | | **147** | **147** | |
+| **รวม** | | **150** | **150** | |
 
 \* รวมเวลา start SQL Server container ครั้งแรก
 
@@ -87,6 +88,7 @@ Oct 19, 2026 · @Non
 | รหัสถูกล้าง attempt ก่อนตรวจสาขา (ต่างสาขาไม่นับเป็นเดารหัส) | `authenticate_inactiveAccount_throws403AfterClearingAttempts`, `authenticate_otherDepartment_throws403NotCsStudent` |
 | `tu_status` ไม่ใช่ "ปกติ" → 403 `ACCOUNT_INACTIVE` และตรวจก่อนสาขา (TC1b) | `authenticate_inactiveAccount_...`, `authenticate_inactiveOtherDepartment_reportsInactiveFirst` |
 | สาขาอื่นหรือบุคลากร → 403 `NOT_CS_STUDENT` (TC2) | `authenticate_otherDepartment_...`, `authenticate_employee_throws403NotCsStudent` |
+| CS ภาคพิเศษ (หลักที่ 5–6 ของรหัสเป็น `65`) → 403 `NOT_CS_STUDENT` ไม่บันทึกผู้ใช้ · `65` ที่ตำแหน่งอื่น, `staff01`, `null` ไม่ใช่ภาคพิเศษ (TC2) | `authenticate_specialTrackCsStudent_throws403NotCsStudent`, `isSpecialTrack_...` 2 test |
 | upsert ผู้ใช้ใหม่/เดิม แยกชื่อจาก `displayname_th` นามสกุลหลายคำอยู่ครบ (TC1a, TC7) | `authenticate_csStudent_newUser_...`, `authenticate_existingUser_updatesProfile`, `authenticate_multiWordLastName_...` |
 | TU API ตอบ 400 + `Users or Password Invalid!` = รหัสผิด | `verifyCredentials_wrongPassword400_returnsStatusFalse` |
 | Application-Key ผิด (ทั้ง 401 และ 400), 5xx, HTML, timeout → 503 ไม่นับ attempt | `HttpTuApiClientTest` 5 test, `authenticate_tuApiUnavailable_doesNotCountAttempt` |
@@ -112,7 +114,7 @@ cd backend
 
 # terminal 2
 cd .doc/US3/T08
-npx -y newman@6.2.1 run US3-T08.postman_collection.json
+npx -y newman run US3-T08.postman_collection.json
 ```
 
 | # | Request | Test case | ผลที่คาดหวัง | ผล |
@@ -129,13 +131,14 @@ npx -y newman@6.2.1 run US3-T08.postman_collection.json
 | 09 | POST login `6609000003` | TC1b | 403 `ACCOUNT_INACTIVE` | PASS |
 | 10 | POST login `6609000002` | TC2 | 403 `NOT_CS_STUDENT` detail มี "วิทยาการคอมพิวเตอร์" และ "ภาคปกติ" | PASS |
 | 11 | POST login `staff01` | TC2 | 403 `NOT_CS_STUDENT` | PASS |
+| 11a | POST login `6609650001` (CS ภาคพิเศษ) | TC2 | 403 `NOT_CS_STUDENT` ไม่มี token detail มี "วิทยาการคอมพิวเตอร์" และ "ภาคปกติ" · ตรวจตาราง `users` หลังรันแล้วไม่มีแถวของ `6609650001` | PASS |
 | 12–15 | POST login `6609000004` รหัสผิดครั้งที่ 1–4 | TC6 | 401 `INVALID_CREDENTIALS` | PASS |
 | 16 | POST login `6609000004` รหัสผิดครั้งที่ 5 | TC6 | 429 `ACCOUNT_LOCKED` `retryAfterSeconds` 899–900 detail มี "15 นาที" | PASS |
 | 17 | POST login `6609000004` **รหัสถูก**ระหว่างล็อก | TC6 | ยัง 429 `retryAfterSeconds` 1–900 | PASS |
 | 18 | POST login ไม่ส่ง password | — | 400 `errors.password` | PASS |
 | 19 | POST login `6609000099` | — | 503 `TU_API_UNAVAILABLE` | PASS |
 
-เวลาตอบเฉลี่ย 66 ms (สูงสุด 361 ms คือ login ครั้งแรกหลัง start) รวม 2.9 วินาที
+เวลาตอบเฉลี่ย 58 ms (สูงสุด 302 ms คือ login ครั้งแรกหลัง start) รวม 2.9 วินาที
 
 **ก่อนรันซ้ำ** ต้องล้างตาราง `login_attempt` เพราะยังไม่มี API ปลดล็อก ถ้าไม่ล้างภายใน 15 นาที request 12–16 จะได้ 429 และ request 07 นับ attempt ของ `0000000000` สะสม (รันซ้ำครบ 5 ครั้งจะได้ 429)
 
@@ -151,7 +154,7 @@ docker exec sqlserver bash -c '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa 
 | --- | --- | --- |
 | TC1a | request 01, 08 · `AuthServiceTest` | บัญชีสมมติใน stub |
 | TC1b | request 09 · `authenticate_inactiveAccount_...` | `tu_status` ไม่ใช่ "ปกติ" |
-| TC2 | request 10, 11 · `authenticate_otherDepartment_...`, `authenticate_employee_...` | ตรวจได้เฉพาะสาขา ไม่ใช่ภาค (ดู "ข้อที่ต้องตัดสิน") |
+| TC2 | request 10, 11, 11a · `authenticate_otherDepartment_...`, `authenticate_employee_...`, `authenticate_specialTrackCsStudent_...` | ภาคพิเศษตรวจจากรหัสนักศึกษา (ดู "ข้อที่ต้องตัดสิน") |
 | TC3, TC4 | — | ระบบไม่เก็บรหัสผ่าน ส่งต่อให้ TU API ทุกครั้ง ผลจึงขึ้นกับ TU API ต้องทดสอบด้วยบัญชีจริงตอน UAT (US3-T20) |
 | TC5 | request 06, 07 | |
 | TC6 | request 12–17 · `LoginAttemptServiceTest`, `authenticate_locked_...`, `authenticate_fifthWrongPassword_...` | |
@@ -159,7 +162,7 @@ docker exec sqlserver bash -c '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa 
 
 ## ข้อที่ต้องตัดสิน
 
-**ตรวจ "ภาคปกติ" ไม่ได้** response จริงของ TU Login API มี `type`, `tu_status`, `department`, `faculty` แต่ไม่มี field บอกภาค (ปกติ/พิเศษ) ตอนนี้ `NOT_CS_STUDENT` ตรวจแค่ `type == student` และ `department == ภาควิชาวิทยาการคอมพิวเตอร์` และเก็บ `track = "ภาคปกติ"` ทุกคน ถ้า `department` ของนักศึกษาภาคพิเศษสะกดต่างกันก็ถูกกันออกอยู่แล้ว ต้องได้ response จริงของนักศึกษา CS ภาคพิเศษมาเทียบก่อน ถ้าเหมือนกันทีมต้องเลือกว่าจะหาข้อมูลจาก endpoint อื่นหรือบันทึกเป็นข้อจำกัด แก้ได้ที่ `AuthService.verifyTuStudentStatus` ที่เดียว
+**ตรวจ "ภาคพิเศษ" จากรหัสนักศึกษา (ทางแก้ชั่วคราว)** response จริงของ TU Login API มี `type`, `tu_status`, `department`, `faculty` แต่ไม่มี field บอกภาค (ปกติ/พิเศษ) ทีมตกลงให้ดูหลักที่ 5–6 ของรหัสนักศึกษา ถ้าเป็น `65` (เช่น `680965xxxx`) เป็นภาคพิเศษ ได้ 403 `NOT_CS_STUDENT` เหมือนต่างสาขา (ใช้ code เดิมตาม T13 IT-09 และ T11 จึงไม่ต้องแก้ UI) นอกนั้นเป็นภาคปกติ และเก็บ `track = "ภาคปกติ"` เพราะภาคพิเศษไม่ถึงขั้นบันทึก ข้อเสียคือขึ้นกับรูปแบบรหัสที่มหาวิทยาลัยไม่ได้ประกาศเป็นทางการ ถ้ารูปแบบรหัสเปลี่ยนหรือ TU API มีข้อมูลภาคให้ แก้ได้ที่ `AuthService.isSpecialTrack` ที่เดียว
 
 **เพิ่ม error `TU_API_UNAVAILABLE` (503)** ไม่มีใน Spec เดิม เพิ่มเพื่อไม่ให้ Application-Key ผิดหรือ TU API ล่มถูกนับเป็นรหัสผิด (ไม่อย่างนั้นผู้ใช้ทุกคนจะถูกล็อก) แก้ [DTO & API Spec](../T05/US3-DTO-API-Spec.md) และ `AuthErrorCode` แล้ว UI (US3-T07) ต้องมีข้อความสำหรับ code นี้
 
@@ -183,6 +186,6 @@ docker exec sqlserver bash -c '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa 
 - **frontend ของ US1 ยังไม่ส่ง token** หลัง merge หน้าตารางเรียนจะได้ 401 จนกว่า UI login ของ US3 จะเสร็จ
 - `compose.yaml` ส่ง `JWT_SECRET`, `TU_API_APPLICATION_KEY` และ `SPRING_PROFILES_ACTIVE` จาก `.env` เข้า container `backend` แล้ว (ไม่มี `JWT_SECRET` compose หยุดพร้อมข้อความ) ตรวจด้วย `docker compose config` แต่ยังไม่ได้ build และรัน image ของ backend ผ่าน compose
 - token เป็น stateless ยังไม่มี logout ฝั่ง server (ลบ token ที่ UI) และ token อยู่ได้ 8 ชั่วโมงแม้บัญชี มธ. ถูกระงับระหว่างนั้น
-- [US3-T13 Integration Test Cases](../T13/US3-T13-integration-test-cases-ui-api.md) ยังอ้าง `TuAuthDto` แบบเดิมและมี case "CS แต่ไม่ใช่ภาคปกติ" ที่ตรวจไม่ได้ ต้องแก้ตามเอกสารนี้
+- [US3-T13 Integration Test Cases](../T13/US3-T13-integration-test-cases-ui-api.md) ยังอ้าง `TuAuthDto` แบบเดิม ต้องแก้ตามเอกสารนี้ (case IT-09 "CS แต่ไม่ใช่ภาคปกติ" ตรวจได้แล้วด้วยบัญชี `6609650001`)
 
 **เอกสารที่เกี่ยวข้อง:** [DTO & API Spec](../T05/US3-DTO-API-Spec.md) · [Extended API Class Diagram](../T06/US3-T06-Extended-API-Class-Diagram.md) · [Sequence Diagram](../T06/US3-T06-Sequence-Diagram.md) · [US3-T12 DAO Unit Test Result](../T12/US3-T12-DAO-Unit-Test-Result.md) · [US3-T16 UAT](../US3-T16.md)

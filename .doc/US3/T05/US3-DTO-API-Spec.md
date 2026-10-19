@@ -2,7 +2,7 @@
 
 Oct 15, 2026 · @Elle
 
-> แก้ไข Oct 19, 2026 (US3-T08) ตาม response จริงของ TU Login API: เพิ่ม error `TU_API_UNAVAILABLE` (503), เงื่อนไข `NOT_CS_STUDENT` ตาม field ที่ TU API มีจริง และ 401 ของ `GET /api/users/me`
+> แก้ไข Oct 19, 2026 (US3-T08) ตาม response จริงของ TU Login API: เพิ่ม error `TU_API_UNAVAILABLE` (503), เงื่อนไข `NOT_CS_STUDENT` ตาม field ที่ TU API มีจริง (ตรวจภาคพิเศษจากหลักที่ 5–6 ของรหัสนักศึกษา) และ 401 ของ `GET /api/users/me`
 
 ## ภาพรวม
 
@@ -41,7 +41,7 @@ POST /api/auth/login ปฏิเสธได้ 5 แบบ ตอบเป็�
 | --- | --- | --- | --- |
 | ACCOUNT_LOCKED | 429 | ใส่รหัสผิด 5 ครั้ง โดนระงับบัญชี (กันตั้งแต่เริ่มฟังก์ชัน ไม่ต้องยิง TU API) | retryAfterSeconds |
 | INVALID_CREDENTIALS | 401 | TU Login API แจ้งว่า Username หรือ Password ไม่ถูกต้อง (หรือไม่มีบัญชีนี้) | - |
-| NOT_CS_STUDENT | 403 | ข้อมูลจาก TU Login API มี `type` ไม่ใช่ `student` หรือ `department` ไม่ใช่ `ภาควิชาวิทยาการคอมพิวเตอร์` (TU API ไม่มี field บอกภาค จึงยังแยกภาคพิเศษไม่ได้) | - |
+| NOT_CS_STUDENT | 403 | ข้อมูลจาก TU Login API มี `type` ไม่ใช่ `student` หรือ `department` ไม่ใช่ `ภาควิชาวิทยาการคอมพิวเตอร์` หรือเป็นภาคพิเศษ (TU API ไม่มี field บอกภาค จึงดูจากหลักที่ 5–6 ของรหัสนักศึกษา `65` = ภาคพิเศษ เช่น `680965xxxx` เป็นทางแก้ชั่วคราว) | - |
 | ACCOUNT_INACTIVE | 403 | `tu_status` ของบัญชี มธ. ไม่ใช่ `ปกติ` เช่น พักการศึกษา, ลาออก (TC1) | - |
 | TU_API_UNAVAILABLE | 503 | เรียก TU Login API ไม่สำเร็จ (Application-Key ผิด, timeout, 5xx) ไม่นับเป็นการใส่รหัสผิด | - |
 
@@ -63,7 +63,7 @@ POST /api/auth/login ปฏิเสธได้ 5 แบบ ตอบเป็�
 2. ยิง HTTP Request ตรวจสอบรหัสผ่านกับ TuApiClient → ถ้า TU API ใช้งานไม่ได้ โยน 503 TU_API_UNAVAILABLE (ไม่นับ Attempt)
 3. ถ้ารหัสผิด: สั่งบวก Attempt ด้วย loginFailed() (เช็คต่อว่าถ้าบวกแล้วครบ 5 ให้โยน 429 พร้อมเวลาที่ต้องรอ ถ้าไม่ถึงโยน 401 INVALID_CREDENTIALS)
 4. ถ้ารหัสถูก: เคลียร์ Attempt ด้วย loginSucceeded()
-5. เช็คสถานะบัญชีและสาขาด้วย verifyTuStudentStatus(tuResponse) → ถ้าบัญชีไม่ Active โยน 403 ACCOUNT_INACTIVE (TC1) แต่ถ้าไม่ใช่นักศึกษา CS โยน 403 NOT_CS_STUDENT (TC2)
+5. เช็คสถานะบัญชีและสาขาด้วย verifyTuStudentStatus(tuResponse) → ถ้าบัญชีไม่ Active โยน 403 ACCOUNT_INACTIVE (TC1) แต่ถ้าไม่ใช่นักศึกษา CS หรือเป็นภาคพิเศษ (หลักที่ 5–6 ของรหัสเป็น `65`) โยน 403 NOT_CS_STUDENT (TC2)
 6. Database Upsert: บันทึกรหัสนักศึกษา ชื่อ-นามสกุล (แยกจาก `displayname_th` ที่ช่องว่างแรก) และสาขาลง Table `users`
 7. สร้าง JWT Token และตอบ 200
 

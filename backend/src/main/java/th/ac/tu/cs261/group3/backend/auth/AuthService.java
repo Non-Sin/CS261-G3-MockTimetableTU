@@ -33,8 +33,10 @@ public class AuthService {
     static final String ACTIVE_TU_STATUS = "ปกติ";
     static final String STUDENT_TYPE = "student";
     static final String CS_DEPARTMENT = "ภาควิชาวิทยาการคอมพิวเตอร์";
-    /** TU API ไม่บอกภาค ผู้ที่ผ่านการตรวจทั้งหมดถือเป็นภาคปกติ */
+    /** ผ่านการตรวจแล้วเป็นภาคปกติเสมอ ภาคพิเศษถูกปฏิเสธใน verifyTuStudentStatus */
     static final String REGULAR_TRACK = "ภาคปกติ";
+    /** หลักที่ 5–6 ของรหัสนักศึกษาภาคพิเศษ เช่น 680965xxxx */
+    private static final String SPECIAL_TRACK_CODE = "65";
 
     private final TuApiClient tuApiClient;
     private final UserRepository userRepository;
@@ -79,7 +81,8 @@ public class AuthService {
             throw new BusinessRuleException(HttpStatus.FORBIDDEN, ACCOUNT_INACTIVE,
                     "บัญชีของท่านไม่อยู่ในสถานะใช้งานปกติ", null);
         }
-        if (!STUDENT_TYPE.equals(tuResponse.type()) || !CS_DEPARTMENT.equals(tuResponse.department())) {
+        if (!STUDENT_TYPE.equals(tuResponse.type()) || !CS_DEPARTMENT.equals(tuResponse.department())
+                || isSpecialTrack(tuResponse.username())) {
             throw new BusinessRuleException(HttpStatus.FORBIDDEN, NOT_CS_STUDENT,
                     "ระบบนี้เปิดให้ใช้งานเฉพาะนักศึกษาสาขาวิทยาการคอมพิวเตอร์ ภาคปกติ", null);
         }
@@ -99,5 +102,13 @@ public class AuthService {
                 .orElseGet(() -> new User(tuResponse.username(), firstName, lastName,
                         tuResponse.department(), REGULAR_TRACK));
         return userRepository.save(user);
+    }
+
+    /**
+     * ชั่วคราว: TU API ไม่บอกภาค จึงดูจากหลักที่ 5–6 ของรหัสนักศึกษา "65" เป็นภาคพิเศษ นอกนั้นเป็นภาคปกติ
+     * ต้องแก้ถ้ารูปแบบรหัสเปลี่ยน หรือ TU API มีข้อมูลภาคให้
+     */
+    static boolean isSpecialTrack(String studentId) {
+        return studentId != null && studentId.startsWith(SPECIAL_TRACK_CODE, 4);
     }
 }

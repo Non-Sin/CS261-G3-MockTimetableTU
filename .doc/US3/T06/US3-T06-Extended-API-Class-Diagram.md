@@ -143,7 +143,7 @@ classDiagram
   - `TuAuthDto` มี field ตาม response ของ TU API (`tu_status`, `displayname_th`, `displayname_en` map ด้วย `@JsonProperty`) ไม่มี field บอกภาค (ปกติ/พิเศษ)
   - `HttpTuApiClient` ถือว่ารหัสผิดเฉพาะ HTTP 400 + `status: false` + `message: "Users or Password Invalid!"` ส่วน Application-Key ผิด (`status: false` + `error`), 5xx, timeout หรือ body ไม่ใช่ JSON โยน `503 TU_API_UNAVAILABLE` และ `AuthService` ไม่นับ attempt เพื่อไม่ให้ config ผิดทำให้ผู้ใช้ทุกคนถูกล็อก
 - **`AuthService`:**
-  - `verifyTuStudentStatus(tuResponse)` ตรวจ `tu_status == "ปกติ"` ก่อน (ไม่ผ่าน → `403 ACCOUNT_INACTIVE`) แล้วตรวจ `type == "student"` และ `department == "ภาควิชาวิทยาการคอมพิวเตอร์"` (ไม่ผ่าน → `403 NOT_CS_STUDENT`)
+  - `verifyTuStudentStatus(tuResponse)` ตรวจ `tu_status == "ปกติ"` ก่อน (ไม่ผ่าน → `403 ACCOUNT_INACTIVE`) แล้วตรวจ `type == "student"` และ `department == "ภาควิชาวิทยาการคอมพิวเตอร์"` และหลักที่ 5–6 ของรหัสนักศึกษาไม่ใช่ `65` (ภาคพิเศษ) (ไม่ผ่าน → `403 NOT_CS_STUDENT`)
   - `upsertUser(tuResponse)` ค้นหา `User` จาก `userRepository.findById(username)` ถ้ามีแล้วให้อัปเดตชื่อ-นามสกุล สาขา และภาค (`updateProfile`) ถ้ายังไม่มีให้สร้าง `User` ใหม่ แล้ว `save` ลงตาราง `users` · ชื่อ-นามสกุลแยกจาก `displayname_th` ที่ช่องว่างแรก (นามสกุลหลายคำอยู่ครบ) · `track` เก็บ `"ภาคปกติ"` เพราะ TU API ไม่บอกภาค
   - เรียก `jwtService.generateToken(studentId)` เพื่อออก JWT Token ห่อด้วย `LoginResponse.of(token)`
 - **`UserService`:**

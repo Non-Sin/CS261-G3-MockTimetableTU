@@ -33,6 +33,8 @@ public class StubTuApiClient implements TuApiClient {
             "6609000003", student("6609000003", "พักการศึกษา", null, "สมศักดิ์ พักก่อน", "somsak pakkon", CS),
             // D: active, CS ภาคปกติ สำรองไว้ทดสอบการล็อก (TC6)
             "6609000004", student("6609000004", "ปกติ", "10", "สมใจ ลองดู", "somjai longdoo", CS),
+            // B2: active, CS ภาคพิเศษ หลักที่ 5–6 ของรหัสเป็น 65 (TC2)
+            "6609650001", student("6609650001", "ปกติ", "10", "สมปอง พิเศษ", "sompong piset", CS),
             // บุคลากร ไม่ใช่นักศึกษา
             "staff01", new TuAuthDto(true, "Success", null, "employee", "staff01", "ปกติ", "10",
                     "บุคลากร ทดสอบ", "staff test", "staff01@tu.ac.th", "สำนักทะเบียนและประมวลผล", null)

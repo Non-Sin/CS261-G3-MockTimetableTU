@@ -244,6 +244,39 @@ class AuthServiceTest {
                 .extracting("code").isEqualTo("NOT_CS_STUDENT");
     }
 
+    // ---------- ภาคพิเศษ (หลักที่ 5–6 ของรหัสนักศึกษาเป็น 65) ----------
+
+    @Test
+    void authenticate_specialTrackCsStudent_throws403NotCsStudent() {
+        String special = "6809650001";
+        when(tuApiClient.verifyCredentials(special, PASSWORD)).thenReturn(
+                new TuAuthDto(true, "Success", null, "student", special, "ปกติ", "10", "สมชาย ใจดี",
+                        "somchai jaidee", special + "@dome.tu.ac.th", CS, "คณะวิทยาศาสตร์และเทคโนโลยี"));
+
+        BusinessRuleException ex = catchThrowableOfType(BusinessRuleException.class,
+                () -> authService.authenticate(new LoginRequest(special, PASSWORD)));
+
+        assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(ex.getCode()).isEqualTo("NOT_CS_STUDENT");
+        verify(loginAttemptService).loginSucceeded(special);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void isSpecialTrack_code65AtPosition5to6_isTrue() {
+        assertThat(AuthService.isSpecialTrack("6809650001")).isTrue();
+        assertThat(AuthService.isSpecialTrack("6709650001")).isTrue();
+    }
+
+    @Test
+    void isSpecialTrack_otherCodeOr65ElsewhereOrNull_isFalse() {
+        assertThat(AuthService.isSpecialTrack("6809610001")).isFalse();
+        assertThat(AuthService.isSpecialTrack("6509610001")).isFalse();
+        assertThat(AuthService.isSpecialTrack("6809616501")).isFalse();
+        assertThat(AuthService.isSpecialTrack("staff01")).isFalse();
+        assertThat(AuthService.isSpecialTrack(null)).isFalse();
+    }
+
     // ---------- TU API ใช้งานไม่ได้ ----------
 
     @Test

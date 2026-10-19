@@ -29,6 +29,11 @@ class StubTuApiClientTest {
                 .isEqualTo("พักการศึกษา");
         assertThat(stub.verifyCredentials("staff01", StubTuApiClient.PASSWORD).type())
                 .isEqualTo("employee");
+        // ภาคพิเศษ: ข้อมูลจาก TU เหมือน CS ภาคปกติทุกอย่าง ต่างกันแค่รหัสนักศึกษา
+        TuAuthDto special = stub.verifyCredentials("6609650001", StubTuApiClient.PASSWORD);
+        assertThat(special.username()).isEqualTo("6609650001");
+        assertThat(special.department()).isEqualTo("ภาควิชาวิทยาการคอมพิวเตอร์");
+        assertThat(special.tuStatus()).isEqualTo("ปกติ");
     }
 
     @Test
