@@ -1,0 +1,55 @@
+# Integration Test Cases: US2 - ระหว่าง API กับ DAO (API & DAO Integration)
+
+---
+
+## 1. ขอบเขตการทดสอบ
+
+ทดสอบการทำงานร่วมกันระหว่าง API Endpoint สำหรับการลบรายวิชาออกจากตารางเรียนจำลอง กับชั้นข้อมูล (DAO / Repository / Service) และฐานข้อมูลจริง (Database)
+- **Endpoints:** 
+  - `DELETE /api/timetable/entries?entryIds=` (ลบหลายวิชาพร้อมกัน)
+  - `DELETE /api/timetable/entries/{entryId}` (ลบวิชาเดียวผ่าน path variable)
+- **Repositories และ Service ที่เกี่ยวข้อง:** 
+  - `TimetableEntryRepository` (`findAllById`, `deleteAll`)[cite: 8]
+  - `TimetableRepository` (`findByStudentIdAndAcademicYearAndSemester`)[cite: 8]
+  - `TimetableDeleteService` (จัดการลำดับการตรวจสอบสิทธิ์และควบคุม Transaction ด้วย `@Transactional`)[cite: 8]
+  - `Timetable.touch()` (อัปเดตฟิลด์ `updated_at` บนตารางเรียนเมื่อมีการเปลี่ยนแปลง)[cite: 8]
+- **สิ่งที่ตรวจในทุก case:** 
+  1. การทำงานของ Service/DAO ในการคัดกรองและลบข้อมูลออกจากตาราง `timetable_entry` ในฐานข้อมูลจริงอย่างแม่นยำ[cite: 8]
+  2. สถานะการตอบกลับของ API (`200 OK` พร้อม `TimetableResponse` หรือ Error Status `400`/`404`)
+  3. ความคงอยู่ของข้อมูลในตารางหลัก (`timetable` และ `section`) โดยการลบ entry จะไม่ส่งผลกระทบหรือลบตารางหลักแบบ CASCADE ผิดเงื่อนไข[cite: 8]
+  4. การอัปเดตเวลา `updated_at` บนตาราง `timetable` ผ่านเมธอด `touch()`[cite: 8]
+
+---
+
+## 2. Precondition และข้อมูลทดสอบ
+
+- **ปีการศึกษา/ภาคการศึกษา:** กำหนดใช้ `academicYear=2568` และ `semester=1` ตาม Seed Data ปัจจุบันของระบบ
+- **ชุดข้อมูลทดสอบ (Seed Data 1/2568):** 
+  - นักศึกษารหัสเจ้าของตาราง (เช่น `std68001`) มีข้อมูลตารางเรียนปี 1/2568 และมีวิชาที่ถูกเพิ่มไว้แล้วอย่างน้อย 2-3 รายการ (`entryId`: 101, 102, 103)
+- **พฤติกรรม DAO ที่อ้างอิงจาก US2-T06:**
+  - ใช้ `findAllById(ids)` เพื่อดึง entry ที่ต้องการลบผ่าน Persistence Context[cite: 8]
+  - ใช้ `deleteAll(entries)` เพื่อลบเฉพาะ entity ที่เลือกทีละตัวตามโควตาในตาราง เพื่อให้ Hibernate บริหารจัดการสถานะใน memory ได้อย่างถูกต้อง[cite: 8]
+  - เรียก `timetable.touch()` เพื่อบันทึกเวลาที่ถูกแก้ไขล่าสุด[cite: 8]
+
+---
+
+## 3. Test Cases: การลบรายวิชาและการอัปเดตฐานข้อมูล (API ↔ DAO)
+
+| ID | Scenario | ขั้นตอนการทดสอบ | ผลที่คาดหวัง (Expected Result) |
+| :--- | :--- | :--- | :--- |
+| **IT-01** | ลบรายวิชาเดียวสำเร็จ (`DELETE /api/timetable/entries/{entryId}`) | ส่งคำขอ `DELETE /api/timetable/entries/101` ของนักศึกษาเจ้าของตารางในภาค 1/2568 | - API ตอบกลับด้วยสถานะ `200 OK` พร้อมโครงสร้าง `TimetableResponse` ชุดใหม่<br>- **DB Verification:** แถวข้อมูลของ `entry_id = 101` ถูกลบออกจากตาราง `timetable_entry` ใน DB อย่างถาวร<br>- แถวข้อมูลอื่นๆ (`102` และ `103`) ยังคงอยู่ครบถ้วน<br>- แถว `timetable` หลักยังคงอยู่ และฟิลด์ `updated_at` ถูกอัปเดตเป็นเวลาปัจจุบันผ่าน `touch()`[cite: 8] |
+| **IT-02** | ลบหลายรายวิชาพร้อมกันในคำขอเดียว (`DELETE /api/timetable/entries?entryIds=101,102`) | ส่งคำขอ `DELETE /api/timetable/entries?entryIds=101,102` | - API เรียกใช้ `TimetableEntryRepository.findAllById([101, 102])` และ `deleteAll(entries)` ใน Transaction เดียวกัน[cite: 8]<br>- API ตอบกลับ `200 OK` พร้อมรายการวิชาที่เหลืออยู่ (`103`)<br>- **DB Verification:** แถวของ `101` และ `102` ถูกลบออกจากฐานข้อมูลพร้อมกัน |
+| **IT-03** | ลบวิชาจนตารางว่างเปล่า | ส่งคำขอลบรายการวิชาที่เหลือทั้งหมดในตาราง (`[101, 102, 103]`) | - API ตอบกลับ `200 OK` พร้อม `entries: []` และ `updated_at` เป็นเวลาที่ลบล่าสุด<br>- **DB Verification:** ตาราง `timetable_entry` ไม่มีรายการเหลือ แต่แถวหลักในตาราง `timetable` ยังคงอยู่ (ไม่ถูกลบหายไปเหมือนตอนยังไม่เคยเพิ่มวิชา)[cite: 8] |
+| **IT-04** | ลบด้วย `entryId` ที่ไม่มีอยู่จริง หรือเป็นของนักศึกษาคนอื่น (Ownership Check) | นักศึกษา `std68001` ส่งคำขอลบ `entryId = 999` (ไม่มีในระบบ) หรือ `entryId = 201` (เป็นของนักศึกษาคนอื่น) | - API ตรวจสอบความเป็นเจ้าของและตอบกลับด้วยสถานะ `404 Not Found` (ProblemDetail)<br>- **DB Verification:** ข้อมูลทั้งหมดในฐานข้อมูลไม่มีการเปลี่ยนแปลงใดๆ (All-or-Nothing / Transaction Rollback) |
+| **IT-05** | ส่ง `entryIds` ว่างเปล่า หรือรูปแบบ ID ไม่ถูกต้อง | ส่งคำขอ `DELETE /api/timetable/entries?entryIds=` หรือส่งพารามิเตอร์ที่ไม่ใช่ตัวเลข | - API ตอบกลับด้วยสถานะ `400 Bad Request`<br>- ไม่มีคำสั่งลบข้อมูลใดๆ ถูกส่งไปยัง DAO / Database |
+| **IT-06** | ส่ง `entryIds` ที่มาจากคนละตารางเรียน (คนละปีหรือคนละภาค) | ส่งคำขอลบรายการวิชาที่มี `entryId` อยู่คนละตารางเรียนกันพร้อมกันในคำขอเดียว | - API ตรวจสอบพบความผิดปกติและตอบกลับด้วยสถานะ `400 Bad Request`<br>- ข้อมูลในฐานข้อมูลไม่มีการถูกลบออก (Rollback ทั้งหมด) |
+
+---
+
+## 4. ตาราง Mapping กับสถาปัตยกรรม DAO (Traceability Matrix)
+
+| Integration Test Case | สอดคล้องกับ Component / DAO (US2-T06) | คำอธิบายความสอดคล้อง |
+| :--- | :--- | :--- |
+| **IT-01, IT-02** | `TimetableEntryRepository.findAllById`, `deleteAll`[cite: 8] | ตรวจสอบว่า API เชื่อมโยงกับ DAO ในการค้นหาและลบเฉพาะแถวข้อมูลที่ผู้ใช้เลือกออกจากตาราง `timetable_entry` ในปีการศึกษา 1/2568 ได้อย่างแม่นยำ |
+| **IT-03** | `Timetable.touch()` & Constraints[cite: 8] | ตรวจสอบว่าการลบจนไม่เหลือ entry จะไม่กระทบต่อแถวหลักในตาราง `timetable` และมีการบันทึกเวลาแก้ไขล่าสุด (`updated_at`) อย่างถูกต้อง |
+| **IT-04, IT-05, IT-06** | Validation & Ownership Rules | ตรวจสอบการจัดการความถูกต้องของสิทธิ์ความเป็นเจ้าของและการควบคุม Transaction แบบ All-or-Nothing ก่อนดำเนินการลบข้อมูลจริงในระบบ |
