@@ -74,11 +74,11 @@ US2 (ลบวิชาออกจากตารางเรียน) ทด�
 
 | TC ID | สถานการณ์ | Input | Expected Result | Actual Result | Status |
 | --- | --- | --- | --- | --- | --- |
-| UT-DAO-US2-01 | ลบ 1 วิชาที่มี 2 คาบคนละวัน และมีนักศึกษาอื่นลง section เดียวกัน | `[E1]` | E1 ไม่อยู่ใน DB; `findByTimetableId(T_A)` คืน E2, E3 จึงไม่มีคาบพุธและศุกร์ของ CS261 ในตาราง A; `count()` 4 → 3; E4 (นักศึกษา B, S1 เดียวกัน) ยังอยู่ |  | ยังไม่รัน |
-| UT-DAO-US2-02 | ลบหลายวิชา | `[E1, E2]` | E1, E2 หาย; ตาราง A เหลือ E3 เท่านั้น; `count()` 4 → 2 |  | ยังไม่รัน |
-| UT-DAO-US2-03 | ลบทุกวิชาของ A | `[E1, E2, E3]` | ตาราง A เหลือ 0 entry แต่ Timetable T\_A ยังอยู่; E4 ของ B ยังอยู่; `count()` 4 → 1 |  | ยังไม่รัน |
-| UT-DAO-US2-04 | entries ว่าง | `List.of()` | ไม่ throw exception; `count()` ยังเป็น 4 และ E1–E4 ยังอยู่ครบ |  | ยังไม่รัน |
-| UT-DAO-US2-05 | ไม่ลบข้อมูลรายวิชาและคาบเรียน | `[E1]` | S1 ยังค้นเจอใน `SectionRepository`; `em.find(Section.class, S1).getSlots()` ยังมี 2 แถว; schedule\_slot ทั้งหมดยังเป็น 5 แถว (นับด้วย JPQL `select count(s) from ScheduleSlot s`) |  | ยังไม่รัน |
+| UT-DAO-US2-01 | ลบ 1 วิชาที่มี 2 คาบคนละวัน และมีนักศึกษาอื่นลง section เดียวกัน | `[E1]` | E1 ไม่อยู่ใน DB; `findByTimetableId(T_A)` คืน E2, E3 จึงไม่มีคาบพุธและศุกร์ของ CS261 ในตาราง A; `count()` 4 → 3; E4 (นักศึกษา B, S1 เดียวกัน) ยังอยู่ | ตรงตามที่คาด | PASS |
+| UT-DAO-US2-02 | ลบหลายวิชา | `[E1, E2]` | E1, E2 หาย; ตาราง A เหลือ E3 เท่านั้น; `count()` 4 → 2 | ตรงตามที่คาด | PASS |
+| UT-DAO-US2-03 | ลบทุกวิชาของ A | `[E1, E2, E3]` | ตาราง A เหลือ 0 entry แต่ Timetable T\_A ยังอยู่; E4 ของ B ยังอยู่; `count()` 4 → 1 | ตรงตามที่คาด | PASS |
+| UT-DAO-US2-04 | entries ว่าง | `List.of()` | ไม่ throw exception; `count()` ยังเป็น 4 และ E1–E4 ยังอยู่ครบ | ตรงตามที่คาด | PASS |
+| UT-DAO-US2-05 | ไม่ลบข้อมูลรายวิชาและคาบเรียน | `[E1]` | S1 ยังค้นเจอใน `SectionRepository`; `em.find(Section.class, S1).getSlots()` ยังมี 2 แถว; schedule\_slot ทั้งหมดยังเป็น 5 แถว (นับด้วย JPQL `select count(s) from ScheduleSlot s`) | ตรงตามที่คาด | PASS |
 
 - ไม่ทดสอบการส่ง entity ที่ถูกลบไปแล้วเข้า `deleteAll` เพราะ Service ส่งเฉพาะ entity ที่เพิ่งโหลดจาก `findAllById` ใน transaction เดียวกัน กรณี ID ที่ไม่มีใน DB แล้วครอบคลุมโดยเคส 07
 - เคส 05 ยืนยันว่าการลบ entry ไม่ cascade ไปลบ `Section` หรือ `schedule_slot` ซึ่งเป็นข้อมูลรายวิชาที่นักศึกษาทุกคนใช้ร่วมกัน นับ schedule\_slot ทั้งหมดด้วย JPQL ผ่าน `TestEntityManager` ไม่เพิ่ม `ScheduleSlotRepository` เพราะไม่มี Service ใดใช้ (คาบเรียนอ่านผ่าน `Section.slots` เสมอ) จึงไม่ควรเพิ่มโค้ด production เพื่อเทสอย่างเดียว
@@ -92,9 +92,9 @@ US2 (ลบวิชาออกจากตารางเรียน) ทด�
 
 | TC ID | สถานการณ์ | Input | Expected Result | Actual Result | Status |
 | --- | --- | --- | --- | --- | --- |
-| UT-DAO-US2-06 | ID ที่มีอยู่ทั้งหมด | `[E1.id, E2.id]` | คืน 2 entry คือ E1 (S1, CS261) และ E2 (S2, CS180) |  | ยังไม่รัน |
-| UT-DAO-US2-07 | มี ID ที่ไม่มีใน DB ปนอยู่ | `[E1.id, Long.MAX_VALUE]` | ไม่ throw exception; คืน E1 รายการเดียว |  | ยังไม่รัน |
-| UT-DAO-US2-08 | มี ID ของนักศึกษาคนอื่นปนอยู่ | `[E1.id, E4.id]` | คืนทั้ง 2 entry; `timetable.studentId` ของ E4 เป็นของ B |  | ยังไม่รัน |
+| UT-DAO-US2-06 | ID ที่มีอยู่ทั้งหมด | `[E1.id, E2.id]` | คืน 2 entry คือ E1 (S1, CS261) และ E2 (S2, CS180) | ตรงตามที่คาด | PASS |
+| UT-DAO-US2-07 | มี ID ที่ไม่มีใน DB ปนอยู่ | `[E1.id, Long.MAX_VALUE]` | ไม่ throw exception; คืน E1 รายการเดียว | ตรงตามที่คาด | PASS |
+| UT-DAO-US2-08 | มี ID ของนักศึกษาคนอื่นปนอยู่ | `[E1.id, E4.id]` | คืนทั้ง 2 entry; `timetable.studentId` ของ E4 เป็นของ B | ตรงตามที่คาด | PASS |
 
 - เคส 07 ยืนยันว่า ID ที่หาไม่เจอถูกข้ามไปโดยไม่ throw จำนวน entry ที่คืนจึงอาจน้อยกว่าจำนวน ID ที่ส่งไป ใช้ `Long.MAX_VALUE` เป็น ID ที่ไม่มีอยู่จริง เพราะ `entry_id` เป็น `BIGINT IDENTITY` ที่เริ่มจาก 1 จึงไม่มีทางสร้างถึงค่านี้ และไม่ขึ้นกับข้อมูลใน fixture
 - เคส 08 ยืนยันว่า DAO ไม่กรองเจ้าของ Service จึงต้องเช็ก `entry.timetable.studentId` เองก่อนลบ
@@ -112,15 +112,15 @@ list ว่างและ ID ซ้ำไม่ทดสอบที่ DAO เ
 
 ## สรุปผลการทดสอบ
 
-กรอกหลังรัน `mvn test`
+รันเมื่อ 2026-10-18 รายละเอียดใน [ผลการทดสอบ](./US2-T12-DAO-Unit-Test-Result.md)
 
 | รายการ | ค่า |
 | --- | --- |
 | จำนวน test case | 8 |
-| Pass |  |
-| Fail |  |
-| ผู้ทดสอบ |  |
-| วันที่ทดสอบ |  |
+| Pass | 8 |
+| Fail | 0 |
+| ผู้ทดสอบ | @Non |
+| วันที่ทดสอบ | 2026-10-18 |
 
 ## เอกสารที่เกี่ยวข้อง
 

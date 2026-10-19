@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ApiError } from "@/lib/api";
 import type { Course } from "../../courses/types";
+import { timetableDeleteApi } from "../../timetable-delete/api";
+import type { DeleteStatus } from "../../timetable-delete/types";
 import { addTimetableEntry, fetchTimetable } from "../api";
 import type { Timetable } from "../types";
 
@@ -11,7 +13,7 @@ const DEFAULT_SEMESTER = 1;
 const DEFAULT_MAX_CREDITS = 22;
 
 // Hook นี้เป็นขอบเขตเชื่อม state กับ UI: Timetable เรียกใช้ แล้วส่งค่าที่คืนให้ลูกแต่ละส่วน
-// ตารางมาจาก GET /api/timetable ของภาคเรียนที่เลือก และการเพิ่มวิชาบันทึกผ่าน POST /api/timetable/entries
+// ตารางมาจาก GET /api/timetable ของภาคเรียนที่เลือก และการเพิ่ม/ลบวิชาบันทึกผ่าน /api/timetable/entries
 export const useTimetable = () => {
   const [academicYear, setAcademicYearState] = useState(DEFAULT_ACADEMIC_YEAR);
   const [semester, setSemesterState] = useState(DEFAULT_SEMESTER);
@@ -21,8 +23,10 @@ export const useTimetable = () => {
   const [reloadKey, setReloadKey] = useState(0);
   const [addingSectionId, setAddingSectionId] = useState<number | null>(null);
   const [addError, setAddError] = useState<string | null>(null);
+  const [deleteStatus, setDeleteStatus] = useState<DeleteStatus>("idle");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [conflictAlertDismissed, setConflictAlertDismissed] = useState(false);
-  // ภาคเรียนที่เลือกล่าสุด ใช้ตรวจผล POST ที่ตอบกลับหลังผู้ใช้เปลี่ยนภาคไปแล้ว
+  // ภาคเรียนที่เลือกล่าสุด ใช้ตรวจผล POST/DELETE ที่ตอบกลับหลังผู้ใช้เปลี่ยนภาคไปแล้ว
   const selectedTermRef = useRef({ academicYear: DEFAULT_ACADEMIC_YEAR, semester: DEFAULT_SEMESTER });
 
   // โหลดตารางใหม่ทุกครั้งที่เปลี่ยนภาคเรียน และไม่ใช้ผลของภาคเก่าที่ตอบกลับมาช้า
@@ -51,6 +55,8 @@ export const useTimetable = () => {
     selectedTermRef.current = { academicYear: nextAcademicYear, semester: nextSemester };
     setTimetable(null);
     setAddError(null);
+    setDeleteError(null);
+    setDeleteStatus("idle");
     setAcademicYearState(nextAcademicYear);
     setSemesterState(nextSemester);
   };
@@ -82,12 +88,52 @@ export const useTimetable = () => {
     }
   };
 
+  // ลบ 1 วิชา หรือลบหลายวิชา/ทั้งหมด แล้วแทนที่ state ตารางด้วย response จาก backend ทันที
+  const executeDelete = async (request: () => Promise<Timetable>): Promise<boolean> => {
+    setDeleteStatus("deleting");
+    setDeleteError(null);
+
+    try {
+      const updated = await request();
+      const { academicYear: currentYear, semester: currentSemester } = selectedTermRef.current;
+      if (updated.academicYear !== currentYear || updated.semester !== currentSemester) {
+        setDeleteStatus("idle");
+        return true;
+      }
+
+      setTimetable(updated);
+      setConflictAlertDismissed(false);
+      setDeleteStatus("idle");
+      return true;
+    } catch (error) {
+      setDeleteStatus("error");
+      // 404 แปลว่าข้อมูลบนหน้าจอเก่า (เช่น ถูกลบจากอีกแท็บไปแล้ว) แจ้งผู้ใช้และโหลดตารางล่าสุดใหม่
+      if (error instanceof ApiError && error.status === 404) {
+        setDeleteError("ข้อมูลตารางเรียนมีการเปลี่ยนแปลง กำลังโหลดข้อมูลล่าสุด");
+        reload();
+      } else {
+        setDeleteError("ลบวิชาไม่สำเร็จ กรุณาลองใหม่");
+      }
+      return false;
+    }
+  };
+
+  const removeCourse = (entryId: number) =>
+    executeDelete(() => timetableDeleteApi.removeEntry(entryId));
+
+  const removeCourses = (entryIds: number[]) => {
+    if (entryIds.length === 0) return Promise.resolve(false);
+    return executeDelete(() => timetableDeleteApi.removeEntries(entryIds));
+  };
+
   return {
     timetable,
     loadError,
     reload,
     entries: timetable?.entries ?? [],
     addError,
+    deleteStatus,
+    deleteError,
     conflictAlertDismissed,
     totalCredits: timetable?.totalCredits ?? 0,
     maxCredits: timetable?.maxCredits ?? DEFAULT_MAX_CREDITS,
@@ -103,6 +149,8 @@ export const useTimetable = () => {
     // กดเพิ่มไม่ได้ระหว่างโหลดตารางหรือระหว่างรอผลการเพิ่มวิชาก่อนหน้า
     addDisabled: timetable === null || addingSectionId !== null,
     addCourse,
+    removeCourse,
+    removeCourses,
     dismissConflictAlert: () => setConflictAlertDismissed(true),
   };
 };
