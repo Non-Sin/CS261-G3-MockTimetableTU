@@ -15,6 +15,8 @@ const Timetable = () => {
     reload,
     entries,
     addError,
+    deleteStatus,
+    deleteError,
     conflictAlertDismissed,
     totalCredits,
     maxCredits,
@@ -25,6 +27,8 @@ const Timetable = () => {
     conflicts,
     addDisabled,
     addCourse,
+    removeCourse,
+    removeCourses,
     dismissConflictAlert,
     setAcademicYear,
     setSemester,
@@ -86,8 +90,14 @@ const Timetable = () => {
           semester={semester}
         />
 
-        {/* การลบวิชาเป็นงานของ US2 ยังไม่มี API จึงไม่ส่ง onRemove ปุ่มลบจะกดไม่ได้ */}
-        <AddedCoursesList entries={entries} />
+        {/* รายการวิชาที่เพิ่มแล้ว รองรับลบรายวิชา ลบที่เลือกด้วย checkbox และลบทั้งหมดพร้อมกล่องยืนยัน (US2) */}
+        <AddedCoursesList
+          entries={entries}
+          deleteStatus={deleteStatus}
+          deleteError={deleteError}
+          onRemove={removeCourse}
+          onRemoveMultiple={removeCourses}
+        />
 
         {/* รหัสที่อยู่ในตารางทำให้ปุ่มของวิชานั้นแสดงสถานะเพิ่มแล้ว; การเพิ่มส่งกลับเข้า hook */}
         <CourseSearchPanel
