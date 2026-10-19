@@ -9,7 +9,7 @@ export default function AccessDenied({ onBack }: { onBack: () => void }) {
       </span>
       <p className="mx-auto mb-2.5 table rounded-full bg-[#ffeaee] px-2.75 py-1 text-[11px] font-bold text-[#cf1833]">Access Denied</p>
       <h1 id="denied-title" className="mt-2.5 mb-1 text-[23px] leading-[1.4] font-extrabold tracking-[-0.5px] max-[440px]:text-[21px]">ไม่สามารถเข้าใช้งานระบบได้</h1>
-      <p className="mt-1 text-[13px] text-[#687d9d]">ระบบนี้เปิดให้ใช้งานเฉพาะนักศึกษาสาขาวิทยาการคอมพิวเตอร์ มหาวิทยาลัยธรรมศาสตร์เท่านั้น</p>
+      <p className="mt-1 text-[13px] text-[#687d9d]">ระบบนี้เปิดให้ใช้งานเฉพาะนักศึกษาสาขาวิทยาการคอมพิวเตอร์ ภาคปกติ มหาวิทยาลัยธรรมศาสตร์เท่านั้น</p>
       <button type="button" className="mt-8 flex min-h-11.5 w-full items-center justify-center gap-2.25 rounded-[15px] border-0 bg-[#d4151e] px-4 py-2.75 text-[14px] font-bold text-white shadow-[0_4px_7px_#d4151e20] transition-colors duration-150 hover:bg-[#b91018] disabled:opacity-65" onClick={onBack}>
         กลับสู่หน้าเข้าสู่ระบบ <AuthIcon name="arrow" width={18} height={18} />
       </button>
