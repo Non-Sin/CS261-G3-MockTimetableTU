@@ -41,6 +41,11 @@ services:
     environment:
       SPRING_DATASOURCE_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=appdb;encrypt=true;trustServerCertificate=true"
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      # US3 login: ไม่มี JWT_SECRET ให้ compose หยุดพร้อมข้อความ แทนที่ backend จะ start ไม่ขึ้น
+      JWT_SECRET: ${JWT_SECRET:?ต้องตั้ง JWT_SECRET ใน .env (ดู .env.example)}
+      TU_API_APPLICATION_KEY: ${TU_API_APPLICATION_KEY:-}
+      # ใส่ SPRING_PROFILES_ACTIVE=stub-tu ใน .env ถ้าจะใช้ TU API ปลอมแทนของจริง
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
     ports:
       - "8080:8080"
     restart: unless-stopped

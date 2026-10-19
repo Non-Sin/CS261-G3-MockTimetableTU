@@ -9,8 +9,7 @@ import th.ac.tu.cs261.group3.backend.timetable.dto.AddTimetableEntryRequest;
 import th.ac.tu.cs261.group3.backend.timetable.dto.TimetableResponse;
 
 /**
- * ตารางเรียนจำลองของนักศึกษาที่ login อยู่ ระหว่างที่ US3 ยังไม่เสร็จ studentId มาจาก DemoStudentProvider
- * path ไม่ต้องเปลี่ยนหลังมี login
+ * ตารางเรียนจำลองของนักศึกษาที่ login อยู่ studentId มาจาก JWT ผ่าน CurrentStudentProvider
  */
 @RestController
 @RequestMapping("/api/timetable")

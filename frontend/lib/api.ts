@@ -9,6 +9,7 @@ export type ProblemDetail = {
   status: number;
   detail?: string;
   code?: string;
+  retryAfterSeconds?: number;
   instance?: string;
   errors?: Record<string, string>;
 };
@@ -16,6 +17,7 @@ export type ProblemDetail = {
 export class ApiError extends Error {
   readonly status: number;
   readonly code?: string;
+  readonly retryAfterSeconds?: number;
   readonly fieldErrors: Record<string, string>;
 
   constructor(problem: ProblemDetail) {
@@ -25,6 +27,7 @@ export class ApiError extends Error {
     this.name = "ApiError";
     this.status = problem.status;
     this.code = problem.code;
+    this.retryAfterSeconds = problem.retryAfterSeconds;
     this.fieldErrors = problem.errors ?? {};
   }
 }
