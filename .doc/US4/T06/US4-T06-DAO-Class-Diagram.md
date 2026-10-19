@@ -28,12 +28,12 @@ classDiagram
 
 **ทำไมไม่มี DAO ใหม่**
 
-- Logout ใช้ `POST /api/auth/logout` ไม่มี Request Body และใช้ Authentication/Session ของ US3
-- Session หมดอายุตรวจที่ Authentication/`apiFetch` ไม่มีการอ่านหรือเขียนข้อมูลผ่าน DAO
+- Logout ใช้ `POST /api/auth/logout` ไม่มี Request Body ใช้ Authentication (JWT) ของ US3 และไม่ invalidate token ฝั่ง server (stateless) จึงไม่มีข้อมูลให้บันทึก
+- token หมดอายุตรวจที่ `JwtService.isTokenValid()` ของ US3 จาก `exp` ใน token ส่วน inactivity timeout จับเวลาฝั่ง Client ทั้งสองกรณีไม่มีการอ่านหรือเขียนข้อมูลผ่าน DAO
 - ไม่มีตารางใหม่ จึงไม่มี Entity หรือ Repository ใหม่ ดู [ER Diagram](./US4-T06-ER-Diagram.md)
 - ไม่ควรสร้าง Repository หรือ method เพียงเพื่อให้แผนภาพมีองค์ประกอบเพิ่ม
 
-รายละเอียดของ `UserRepository` และ Entity `User` ให้ยึดตามการออกแบบของ US3
+รายละเอียดของ `UserRepository` และ Entity `User` (ตาราง `users`) ให้ยึดตาม [DAO Class Diagram ของ US3-T06](../../US3/T06/US3-T06-DAO-Class-Diagram.md)
 
 ## เอกสารที่เกี่ยวข้อง
 
@@ -43,4 +43,4 @@ classDiagram
 - [ER Diagram (DB)](./US4-T06-ER-Diagram.md)
 - [US4-T05 — API Class Diagram](../T05/US4-API-Class-Diagram.md)
 - [US4-T05 — DTO & API Spec](../T05/US4-DTO%20%26%20API%20Spec.md)
-- [US3 — API Class Diagram](../../US3/T05/US3-API-Class-Diagram.md)
+- [US3 — DAO Class Diagram](../../US3/T06/US3-T06-DAO-Class-Diagram.md)
