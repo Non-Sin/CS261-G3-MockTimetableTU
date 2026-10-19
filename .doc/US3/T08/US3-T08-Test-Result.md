@@ -6,7 +6,7 @@ Oct 19, 2026 · @Non
 
 | ชุดทดสอบ | ผล |
 | --- | --- |
-| Unit test backend (`./mvnw clean test`) | **ผ่าน 150/150** (28 test class) เป็นของ US3-T08 ใหม่ 65 test ใน 12 class |
+| Unit test backend (`./mvnw clean test`) | **ผ่าน 175/175** (31 test class) หลัง merge `main` เป็นของ US3-T08 ใหม่ 65 test ใน 12 class · คำสั่งของ CI (ไม่รวม `BackendApplicationTests`) ผ่าน 174/174 |
 | Postman (newman) 21 request | **ผ่าน 25/25 assertion** ไม่มี request ล้ม |
 | Test case ของการ์ด US3 ที่ทดสอบผ่าน API | TC1a, TC1b, TC2, TC5, TC6, TC7 ผ่าน · TC3, TC4 ต้องใช้บัญชี มธ. จริง (ดู "การจับคู่กับ UAT") |
 
@@ -43,39 +43,44 @@ Oct 19, 2026 · @Non
 
 | Test class | ชั้น | Tests | ผ่าน | เวลา (s) |
 | --- | --- | --- | --- | --- |
-| `auth.AuthControllerTest` | Controller (US3) | 8 | 8 | 4.607 |
-| `user.UserControllerTest` | Controller (US3) | 2 | 2 | 0.281 |
-| `config.SecurityConfigTest` | Security filter chain + JWT จริง (US3) | 6 | 6 | 0.499 |
-| `auth.AuthServiceTest` | Service (US3) | 15 | 15 | 0.589 |
-| `auth.LoginAttemptServiceTest` | Service (US3) | 8 | 8 | 0.100 |
-| `auth.JwtServiceTest` | Service (US3) | 5 | 5 | 0.151 |
-| `user.UserServiceTest` | Service (US3) | 2 | 2 | 0.005 |
-| `auth.tu.HttpTuApiClientTest` | TU API client + `MockRestServiceServer` (US3) | 7 | 7 | 0.104 |
+| `auth.AuthControllerTest` | Controller (US3) | 8 | 8 | 4.362 |
+| `user.UserControllerTest` | Controller (US3) | 2 | 2 | 0.297 |
+| `config.SecurityConfigTest` | Security filter chain + JWT จริง (US3) | 6 | 6 | 0.536 |
+| `auth.AuthServiceTest` | Service (US3) | 15 | 15 | 0.501 |
+| `auth.LoginAttemptServiceTest` | Service (US3) | 8 | 8 | 0.103 |
+| `auth.JwtServiceTest` | Service (US3) | 5 | 5 | 0.160 |
+| `user.UserServiceTest` | Service (US3) | 2 | 2 | 0.006 |
+| `auth.tu.HttpTuApiClientTest` | TU API client + `MockRestServiceServer` (US3) | 7 | 7 | 0.100 |
 | `auth.tu.StubTuApiClientTest` | TU API stub (US3) | 4 | 4 | 0.007 |
-| `common.student.SecurityContextStudentProviderTest` | common (US3) | 3 | 3 | 0.007 |
-| `auth.dto.LoginRequestTest` | DTO / validation (US3) | 4 | 4 | 0.041 |
-| `user.dto.UserProfileResponseTest` | DTO / JSON (US3) | 1 | 1 | 0.055 |
-| `auth.LoginAttemptRepositoryTest` | DAO (US3-T12) | 6 | 6 | 19.82 * |
-| `user.UserRepositoryTest` | DAO (US3-T12) | 4 | 4 | 0.156 |
-| `course.CourseControllerTest` | Controller (US1) | 7 | 7 | 0.480 |
-| `timetable.TimetableControllerTest` | Controller (US1) | 8 | 8 | 0.569 |
-| `course.CourseServiceTest` | Service (US1) | 4 | 4 | 0.211 |
-| `timetable.TimetableServiceTest` | Service (US1) | 12 | 12 | 0.229 |
-| `course.dto.CourseResponseTest` | DTO / JSON (US1) | 3 | 3 | 0.192 |
-| `timetable.dto.TimetableResponseTest` | DTO / JSON (US1) | 6 | 6 | 0.147 |
-| `course.CourseRepositoryTest` | DAO (US1-T12) | 5 | 5 | 0.789 |
-| `course.SectionRepositoryTest` | DAO (US1-T12) | 5 | 5 | 0.778 |
-| `timetable.TimetableRepositoryTest` | DAO (US1-T12) | 4 | 4 | 0.486 |
-| `timetable.TimetableEntryRepositoryTest` | DAO (US1-T12) | 6 | 6 | 0.716 |
-| `SchemaConstraintTest` | DAO | 6 | 6 | 0.748 |
-| `common.exception.GlobalExceptionHandlerTest` | common | 2 | 2 | 0.034 |
-| `item.ItemControllerTest` | ตัวอย่างเดิม | 6 | 6 | 0.453 |
-| `BackendApplicationTests` | context | 1 | 1 | 2.158 |
-| **รวม** | | **150** | **150** | |
+| `common.student.SecurityContextStudentProviderTest` | common (US3) | 3 | 3 | 0.009 |
+| `auth.dto.LoginRequestTest` | DTO / validation (US3) | 4 | 4 | 0.039 |
+| `user.dto.UserProfileResponseTest` | DTO / JSON (US3) | 1 | 1 | 0.048 |
+| `auth.LoginAttemptRepositoryTest` | DAO (US3-T12) | 6 | 6 | 16.85 * |
+| `user.UserRepositoryTest` | DAO (US3-T12) | 4 | 4 | 0.138 |
+| `course.CourseControllerTest` | Controller (US1) | 7 | 7 | 0.492 |
+| `timetable.TimetableControllerTest` | Controller (US1) | 8 | 8 | 0.583 |
+| `course.CourseServiceTest` | Service (US1) | 4 | 4 | 0.220 |
+| `timetable.TimetableServiceTest` | Service (US1) | 12 | 12 | 0.168 |
+| `course.dto.CourseResponseTest` | DTO / JSON (US1) | 3 | 3 | 0.206 |
+| `timetable.dto.TimetableResponseTest` | DTO / JSON (US1) | 6 | 6 | 0.146 |
+| `course.CourseRepositoryTest` | DAO (US1-T12) | 5 | 5 | 0.799 |
+| `course.SectionRepositoryTest` | DAO (US1-T12) | 5 | 5 | 0.730 |
+| `timetable.TimetableRepositoryTest` | DAO (US1-T12) | 4 | 4 | 0.477 |
+| `timetable.TimetableEntryRepositoryTest` | DAO (US1-T12) | 6 | 6 | 0.695 |
+| `timetable.TimetableDeleteControllerTest` | Controller (US2) | 8 | 8 | 0.468 |
+| `timetable.TimetableDeleteServiceTest` | Service (US2) | 9 | 9 | 0.144 |
+| `timetable.TimetableEntryDeleteRepositoryTest` | DAO (US2-T12) | 8 | 8 | 0.706 |
+| `SchemaConstraintTest` | DAO | 6 | 6 | 0.773 |
+| `common.exception.GlobalExceptionHandlerTest` | common | 2 | 2 | 0.032 |
+| `item.ItemControllerTest` | ตัวอย่างเดิม | 6 | 6 | 0.492 |
+| `BackendApplicationTests` | context | 1 | 1 | 2.554 |
+| **รวม** | | **175** | **175** | |
 
 \* รวมเวลา start SQL Server container ครั้งแรก
 
 `DemoStudentProviderTest` ถูกลบพร้อม `DemoStudentProvider` เพราะ `SecurityContextStudentProvider` มาแทน และ controller test เดิมของ US1 (`CourseControllerTest`, `TimetableControllerTest`, `ItemControllerTest`) เพิ่ม `@AutoConfigureMockMvc(addFilters = false)` ให้ทดสอบเฉพาะ controller ส่วนการตรวจ token อยู่ใน `SecurityConfigTest`
+
+หลัง merge `main` (US2-T08 #43) `TimetableDeleteControllerTest` ได้ 403 ทั้ง 8 test เพราะ Spring Security เปิด filter ใน `@WebMvcTest` (CSRF กับ DELETE) จึงเพิ่ม `@AutoConfigureMockMvc(addFilters = false)` แบบเดียวกัน
 
 **สิ่งที่ unit test ของ US3 ครอบคลุม**
 
