@@ -1,0 +1,64 @@
+newman
+
+US4-T08 Logout API
+
+→ 00 POST /api/auth/logout ไม่มี token → 401
+  POST http://localhost:8080/api/auth/logout [401 Unauthorized, 596B, 48ms]
+  √  401 ProblemDetail ตาม US4-T05 (logout ต้องผ่าน Authentication)
+  √  body ไม่มี instance ตาม Spec ที่แก้แล้ว
+
+→ 01 POST login นักศึกษา CS (เตรียม token)
+  POST http://localhost:8080/api/auth/login [200 OK, 635B, 57ms]
+  √  200 ได้ token เป็น JWT
+
+→ 02 IT-06 GET /api/users/me ก่อน Logout → 200
+  GET http://localhost:8080/api/users/me [200 OK, 497B, 15ms]
+  √  200 API ใช้งานได้ก่อน Logout
+
+→ 03 IT-01/IT-02 POST /api/auth/logout ด้วย token → 204
+  POST http://localhost:8080/api/auth/logout [204 No Content, 371B, 6ms]
+  √  204 No Content ไม่มี Response Body
+
+→ 04 IT-07 GET /api/users/me หลัง Logout ไม่ส่ง token → 401
+  GET http://localhost:8080/api/users/me [401 Unauthorized, 596B, 4ms]
+  √  401 Client ล้าง token แล้วเรียก API ไม่ได้
+
+→ 05 IT-08 GET /api/users/me ด้วย token เดิมหลัง Logout → 200
+  GET http://localhost:8080/api/users/me [200 OK, 497B, 17ms]
+  √  200 stateless JWT ไม่มี denylist token เดิมยังใช้ได้จนหมดอายุ (ข้อจำกัดตามการออกแบบ)
+
+→ 06 POST /api/auth/logout ซ้ำด้วย token เดิม → 204
+  POST http://localhost:8080/api/auth/logout [204 No Content, 371B, 5ms]
+  √  204 backend ไม่เก็บสถานะ Logout ซ้ำได้
+
+→ 07 POST /api/auth/logout token ถูกแก้ลายเซ็น → 401
+  POST http://localhost:8080/api/auth/logout [401 Unauthorized, 596B, 5ms]
+  √  401 token ไม่ถูกต้อง
+
+→ 08 POST /api/auth/logout token ไม่ใช่ JWT → 401
+  POST http://localhost:8080/api/auth/logout [401 Unauthorized, 596B, 4ms]
+  √  401 token ไม่ถูกต้อง
+
+→ 09 POST /api/auth/logout ใช้ scheme Basic → 401
+  POST http://localhost:8080/api/auth/logout [401 Unauthorized, 596B, 4ms]
+  √  401 ต้องเป็น Authorization: Bearer
+
+┌─────────────────────────┬──────────────────┬──────────────────┐
+│                         │         executed │           failed │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              iterations │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│                requests │               10 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│            test-scripts │               10 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│      prerequest-scripts │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              assertions │               11 │                0 │
+├─────────────────────────┴──────────────────┴──────────────────┤
+│ total run duration: 969ms                                     │
+├───────────────────────────────────────────────────────────────┤
+│ total data received: 1.12kB (approx)                          │
+├───────────────────────────────────────────────────────────────┤
+│ average response time: 16ms [min: 4ms, max: 57ms, s.d.: 18ms] │
+└───────────────────────────────────────────────────────────────┘

@@ -22,7 +22,9 @@ Oct 19, 2026 · @Non
 | Postman | newman 6.2.3 (`npx -y newman`) · Node 24.21.0 |
 | Backend ตอนรัน Postman | `./mvnw spring-boot:run -Dspring-boot.run.profiles=stub-tu` ที่ `http://localhost:8080` กับ DB ของ `docker compose` ตาราง `login_attempt` ว่าง |
 | TU Login API | **stub** (`StubTuApiClient`) ค่า `type`, `tu_status`, `department`, `faculty` สะกดตาม response จริงของ TU API ส่วนรหัสนักศึกษาและชื่อเป็นค่าสมมติ |
-| ค่า config | `JWT_SECRET` จาก `.env` (ยาว ≥ 32 ตัวอักษร) · `app.auth.max-attempts=5` · `app.auth.lock-seconds=900` · token อายุ 8 ชั่วโมง |
+| ค่า config | `JWT_SECRET` จาก `.env` (ยาว ≥ 32 ตัวอักษร) · `app.auth.max-attempts=5` · `app.auth.lock-seconds=900` · token อายุ 8 ชั่วโมง (ตอนรัน ภายหลังเปลี่ยนเป็น 3 ชั่วโมง ดูหมายเหตุใต้ตาราง) |
+
+> **หมายเหตุ (2026-10-20, US4-T08):** อายุ token เปลี่ยนจาก 8 ชั่วโมง (`28800000`) เป็น 3 ชั่วโมง (`app.auth.jwt.expiration-ms=10800000`) และ stub เพิ่มบัญชี demo `6609000000` ผลในเอกสารนี้รันก่อนการเปลี่ยนแปลง ไม่กระทบผลการทดสอบเพราะไม่มี test ใดขึ้นกับอายุ token ดู [US4-T08 Test Result](../../US4/T08/US4-T08-Test-Result.md)
 
 ### บัญชีใน stub (รหัสผ่าน `Passw0rd!` ทุกบัญชี)
 
@@ -35,6 +37,7 @@ Oct 19, 2026 · @Non
 | `staff01` | บุคลากร | `type: employee` | 2 |
 | `6609650001` | B2 CS ภาคพิเศษ (หลักที่ 5–6 เป็น `65`) | เหมือน `6609000001` ต่างแค่รหัสนักศึกษา ชื่อ "สมปอง พิเศษ" | 2 |
 | `6609000099` | — | โยน 503 เหมือน TU API ใช้งานไม่ได้ | — |
+| `6609000000` | demo active, CS ภาคปกติ (เพิ่มใน US4-T08) | เหมือน `6609000001` ชื่อ "สมพร ตัวอย่าง" รหัสเดียวกับนักศึกษา demo ของ US1 | — (ไม่อยู่ใน collection นี้) |
 | อื่น ๆ หรือรหัสผิด | — | `status: false`, `message: "Users or Password Invalid!"` เหมือน TU API ตอบ 400 | 5, 6 |
 
 ## Unit Test
@@ -190,7 +193,7 @@ docker exec sqlserver bash -c '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa 
 - Postman ใช้ TU API stub ยังไม่ได้รันกับ TU Login API จริงทั้ง collection (การตีความ response ทดสอบใน `HttpTuApiClientTest` ด้วย JSON รูปแบบจริง) ตอน UAT ให้รัน backend โดยไม่ใส่ profile และมี `TU_API_APPLICATION_KEY` ใน `.env`
 - **frontend ของ US1 ยังไม่ส่ง token** หลัง merge หน้าตารางเรียนจะได้ 401 จนกว่า UI login ของ US3 จะเสร็จ
 - `compose.yaml` ส่ง `JWT_SECRET`, `TU_API_APPLICATION_KEY` และ `SPRING_PROFILES_ACTIVE` จาก `.env` เข้า container `backend` แล้ว (ไม่มี `JWT_SECRET` compose หยุดพร้อมข้อความ) ตรวจด้วย `docker compose config` แต่ยังไม่ได้ build และรัน image ของ backend ผ่าน compose
-- token เป็น stateless ยังไม่มี logout ฝั่ง server (ลบ token ที่ UI) และ token อยู่ได้ 8 ชั่วโมงแม้บัญชี มธ. ถูกระงับระหว่างนั้น
+- token เป็น stateless ยังไม่มี logout ฝั่ง server (ลบ token ที่ UI) และ token อยู่ได้ 8 ชั่วโมงแม้บัญชี มธ. ถูกระงับระหว่างนั้น (ภายหลังลดเหลือ 3 ชั่วโมงใน US4-T08 · logout ของ US4 ก็เป็นแบบ stateless ไม่ invalidate token ฝั่ง server)
 - [US3-T13 Integration Test Cases](../T13/US3-T13-integration-test-cases-ui-api.md) ยังอ้าง `TuAuthDto` แบบเดิม ต้องแก้ตามเอกสารนี้ (case IT-09 "CS แต่ไม่ใช่ภาคปกติ" ตรวจได้แล้วด้วยบัญชี `6609650001`)
 
 **เอกสารที่เกี่ยวข้อง:** [DTO & API Spec](../T05/US3-DTO-API-Spec.md) · [Extended API Class Diagram](../T06/US3-T06-Extended-API-Class-Diagram.md) · [Sequence Diagram](../T06/US3-T06-Sequence-Diagram.md) · [US3-T12 DAO Unit Test Result](../T12/US3-T12-DAO-Unit-Test-Result.md) · [US3-T16 UAT](../US3-T16.md)

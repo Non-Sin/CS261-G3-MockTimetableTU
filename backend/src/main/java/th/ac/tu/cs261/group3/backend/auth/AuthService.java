@@ -3,6 +3,7 @@ package th.ac.tu.cs261.group3.backend.auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import th.ac.tu.cs261.group3.backend.auth.dto.LoginRequest;
 import th.ac.tu.cs261.group3.backend.auth.dto.LoginResponse;
@@ -64,6 +65,15 @@ public class AuthService {
         verifyTuStudentStatus(tuResponse);
         User user = upsertUser(tuResponse);
         return LoginResponse.of(jwtService.generateToken(user.getStudentId()));
+    }
+
+    /**
+     * US4 แบบ stateless: ไม่ invalidate token และไม่เข้า DB (ไม่เปิด transaction ด้วย)
+     * token เดิมยังใช้ได้จนหมดอายุ Frontend เป็นฝ่ายล้าง token
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void logout() {
+        // ตั้งใจว่างไว้ ถ้าภายหลังเพิ่ม denylist ให้บันทึก token ที่นี่
     }
 
     private BusinessRuleException accountLocked(String username) {
