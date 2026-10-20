@@ -73,4 +73,17 @@ describe("Auth API adapters (mock fetch, ไม่เรียก TU จริ�
     expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
     expect(SessionProvider.isSessionExpired()).toBe(false);
   });
+
+  it("US4: network error ระหว่าง Logout ยังล้าง session ฝั่ง browser แล้วส่ง error กลับให้ caller จัดการ", async () => {
+    SessionProvider.saveToken("logout-token");
+    const networkError = new TypeError("Failed to fetch");
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(networkError));
+
+    await expect(authApi.logout()).rejects.toBe(networkError);
+
+    expect(SessionProvider.isAuthenticated()).toBe(false);
+    expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
+    expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
+    expect(SessionProvider.isSessionExpired()).toBe(false);
+  });
 });
