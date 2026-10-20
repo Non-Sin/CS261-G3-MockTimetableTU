@@ -59,6 +59,19 @@ describe("US3-T07: หน้าจัดตารางเริ่มต้น�
     expect(await screen.findByText("สมชาย ใจดี")).toBeInTheDocument();
   });
 
+  it("dropdown แสดงชื่อภาษาไทยจาก API ใต้รหัสนักศึกษา และชื่ออังกฤษตัวพิมพ์ใหญ่บรรทัดล่าง", async () => {
+    vi.mocked(userApi.getCurrentUser).mockResolvedValue({
+      studentId: "6609000001", firstName: "Somchai", lastName: "Jaidee", firstNameTh: "สมชาย", lastNameTh: "ใจดี",
+    });
+    authSession.saveToken("test-token");
+    render(<MainMenuPage />);
+    const navbar = within(await screen.findByLabelText("ข้อมูลนักศึกษา"));
+    await userEvent.click(await navbar.findByRole("button", { name: /Somchai Jaidee/ }));
+    const dialog = within(navbar.getByRole("dialog", { name: "เมนูบัญชีผู้ใช้" }));
+    expect(dialog.getByText("สมชาย ใจดี")).toBeInTheDocument();
+    expect(dialog.getByText("SOMCHAI JAIDEE")).toBeInTheDocument();
+  });
+
   it("UT-29 profile ตอบ 401 ล้าง token และกลับหน้า login", async () => {
     vi.mocked(userApi.getCurrentUser).mockRejectedValue(new ApiError({ status: 401 }));
     authSession.saveToken("expired-token");

@@ -53,13 +53,13 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-    private static TuAuthDto tu(String type, String tuStatus, String department, String displaynameTh) {
-        return new TuAuthDto(true, "Success", null, type, USER, tuStatus, "10", displaynameTh,
-                "somchai jaidee", USER + "@dome.tu.ac.th", department, "คณะวิทยาศาสตร์และเทคโนโลยี");
+    private static TuAuthDto tu(String type, String tuStatus, String department, String displaynameEn) {
+        return new TuAuthDto(true, "Success", null, type, USER, tuStatus, "10", "สมชาย ใจดี",
+                displaynameEn, USER + "@dome.tu.ac.th", department, "คณะวิทยาศาสตร์และเทคโนโลยี");
     }
 
     private static TuAuthDto csStudent() {
-        return tu("student", "ปกติ", CS, "สมชาย ใจดี");
+        return tu("student", "ปกติ", CS, "somchai jaidee");
     }
 
     private static TuAuthDto invalidCredentials() {
@@ -91,8 +91,10 @@ class AuthServiceTest {
         assertThat(response.token()).isEqualTo("jwt-token");
         User saved = savedUser();
         assertThat(saved.getStudentId()).isEqualTo(USER);
-        assertThat(saved.getFirstName()).isEqualTo("สมชาย");
-        assertThat(saved.getLastName()).isEqualTo("ใจดี");
+        assertThat(saved.getFirstName()).isEqualTo("Somchai");
+        assertThat(saved.getLastName()).isEqualTo("Jaidee");
+        assertThat(saved.getFirstNameTh()).isEqualTo("สมชาย");
+        assertThat(saved.getLastNameTh()).isEqualTo("ใจดี");
         assertThat(saved.getDepartment()).isEqualTo(CS);
         assertThat(saved.getTrack()).isEqualTo("ภาคปกติ");
         verify(loginAttemptService).loginSucceeded(USER);
@@ -101,7 +103,7 @@ class AuthServiceTest {
 
     @Test
     void authenticate_existingUser_updatesProfile() {
-        User existing = new User(USER, "ชื่อเก่า", "นามสกุลเก่า", CS, "ภาคปกติ");
+        User existing = new User(USER, "Old", "Name", "ชื่อเก่า", "นามสกุลเก่า", CS, "ภาคปกติ");
         when(tuApiClient.verifyCredentials(USER, PASSWORD)).thenReturn(csStudent());
         when(userRepository.findById(USER)).thenReturn(Optional.of(existing));
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -111,14 +113,29 @@ class AuthServiceTest {
 
         User saved = savedUser();
         assertThat(saved).isSameAs(existing);
-        assertThat(saved.getFirstName()).isEqualTo("สมชาย");
-        assertThat(saved.getLastName()).isEqualTo("ใจดี");
+        assertThat(saved.getFirstName()).isEqualTo("Somchai");
+        assertThat(saved.getLastName()).isEqualTo("Jaidee");
+        assertThat(saved.getFirstNameTh()).isEqualTo("สมชาย");
+        assertThat(saved.getLastNameTh()).isEqualTo("ใจดี");
     }
 
     @Test
     void authenticate_multiWordLastName_keepsRestAsLastName() {
         when(tuApiClient.verifyCredentials(USER, PASSWORD))
-                .thenReturn(tu("student", "ปกติ", CS, " สมชาย  ณ อยุธยา "));
+                .thenReturn(tu("student", "ปกติ", CS, " somchai  na ayutthaya "));
+        when(userRepository.findById(USER)).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        authService.authenticate(request());
+
+        User saved = savedUser();
+        assertThat(saved.getFirstName()).isEqualTo("Somchai");
+        assertThat(saved.getLastName()).isEqualTo("Na Ayutthaya");
+    }
+
+    @Test
+    void authenticate_missingEnglishName_fallsBackToThaiName() {
+        when(tuApiClient.verifyCredentials(USER, PASSWORD)).thenReturn(tu("student", "ปกติ", CS, null));
         when(userRepository.findById(USER)).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -126,7 +143,30 @@ class AuthServiceTest {
 
         User saved = savedUser();
         assertThat(saved.getFirstName()).isEqualTo("สมชาย");
-        assertThat(saved.getLastName()).isEqualTo("ณ อยุธยา");
+        assertThat(saved.getLastName()).isEqualTo("ใจดี");
+        assertThat(saved.getFirstNameTh()).isEqualTo("สมชาย");
+    }
+
+    @Test
+    void authenticate_missingThaiName_savesNullThaiName() {
+        when(tuApiClient.verifyCredentials(USER, PASSWORD)).thenReturn(
+                new TuAuthDto(true, "Success", null, "student", USER, "ปกติ", "10", null,
+                        "somchai jaidee", USER + "@dome.tu.ac.th", CS, "คณะวิทยาศาสตร์และเทคโนโลยี"));
+        when(userRepository.findById(USER)).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        authService.authenticate(request());
+
+        User saved = savedUser();
+        assertThat(saved.getFirstName()).isEqualTo("Somchai");
+        assertThat(saved.getFirstNameTh()).isNull();
+        assertThat(saved.getLastNameTh()).isNull();
+    }
+
+    @Test
+    void capitalizeWords_upperCasesFirstLetterOfEachWordOnly() {
+        assertThat(AuthService.capitalizeWords("somchai na ayutthaya")).isEqualTo("Somchai Na Ayutthaya");
+        assertThat(AuthService.capitalizeWords("McDonald o'neil")).isEqualTo("McDonald O'neil");
     }
 
     @Test
@@ -200,7 +240,7 @@ class AuthServiceTest {
 
     @Test
     void authenticate_inactiveAccount_throws403AfterClearingAttempts() {
-        when(tuApiClient.verifyCredentials(USER, PASSWORD)).thenReturn(tu("student", "พักการศึกษา", CS, "สมชาย ใจดี"));
+        when(tuApiClient.verifyCredentials(USER, PASSWORD)).thenReturn(tu("student", "พักการศึกษา", CS, "somchai jaidee"));
 
         BusinessRuleException ex = catchThrowableOfType(BusinessRuleException.class,
                 () -> authService.authenticate(request()));
@@ -215,7 +255,7 @@ class AuthServiceTest {
     @Test
     void authenticate_inactiveOtherDepartment_reportsInactiveFirst() {
         when(tuApiClient.verifyCredentials(USER, PASSWORD))
-                .thenReturn(tu("student", "ลาออก", "ภาควิชาคณิตศาสตร์และสถิติ", "สมชาย ใจดี"));
+                .thenReturn(tu("student", "ลาออก", "ภาควิชาคณิตศาสตร์และสถิติ", "somchai jaidee"));
 
         assertThatThrownBy(() -> authService.authenticate(request()))
                 .isInstanceOf(BusinessRuleException.class)
@@ -225,7 +265,7 @@ class AuthServiceTest {
     @Test
     void authenticate_otherDepartment_throws403NotCsStudent() {
         when(tuApiClient.verifyCredentials(USER, PASSWORD))
-                .thenReturn(tu("student", "ปกติ", "ภาควิชาคณิตศาสตร์และสถิติ", "สมชาย ใจดี"));
+                .thenReturn(tu("student", "ปกติ", "ภาควิชาคณิตศาสตร์และสถิติ", "somchai jaidee"));
 
         BusinessRuleException ex = catchThrowableOfType(BusinessRuleException.class,
                 () -> authService.authenticate(request()));
@@ -238,7 +278,7 @@ class AuthServiceTest {
 
     @Test
     void authenticate_employee_throws403NotCsStudent() {
-        when(tuApiClient.verifyCredentials(USER, PASSWORD)).thenReturn(tu("employee", "ปกติ", CS, "สมชาย ใจดี"));
+        when(tuApiClient.verifyCredentials(USER, PASSWORD)).thenReturn(tu("employee", "ปกติ", CS, "somchai jaidee"));
 
         assertThatThrownBy(() -> authService.authenticate(request()))
                 .isInstanceOf(BusinessRuleException.class)

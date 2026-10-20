@@ -51,7 +51,7 @@ POST /api/auth/login ปฏิเสธได้ 5 แบบ ตอบเป็�
 
 | TU API ตอบ | ระบบเราถือว่า |
 | --- | --- |
-| 200 + `status: true` (มี `type`, `username`, `tu_status`, `displayname_th`, `department`, `faculty`) | รหัสถูก ตรวจสถานะต่อ |
+| 200 + `status: true` (มี `type`, `username`, `tu_status`, `displayname_th`, `displayname_en`, `department`, `faculty`) | รหัสถูก ตรวจสถานะต่อ |
 | 400 + `status: false` + `message: "Users or Password Invalid!"` | รหัสผิดหรือไม่มีบัญชี → นับ attempt |
 | `status: false` + `error` (Application-Key ผิด), 5xx, timeout | `503 TU_API_UNAVAILABLE` |
 
@@ -64,7 +64,7 @@ POST /api/auth/login ปฏิเสธได้ 5 แบบ ตอบเป็�
 3. ถ้ารหัสผิด: สั่งบวก Attempt ด้วย loginFailed() (เช็คต่อว่าถ้าบวกแล้วครบ 5 ให้โยน 429 พร้อมเวลาที่ต้องรอ ถ้าไม่ถึงโยน 401 INVALID_CREDENTIALS)
 4. ถ้ารหัสถูก: เคลียร์ Attempt ด้วย loginSucceeded()
 5. เช็คสถานะบัญชีและสาขาด้วย verifyTuStudentStatus(tuResponse) → ถ้าบัญชีไม่ Active โยน 403 ACCOUNT_INACTIVE (TC1) แต่ถ้าไม่ใช่นักศึกษา CS หรือเป็นภาคพิเศษ (หลักที่ 5–6 ของรหัสเป็น `65`) โยน 403 NOT_CS_STUDENT (TC2)
-6. Database Upsert: บันทึกรหัสนักศึกษา ชื่อ-นามสกุล (แยกจาก `displayname_th` ที่ช่องว่างแรก) และสาขาลง Table `users`
+6. Database Upsert: บันทึกรหัสนักศึกษา ชื่อ-นามสกุล (แยกจาก `displayname_en` ที่ช่องว่างแรก) และสาขาลง Table `users`
 7. สร้าง JWT Token และตอบ 200
 
 ตัวอย่าง Error Response 429 (ACCOUNT_LOCKED):
@@ -88,12 +88,14 @@ POST /api/auth/login ปฏิเสธได้ 5 แบบ ตอบเป็�
 ```json
 {
   "studentId": "6809610000",
-  "firstName": "สมชาย",
-  "lastName": "ใจดี"
+  "firstName": "Somchai",
+  "lastName": "Jaidee",
+  "firstNameTh": "สมชาย",
+  "lastNameTh": "ใจดี"
 }
 ```
 
-ชื่อ-นามสกุลเป็นภาษาไทยจาก `displayname_th` ของ TU API
+`firstName`, `lastName` เป็นภาษาอังกฤษจาก `displayname_en` ของ TU API (ทำตัวแรกของแต่ละคำเป็นตัวใหญ่) ถ้าไม่มี `displayname_en` ใช้ `displayname_th` แทน ส่วน `firstNameTh`, `lastNameTh` เป็นภาษาไทยจาก `displayname_th` แสดงใน dropdown ของ Navbar เป็น `null` ได้ถ้ายังไม่มีข้อมูล
 
 ไม่มี token, token ผิด หรือหมดอายุ (อายุ 3 ชั่วโมง) ตอบ `401` ทั้ง endpoint นี้และ `/api/**` อื่นทุกตัว ยกเว้น `POST /api/auth/login` (UI ควรพากลับหน้า Login)
 ```json
@@ -140,5 +142,7 @@ export type UserProfileResponse = {
   studentId: string;
   firstName: string;
   lastName: string;
+  firstNameTh?: string | null;
+  lastNameTh?: string | null;
 };
 ```

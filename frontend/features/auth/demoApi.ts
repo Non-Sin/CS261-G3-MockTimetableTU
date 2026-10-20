@@ -6,12 +6,12 @@ import type { LoginRequest, LoginResponse } from "./types";
 // บัญชีและรหัสผ่านตรงกับ StubTuApiClient (profile stub-tu) ของ backend ใช้ชุดเดียวกับ US3-T13
 const DEMO_PASSWORD = "Passw0rd!";
 const ACTIVE_CS: Record<string, Omit<UserProfileResponse, "studentId">> = {
-  "6609000000": { firstName: "สมพร", lastName: "ตัวอย่าง" },
-  "6609000001": { firstName: "สมชาย", lastName: "ใจดี" },
-  "6609000004": { firstName: "สมใจ", lastName: "ลองดู" },
+  "6609000000": { firstName: "Somporn", lastName: "Tuayang", firstNameTh: "สมพร", lastNameTh: "ตัวอย่าง" },
+  "6609000001": { firstName: "Somchai", lastName: "Jaidee", firstNameTh: "สมชาย", lastNameTh: "ใจดี" },
+  "6609000004": { firstName: "Somjai", lastName: "Longdoo", firstNameTh: "สมใจ", lastNameTh: "ลองดู" },
   // มีเฉพาะ demo: ดูหน้าระงับโดยไม่ต้องกรอกผิด 5 ครั้ง 0005 ปลดใน 5 วินาที ส่วน 0006 ใช้ตรวจตัวนับ 02:05
-  "6609000005": { firstName: "ทดลอง", lastName: "ปลดระงับ" },
-  "6609000006": { firstName: "ทดลอง", lastName: "นับถอยหลัง" },
+  "6609000005": { firstName: "Thodlong", lastName: "Plodrangab", firstNameTh: "ทดลอง", lastNameTh: "ปลดระงับ" },
+  "6609000006": { firstName: "Thodlong", lastName: "Nubthoilang", firstNameTh: "ทดลอง", lastNameTh: "นับถอยหลัง" },
 };
 const INACTIVE = new Set(["6609000003"]);
 const NOT_CS = new Set(["6609000002", "6609650001"]);

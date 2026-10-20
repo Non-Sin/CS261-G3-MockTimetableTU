@@ -88,7 +88,7 @@ sequenceDiagram
                     UI-->>User: แจ้งเตือนชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง
                 end
             else username และ password ถูกต้อง
-                TU-->>AS: TuAuthDto (status: true, type, username, tu_status, displayname_th, department, faculty)
+                TU-->>AS: TuAuthDto (status: true, type, username, tu_status, displayname_th, displayname_en, department, faculty)
                 AS->>LAS: loginSucceeded(username) [REQUIRES_NEW]
                 LAS->>LAR: deleteById(username)
                 LAR->>DB: DELETE FROM login_attempt WHERE username = ?
@@ -111,7 +111,7 @@ sequenceDiagram
                     UR->>DB: SELECT users WHERE student_id = ?
                     DB-->>UR: User หรือยังไม่มี
                     UR-->>AS: Optional<User>
-                    AS->>UR: save(user) (แยก displayname_th เป็นชื่อ/นามสกุล, track = "ภาคปกติ")
+                    AS->>UR: save(user) (แยก displayname_en เป็นชื่อ/นามสกุล, track = "ภาคปกติ")
                     UR->>DB: INSERT หรือ UPDATE users
                     DB-->>UR: สำเร็จ
                     AS->>JWT: generateToken(studentId)

@@ -70,12 +70,14 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('200 รหัสนักศึกษาและชื่อ-นามสกุลภาษาไทย แยกจาก displayname_th', () => {",
+              "pm.test('200 รหัสนักศึกษา ชื่อ-นามสกุลภาษาอังกฤษจาก displayname_en และภาษาไทยจาก displayname_th', () => {",
               "  pm.response.to.have.status(200);",
               "  pm.expect(pm.response.json()).to.eql({",
               "    studentId: pm.collectionVariables.get('csUser'),",
-              "    firstName: 'สมชาย',",
-              "    lastName: 'ใจดี'",
+              "    firstName: 'Somchai',",
+              "    lastName: 'Jaidee',",
+              "    firstNameTh: 'สมชาย',",
+              "    lastNameTh: 'ใจดี'",
               "  });",
               "});"
             ]

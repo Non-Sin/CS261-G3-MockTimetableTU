@@ -24,10 +24,12 @@ classDiagram
         -String studentId
         -String firstName
         -String lastName
+        -String firstNameTh
+        -String lastNameTh
         -String department
         -String track
         -OffsetDateTime updatedAt
-        +updateProfile(String firstName, String lastName, String department, String track) void
+        +updateProfile(String firstName, String lastName, String firstNameTh, String lastNameTh, String department, String track) void
     }
     class LoginAttempt {
         -String username

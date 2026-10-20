@@ -16,6 +16,8 @@ classDiagram
         - String studentId
         - String firstName
         - String lastName
+        - String firstNameTh
+        - String lastNameTh
         + from(user: User) UserProfileResponse
     }
     note for LoginRequest "รับ Request Body จาก POST /api/auth/login"
