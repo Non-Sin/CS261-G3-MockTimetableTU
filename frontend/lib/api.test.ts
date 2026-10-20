@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AUTH_TOKEN_KEY, SessionProvider } from "@/features/auth/session";
 import { timetableDeleteApi } from "@/features/timetable-delete/api";
 import { apiFetch } from "./api";
-import { authSession } from "./authSession";
 
 const fetchMock = vi.fn();
 const sentHeaders = () => new Headers(fetchMock.mock.calls[0][1].headers);
@@ -27,7 +26,7 @@ describe("apiFetch เชื่อม JWT ของ browser กับ API ตา
     ["/api/timetable/entries", "POST"],
     ["/api/timetable/entries/1", "DELETE"],
   ])("แนบ token จาก session ให้ %s (%s)", async (path, method) => {
-    authSession.saveToken("stored-test-token");
+    SessionProvider.saveToken("stored-test-token");
     await apiFetch(path, { method });
     const headers = sentHeaders();
     expect(headers.get("Authorization")).toBe("Bearer stored-test-token");
@@ -35,7 +34,7 @@ describe("apiFetch เชื่อม JWT ของ browser กับ API ตา
   });
 
   it("US3-T10 ลบหลายวิชา (DELETE /api/timetable/entries?entryIds=) แนบ token", async () => {
-    authSession.saveToken("stored-test-token");
+    SessionProvider.saveToken("stored-test-token");
     await timetableDeleteApi.removeEntries([1, 2]);
     expect(fetchMock.mock.calls[0][0]).toContain("/api/timetable/entries?entryIds=1,2");
     expect(sentHeaders().get("Authorization")).toBe("Bearer stored-test-token");
@@ -47,13 +46,13 @@ describe("apiFetch เชื่อม JWT ของ browser กับ API ตา
   });
 
   it("ใช้ Authorization ที่ caller ส่งมาแทน token ใน session", async () => {
-    authSession.saveToken("old-test-token");
+    SessionProvider.saveToken("old-test-token");
     await apiFetch("/api/users/me", { headers: new Headers({ Authorization: "Bearer explicit-test-token" }) });
     expect(sentHeaders().get("Authorization")).toBe("Bearer explicit-test-token");
   });
 
   it("ไม่แนบ token ใน session ไปกับ request Login", async () => {
-    authSession.saveToken("old-test-token");
+    SessionProvider.saveToken("old-test-token");
     await apiFetch("/api/auth/login", { method: "POST", body: JSON.stringify({ username: "test-student", password: "test-password" }) });
     expect(sentHeaders().has("Authorization")).toBe(false);
   });
