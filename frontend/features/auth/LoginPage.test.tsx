@@ -131,7 +131,7 @@ describe("US3-T07: ฟอร์ม login (T11 และข้อสรุปล�
     await userEvent.click(loginButton());
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     await act(async () => { request.resolve({ token: "test-token" }); });
-    expect(router.replace).toHaveBeenCalledWith("/dashboard");
+    expect(router.replace).toHaveBeenCalledWith("/");
   });
 
   it("UT-13 ไม่ใช่ CS ภาคปกติแสดง Access Denied ไม่เก็บ token และไม่โหลด profile", async () => {
@@ -142,7 +142,7 @@ describe("US3-T07: ฟอร์ม login (T11 และข้อสรุปล�
     expect(screen.getByRole("heading", { name: "ไม่สามารถเข้าใช้งานระบบได้" })).toBeInTheDocument();
     expect(screen.getByText(/เฉพาะนักศึกษาสาขาวิทยาการคอมพิวเตอร์ ภาคปกติ/)).toBeInTheDocument();
     expect(screen.getByText("Access Denied")).toBeInTheDocument();
-    expect(within(screen.getByRole("region", { name: "ไม่สามารถเข้าใช้งานระบบได้" })).getByRole("link", { name: /^ไปยัง REG-TU/ })).toHaveAttribute("href", "https://reg.tu.ac.th/");
+    expect(within(screen.getByRole("region", { name: "ไม่สามารถเข้าใช้งานระบบได้" })).getByRole("link", { name: /^ไปยัง REG-TU/ })).toHaveAttribute("href", "https://vnweb68.reg.tu.ac.th/registrar/home");
     expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
     expect(userApi.getCurrentUser).not.toHaveBeenCalled();
   });
@@ -191,12 +191,12 @@ describe("US3-T07: ฟอร์ม login (T11 และข้อสรุปล�
     expect(password()).toHaveValue("");
   });
 
-  it.each([["ครั้งแรก", false], ["ครั้งถัดไป", true]] as const)("UT-24 login %s ไปเมนูหลักเสมอ ไม่มีหน้าประวัติ", async (_name, returning) => {
+  it.each([["ครั้งแรก", false], ["ครั้งถัดไป", true]] as const)("UT-24 login %s ไปหน้าจัดตารางเสมอ ไม่มีหน้าประวัติคั่น", async (_name, returning) => {
     if (returning) sessionStorage.setItem(AUTH_TOKEN_KEY, "previous-session-token");
     render(<LoginPage />);
     await fill();
     await userEvent.click(loginButton());
-    expect(router.replace).toHaveBeenCalledExactlyOnceWith("/dashboard");
+    expect(router.replace).toHaveBeenCalledExactlyOnceWith("/");
     expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBe("test-token");
   });
 

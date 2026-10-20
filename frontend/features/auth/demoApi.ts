@@ -51,7 +51,7 @@ export async function demoCurrentUser(token: string): Promise<UserProfileRespons
   await new Promise((resolve) => setTimeout(resolve, 150));
   const studentId = token.replace(/^demo-student-/, "");
   if (!/^demo-student-680961000[034]$/.test(token)) throw new ApiError({ status: 401 });
-  return { studentId, firstName: "Alysa", lastName: "Liu" };
+  return { studentId, firstName: "สมชาย", lastName: "ใจดี" };
 }
 
 export async function demoLogout(): Promise<void> {

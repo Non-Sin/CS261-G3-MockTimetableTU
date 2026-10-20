@@ -8,8 +8,7 @@ const notifyListeners = () => {
   listeners.forEach((listener) => listener());
 };
 
-// เรียกจาก event หรือ effect ฝั่ง browser เท่านั้น จึงไม่อ่าน storage ระหว่าง server render
-// เก็บเฉพาะ token: refresh ในแท็บเดิมได้ และไม่มี username/password อยู่ใน storage
+// อ่าน session เฉพาะใน browser และรองรับ session เก่าที่อาจยังเก็บ token ใน localStorage
 export const SessionProvider = {
   getToken: () => {
     if (typeof window === "undefined") return null;
@@ -66,4 +65,3 @@ export const SessionProvider = {
 };
 
 export const authSession = SessionProvider;
-

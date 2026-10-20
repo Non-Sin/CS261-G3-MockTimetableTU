@@ -79,7 +79,7 @@ export const useLogin = () => {
       if (!token?.trim()) throw new Error("Missing login token");
       SessionProvider.saveToken(token);
       setFields({ username: "", password: "" });
-      router.replace("/dashboard");
+      router.replace("/");
     } catch (cause) {
       if (!mounted.current) return;
       if (cause instanceof ApiError) {

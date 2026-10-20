@@ -1,5 +1,6 @@
-import MainMenuPage from "@/features/auth/MainMenuPage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <MainMenuPage />;
+  // รองรับลิงก์เก่า ให้ใช้หน้าจัดตารางและ header ชุดเดียวที่ /
+  redirect("/");
 }
