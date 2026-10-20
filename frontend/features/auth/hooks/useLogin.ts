@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api";
 import { authApi } from "../api";
-import { authSession } from "../session";
+import { SessionProvider } from "../session";
 import type { LoginRequest } from "../types";
 
 export const INVALID_LOGIN_MESSAGE =
@@ -10,11 +10,20 @@ export const INVALID_LOGIN_MESSAGE =
 export const DEFAULT_LOCK_SECONDS = 900;
 type FieldErrors = Partial<Record<keyof LoginRequest, string>>;
 
+const subscribeSession = (callback: () => void) => SessionProvider.subscribe(callback);
+const getSessionExpiredSnapshot = () => SessionProvider.isSessionExpired();
+const getServerSessionExpiredSnapshot = () => false;
+
 export const useLogin = () => {
   const router = useRouter();
   const [fields, setFields] = useState<LoginRequest>({ username: "", password: "" });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [error, setError] = useState<string | null>(null);
+  const sessionExpired = useSyncExternalStore(
+    subscribeSession,
+    getSessionExpiredSnapshot,
+    getServerSessionExpiredSnapshot,
+  );
   const [view, setView] = useState<"login" | "denied" | "locked">("login");
   const [lockedUntil, setLockedUntil] = useState(0);
   const [unlocked, setUnlocked] = useState(false);
@@ -24,8 +33,17 @@ export const useLogin = () => {
   const mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
-    return () => { mounted.current = false; };
-  }, []);
+    const handlePopState = () => {
+      if (!SessionProvider.isAuthenticated()) {
+        router.replace("/login");
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      mounted.current = false;
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [router]);
 
   const changeField = (field: keyof LoginRequest, value: string) => {
     setFields((current) => ({ ...current, [field]: value }));
@@ -36,6 +54,7 @@ export const useLogin = () => {
     setFields({ username: "", password: "" });
     setFieldErrors({});
     setError(null);
+    SessionProvider.clearSessionExpired();
     setUnlocked(afterLock);
     setView("login");
   }, []);
@@ -51,13 +70,14 @@ export const useLogin = () => {
     inFlight.current = true;
     setSubmitting(true);
     setError(null);
+    SessionProvider.clearSessionExpired();
     try {
-      authSession.clear();
+      SessionProvider.clear();
       // ตัดช่องว่างเฉพาะ username; password ต้องส่งตรงตามที่ผู้ใช้กรอก
       const { token } = await authApi.login({ username: fields.username.trim(), password: fields.password });
       if (!mounted.current) return;
       if (!token?.trim()) throw new Error("Missing login token");
-      authSession.saveToken(token);
+      SessionProvider.saveToken(token);
       setFields({ username: "", password: "" });
       router.replace("/dashboard");
     } catch (cause) {
@@ -91,5 +111,5 @@ export const useLogin = () => {
     }
   };
 
-  return { fields, fieldErrors, error, view, lockedUntil, unlocked, submitting, changeField, reset, submit };
+  return { fields, fieldErrors, error, sessionExpired, view, lockedUntil, unlocked, submitting, changeField, reset, submit };
 };

@@ -1,7 +1,13 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "@/lib/api";
 import { userApi } from "../users/api";
 import { authApi } from "./api";
+import { AUTH_TOKEN_KEY, SESSION_EXPIRED_KEY, SessionProvider } from "./session";
+
+beforeEach(() => {
+  sessionStorage.clear();
+  localStorage.clear();
+});
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -28,5 +34,37 @@ describe("Auth API adapters (mock fetch, ไม่เรียก TU จริ�
     vi.stubGlobal("fetch", fetchMock);
     await expect(userApi.getCurrentUser("test-token")).resolves.toEqual(profile);
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/users/me"), expect.objectContaining({ headers: { "Content-Type": "application/json", Authorization: "Bearer test-token" } }));
+  });
+
+  it("US4: POST /api/auth/logout ส่ง Bearer token ไม่มี body และล้าง session เมื่อได้ 204", async () => {
+    SessionProvider.saveToken("logout-token");
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(authApi.logout()).resolves.toBeUndefined();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/auth/logout"),
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer logout-token" },
+      }),
+    );
+    expect(fetchMock.mock.calls[0]?.[1]?.body).toBeUndefined();
+    expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
+    expect(sessionStorage.getItem(SESSION_EXPIRED_KEY)).toBeNull();
+  });
+
+  it("US4: POST /api/auth/logout ตอบ 401 ล้าง session เหมือนสำเร็จโดยไม่ติดสถานะเซสชันหมดอายุ", async () => {
+    SessionProvider.saveToken("expired-token");
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ status: 401, title: "Unauthorized", detail: "กรุณาเข้าสู่ระบบก่อนใช้งาน" }), { status: 401 }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(authApi.logout()).resolves.toBeUndefined();
+
+    expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
+    expect(SessionProvider.isSessionExpired()).toBe(false);
   });
 });

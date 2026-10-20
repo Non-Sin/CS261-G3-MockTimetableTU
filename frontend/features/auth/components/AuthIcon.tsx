@@ -15,6 +15,7 @@ const paths = {
   search: "M15 15l6 6M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z",
   sparkle: "m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z",
   shield: "m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6l9-4ZM8 12l3 3 5-6",
+  logout: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
 } as const;
 
 export default function AuthIcon({ name, ...props }: SVGProps<SVGSVGElement> & { name: keyof typeof paths }) {
