@@ -68,8 +68,8 @@ Branch: `codex/ui-navigation-feedback`
 production frontend ใช้ API ของ backend ส่วน backend เปิด profile `stub-tu` เพื่อจำลอง TU Login API
 
 - บัญชีทดสอบ: `6609000001` / `Passw0rd!` ชื่อ **สมชาย ใจดี** (ข้อมูลจาก `StubTuApiClient`)
-- บัญชี mock เดิม `6809610000` / `DemoPass123!` ใช้เฉพาะ `next dev` ที่เปิด auth mock
-- `lib/authSession.ts` เก็บ token ที่ใช้ร่วมกัน และ `features/auth/session.ts` re-export ให้ import เดิมทำงานต่อ
+- auth mock (`next dev` ที่ตั้ง `NEXT_PUBLIC_AUTH_MODE=mock`) ใช้บัญชีและรหัสผ่านชุดเดียวกับ stub ดู `demoApi.ts`
+- `features/auth/session.ts` (`SessionProvider`) เป็นที่เก็บ token ที่เดียว ทั้ง auth และ `lib/api.ts` ใช้ร่วมกัน และแจ้ง listener (`AuthGuard`, `useTimetable`) ทุกครั้งที่ session เปลี่ยน
 - `lib/api.ts` แนบ `Authorization: Bearer ...` จาก session ให้ API ของตาราง รายวิชา และการลบ โดยคง header ที่ caller ระบุเองไว้
 - ไม่แนบ token ใน session ไปกับ request Login และไม่อ่าน browser storage ตอน server render
 - เพิ่ม regression tests ครอบคลุม GET/POST/DELETE, ไม่มี token, header ที่ระบุเอง และ Login
