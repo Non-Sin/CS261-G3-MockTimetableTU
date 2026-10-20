@@ -8,6 +8,10 @@ spring:
       - "optional:file:.env[.properties]"
       - "optional:file:../.env[.properties]"
 
+  # อ่าน SPRING_PROFILES_ACTIVE จาก .env ตอนรันนอก compose (เช่น stub-tu) เว้นว่าง = ไม่มี profile
+  profiles:
+    active: "${SPRING_PROFILES_ACTIVE:}"
+
   # --- Database ---
   datasource:
     url: "jdbc:sqlserver://localhost:1433;databaseName=appdb;encrypt=true;trustServerCertificate=true"
