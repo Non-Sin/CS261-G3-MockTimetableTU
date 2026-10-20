@@ -48,7 +48,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     SessionProvider.saveToken("valid-token");
     render(<MainMenuPage />);
 
-    expect(await screen.findByRole("heading", { name: "เมนูหลัก" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
     const navbar = within(screen.getByLabelText("ข้อมูลนักศึกษา"));
     await userEvent.click(navbar.getByRole("button", { name: /Alysa Liu/ }));
     const dialog = navbar.getByRole("dialog", { name: "เมนูบัญชีผู้ใช้" });
@@ -71,7 +71,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     SessionProvider.saveToken("valid-token");
     render(<MainMenuPage />);
 
-    expect(await screen.findByRole("heading", { name: "เมนูหลัก" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
     const logoutBtn = screen.getByRole("button", { name: "ออกจากระบบ" });
 
     await userEvent.click(logoutBtn);
@@ -92,7 +92,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     localStorage.setItem(AUTH_TOKEN_KEY, "valid-token");
     const { unmount } = render(<MainMenuPage />);
 
-    expect(await screen.findByRole("heading", { name: "เมนูหลัก" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
     expect(screen.getByText("Alysa Liu")).toBeInTheDocument();
     expect(screen.getByText("6809610000")).toBeInTheDocument();
 
@@ -102,7 +102,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     expect(SessionProvider.isAuthenticated()).toBe(false);
     expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
     expect(localStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
-    expect(screen.queryByRole("heading", { name: "เมนูหลัก" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "จัดตารางเรียนจำลอง" })).not.toBeInTheDocument();
     expect(screen.queryByText("Alysa Liu")).not.toBeInTheDocument();
     expect(screen.queryByText("6809610000")).not.toBeInTheDocument();
 
@@ -120,7 +120,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     SessionProvider.saveToken("valid-token");
     const { unmount } = render(<MainMenuPage />);
 
-    expect(await screen.findByRole("heading", { name: "เมนูหลัก" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
     expect(screen.getByText("Alysa Liu")).toBeInTheDocument();
 
     // กดปุ่มออกจากระบบจนกลับมาหน้า Login
@@ -144,7 +144,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     render(<MainMenuPage />);
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith("/login"));
     expect(SessionProvider.isAuthenticated()).toBe(false);
-    expect(screen.queryByRole("heading", { name: "เมนูหลัก" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "จัดตารางเรียนจำลอง" })).not.toBeInTheDocument();
     expect(screen.queryByText("Alysa Liu")).not.toBeInTheDocument();
     expect(screen.queryByText("6809610000")).not.toBeInTheDocument();
   });
@@ -157,7 +157,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     await act(async () => {
       await Promise.resolve();
     });
-    expect(screen.getByRole("heading", { name: "เมนูหลัก" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
     expect(SessionProvider.isAuthenticated()).toBe(true);
 
     // จำลองการไม่มีการใช้งานจนครบกำหนด 60 วินาที
@@ -170,7 +170,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     expect(SessionProvider.isSessionExpired()).toBe(true);
     expect(router.replace).toHaveBeenCalledWith("/login");
     expect(authApi.logout).not.toHaveBeenCalled();
-    expect(screen.queryByRole("heading", { name: "เมนูหลัก" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "จัดตารางเรียนจำลอง" })).not.toBeInTheDocument();
     expect(screen.queryByText("Alysa Liu")).not.toBeInTheDocument();
 
     unmount();
@@ -191,7 +191,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     await act(async () => {
       await Promise.resolve();
     });
-    expect(screen.getByRole("heading", { name: "เมนูหลัก" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
 
     // ผ่านไป 40 วินาทีแล้วผู้ใช้ขยับเมาส์/กดปุ่ม
     act(() => {
@@ -242,7 +242,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     SessionProvider.saveToken("valid-token");
     const { unmount } = render(<MainMenuPage />);
 
-    expect(await screen.findByRole("heading", { name: "เมนูหลัก" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "ออกจากระบบ" }));
 
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith("/login"));

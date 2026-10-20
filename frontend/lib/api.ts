@@ -23,8 +23,6 @@ export class ApiError extends Error {
   readonly fieldErrors: Record<string, string>;
 
   constructor(problem: ProblemDetail) {
-    // แปลง error response ให้เป็น Error มาตรฐาน พร้อมเก็บ status/code/field errors
-    // เพื่อให้หน้าจอเลือกแสดงข้อความหรือจัดการกรณีเฉพาะได้
     super(problem.detail ?? problem.title ?? `HTTP ${problem.status}`);
     this.name = "ApiError";
     this.status = problem.status;
@@ -35,13 +33,20 @@ export class ApiError extends Error {
 }
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = !path.startsWith("/api/auth/login") ? SessionProvider.getToken() : null;
-  const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
-  // ทุก feature service เรียกผ่านจุดนี้ เพื่อรวม base URL, JSON header และการแปลง error
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...authHeader, ...init?.headers },
-  });
+  const headers = new Headers(init?.headers);
+  if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+
+  // ใช้ SessionProvider ชุดเดียวกับ AuthGuard; ข้าม Login และคง Authorization ที่ caller กำหนด
+  if (
+    path.startsWith("/api/") &&
+    path.split("?")[0] !== "/api/auth/login" &&
+    !headers.has("Authorization")
+  ) {
+    const token = SessionProvider.getToken();
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const res = await fetch(`${API_URL}${path}`, { ...init, headers });
 
   if (!res.ok) {
     if (res.status === 401) {

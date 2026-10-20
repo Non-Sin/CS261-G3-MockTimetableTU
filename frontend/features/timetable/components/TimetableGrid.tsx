@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { DAY_NAMES } from "../../courses/dayNames";
+import type { DayOfWeek } from "../../courses/types";
 import ExportPngButton from "../../timetable-export/ExportPngButton";
 import {
   GRID_DAYS,
@@ -10,6 +11,17 @@ import {
 import type { TimetableEntry, TimeConflict } from "../types";
 import { groupConflicts } from "../utils/conflicts";
 import { toMinutes } from "../utils/time";
+
+// กำหนดสีประจำวันด้วยชื่อคลาสเต็ม เพื่อให้ Tailwind สร้าง CSS ได้ครบทุกสี
+const DAY_LABEL_COLORS = {
+  MONDAY: "border-yellow-200 bg-yellow-100 text-yellow-950",
+  TUESDAY: "border-pink-200 bg-pink-100 text-pink-950",
+  WEDNESDAY: "border-green-200 bg-green-100 text-green-950",
+  THURSDAY: "border-orange-200 bg-orange-100 text-orange-950",
+  FRIDAY: "border-sky-200 bg-sky-100 text-sky-950",
+  SATURDAY: "border-purple-200 bg-purple-100 text-purple-950",
+  SUNDAY: "border-red-200 bg-red-100 text-red-950",
+} satisfies Record<DayOfWeek, string>;
 
 type TimetableGridProps = {
   entries: TimetableEntry[];
@@ -105,9 +117,9 @@ const TimetableGrid = ({
 
           {GRID_DAYS.map((day) => (
             <div key={day} className="grid grid-cols-[64px_1fr] gap-2">
-              <div className="flex min-h-16 flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold">
+              <div className={`flex min-h-16 flex-col items-center justify-center rounded-xl border text-xs font-bold ${DAY_LABEL_COLORS[day]}`}>
                 {DAY_NAMES[day]}
-                <span className="text-[10px] text-slate-400">{day.slice(0, 3)}</span>
+                <span className="text-[10px] opacity-70">{day.slice(0, 3)}</span>
               </div>
 
               <div className="relative min-h-16">
@@ -140,7 +152,12 @@ const TimetableGrid = ({
                           className="absolute inset-y-0 z-10 overflow-hidden rounded-lg border border-blue-300 bg-blue-50 px-2 py-1.5 text-[11px] leading-tight text-blue-950"
                           style={{ left: `${left}%`, width: `${width}%` }}
                         >
-                          <strong>{entry.courseCode}</strong>
+                          <div className="flex flex-wrap items-center justify-between gap-x-1 gap-y-0.5">
+                            <strong>{entry.courseCode}</strong>
+                            <span className="shrink-0 whitespace-nowrap rounded-full bg-blue-600 px-1.5 py-0.5 text-[9px] font-bold leading-3 text-white">
+                              Sec {entry.sectionNo}
+                            </span>
+                          </div>
                           <div>{slot.startTime}-{slot.endTime}</div>
                           <div>{slot.room}</div>
                         </div>
@@ -184,7 +201,12 @@ const TimetableGrid = ({
                                 key={entry.entryId}
                                 className="min-w-0 px-2 py-1 text-[9px] leading-tight"
                               >
-                                <strong>{entry.courseCode}</strong>
+                                <div className="flex flex-wrap items-center justify-between gap-x-1 gap-y-0.5">
+                                  <strong>{entry.courseCode}</strong>
+                                  <span className="shrink-0 whitespace-nowrap rounded-full bg-red-600 px-1 py-0.5 text-[8px] font-bold leading-tight text-white">
+                                    Sec {entry.sectionNo}
+                                  </span>
+                                </div>
                                 <div>{group.overlapStart}-{group.overlapEnd}</div>
                                 <div>{slot.room}</div>
                               </div>

@@ -17,8 +17,9 @@ describe("Auth API adapters (mock fetch, ไม่เรียก TU จริ�
     vi.stubGlobal("fetch", fetchMock);
     await expect(authApi.login({ username: "6809610000", password: "test-password" })).resolves.toEqual({ token: "test-token" });
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/auth/login"), expect.objectContaining({
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: "6809610000", password: "test-password" }),
+      method: "POST", body: JSON.stringify({ username: "6809610000", password: "test-password" }),
     }));
+    expect(new Headers(fetchMock.mock.calls[0][1].headers).get("Content-Type")).toBe("application/json");
   });
 
   it("เก็บ code และ retryAfterSeconds จาก ProblemDetail ให้ UI ใช้", async () => {
@@ -33,7 +34,10 @@ describe("Auth API adapters (mock fetch, ไม่เรียก TU จริ�
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(profile), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
     await expect(userApi.getCurrentUser("test-token")).resolves.toEqual(profile);
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/users/me"), expect.objectContaining({ headers: { "Content-Type": "application/json", Authorization: "Bearer test-token" } }));
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/users/me"), expect.any(Object));
+    const headers = new Headers(fetchMock.mock.calls[0][1].headers);
+    expect(headers.get("Content-Type")).toBe("application/json");
+    expect(headers.get("Authorization")).toBe("Bearer test-token");
   });
 
   it("US4: POST /api/auth/logout ส่ง Bearer token ไม่มี body และล้าง session เมื่อได้ 204", async () => {
@@ -47,9 +51,11 @@ describe("Auth API adapters (mock fetch, ไม่เรียก TU จริ�
       expect.stringContaining("/api/auth/logout"),
       expect.objectContaining({
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: "Bearer logout-token" },
       }),
     );
+    const headers = new Headers(fetchMock.mock.calls[0]?.[1]?.headers);
+    expect(headers.get("Content-Type")).toBe("application/json");
+    expect(headers.get("Authorization")).toBe("Bearer logout-token");
     expect(fetchMock.mock.calls[0]?.[1]?.body).toBeUndefined();
     expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
     expect(sessionStorage.getItem(SESSION_EXPIRED_KEY)).toBeNull();

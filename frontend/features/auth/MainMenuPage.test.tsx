@@ -10,6 +10,8 @@ import MainMenuPage from "./MainMenuPage";
 const router = vi.hoisted(() => ({ replace: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
 vi.mock("../users/api", () => ({ userApi: { getCurrentUser: vi.fn() } }));
+// แยกการตรวจ session/navbar ออกจาก API ของตารางที่มีชุดทดสอบของตัวเอง
+vi.mock("../timetable/Timetable", () => ({ default: () => <section aria-label="เนื้อหาตารางเรียน">ตารางเรียน</section> }));
 const profile = { studentId: "6809610000", firstName: "Alysa", lastName: "Liu" };
 
 beforeEach(() => {
@@ -18,25 +20,25 @@ beforeEach(() => {
   vi.mocked(userApi.getCurrentUser).mockReset().mockResolvedValue(profile);
 });
 
-describe("US3-T07: เมนูหลักและ Navbar", () => {
+describe("US3-T07: หน้าจัดตารางเริ่มต้นและ Navbar", () => {
   it("UT-25 ไม่มี token พากลับ login และไม่โหลด profile", async () => {
     render(<MainMenuPage />);
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith("/login"));
     expect(userApi.getCurrentUser).not.toHaveBeenCalled();
-    expect(screen.queryByRole("heading", { name: "เมนูหลัก" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "จัดตารางเรียนจำลอง" })).not.toBeInTheDocument();
   });
 
   it("UT-26 แสดงชื่อและรหัสใน Navbar และโหลด profile ด้วย token ที่เก็บไว้", async () => {
     authSession.saveToken("test-token");
     render(<MainMenuPage />);
-    expect(await screen.findByRole("heading", { name: "เมนูหลัก" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
     const navbar = within(screen.getByLabelText("ข้อมูลนักศึกษา"));
     expect(navbar.getByText("Alysa Liu")).toBeInTheDocument();
     expect(navbar.getByText("6809610000")).toBeInTheDocument();
     expect(userApi.getCurrentUser).toHaveBeenCalledWith("test-token");
-    expect(screen.getByRole("link", { name: /จัดตารางเรียนจำลอง/ })).toHaveAttribute("href", "/");
-    for (const title of ["ตรวจสอบเงื่อนไขรายวิชา", "บันทึกวิชาที่เคยเรียนผ่าน", "ดูวิชาเสริมแนะนำ", "ค้นหาช่องทางขอโควตา"]) {
-      expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "จัดตารางเรียนจำลอง" })).toHaveAttribute("aria-current", "page");
+    for (const title of ["ดูวิชาเสรีแนะนำ", "ค้นหาช่องทางขอโควตา"]) {
+      expect(screen.getByRole("button", { name: title })).toBeInTheDocument();
     }
   });
 
@@ -63,16 +65,16 @@ describe("US3-T07: เมนูหลักและ Navbar", () => {
     render(<MainMenuPage />);
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith("/login"));
     expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
-    expect(screen.queryByRole("heading", { name: "เมนูหลัก" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "จัดตารางเรียนจำลอง" })).not.toBeInTheDocument();
   });
 
-  it("refresh/เปิดเมนูหลักใหม่อ่าน token จาก session เดิม", async () => {
+  it("refresh/เปิดหน้าจัดตารางใหม่อ่าน token จาก session เดิม", async () => {
     authSession.saveToken("saved-token");
     const first = render(<MainMenuPage />);
-    await screen.findByRole("heading", { name: "เมนูหลัก" });
+    await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" });
     first.unmount();
     render(<MainMenuPage />);
-    await screen.findByRole("heading", { name: "เมนูหลัก" });
+    await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" });
     expect(userApi.getCurrentUser).toHaveBeenLastCalledWith("saved-token");
     expect(router.replace).not.toHaveBeenCalled();
   });
@@ -83,7 +85,7 @@ describe("US3-T07: เมนูหลักและ Navbar", () => {
     render(<MainMenuPage />);
     expect(await screen.findByRole("alert")).toHaveTextContent("โหลดข้อมูลนักศึกษาไม่สำเร็จ");
     await userEvent.click(screen.getByRole("button", { name: "ลองใหม่" }));
-    expect(await screen.findByRole("heading", { name: "เมนูหลัก" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
     expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBe("test-token");
   });
 });
