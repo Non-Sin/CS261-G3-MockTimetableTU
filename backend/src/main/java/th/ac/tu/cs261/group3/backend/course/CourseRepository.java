@@ -19,19 +19,20 @@ public interface CourseRepository extends JpaRepository<Course, String> {
      * @param category null = ทุกหมวดวิชา
      */
     default List<Course> search(int academicYear, int semester, String q, CourseCategory category) {
-        String prefix = q == null || q.isEmpty() ? null : escapeLike(q.toUpperCase(Locale.ROOT));
+        // ไม่ค้นใช้ "" แทน null: LIKE '%' ตรงทุกแถวอยู่แล้ว และถ้า query นี้เคย bind prefix เป็น null
+        // (JAVA_OBJECT) บน connection เดิม SQL Server จะหา prefix ภาษาไทยที่ส่งตามมาไม่เจอ
+        String prefix = q == null ? "" : escapeLike(q.toUpperCase(Locale.ROOT));
         return searchByPrefix(academicYear, semester, prefix, category);
     }
 
-    /** ใช้ผ่าน {@link #search} เท่านั้น {@code prefix} ต้องเป็นตัวพิมพ์ใหญ่และ escape แล้ว */
+    /** ใช้ผ่าน {@link #search} เท่านั้น {@code prefix} ห้ามเป็น null ต้องเป็นตัวพิมพ์ใหญ่และ escape แล้ว */
     @Query("""
             select c from Course c
             where exists (
                     select 1 from Section s
                     where s.course = c and s.academicYear = :academicYear and s.semester = :semester)
               and (:category is null or c.category = :category)
-              and (:prefix is null
-                   or upper(c.courseCode) like concat(:prefix, '%') escape '!'
+              and (upper(c.courseCode) like concat(:prefix, '%') escape '!'
                    or upper(c.courseName) like concat(:prefix, '%') escape '!'
                    or upper(c.courseName) like concat('% ', :prefix, '%') escape '!'
                    or upper(c.courseName) like concat('%-', :prefix, '%') escape '!')
