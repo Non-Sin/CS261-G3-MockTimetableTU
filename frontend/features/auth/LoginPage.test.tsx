@@ -181,6 +181,21 @@ describe("US3-T07: ฟอร์ม login (T11 และข้อสรุปล�
     expect(router.replace).not.toHaveBeenCalled();
   });
 
+  it("US3-T10 TU Login API ใช้งานไม่ได้ (503) แจ้งเชื่อมต่อไม่ได้ ไม่ใช่รหัสผิด และเก็บค่าที่กรอกไว้", async () => {
+    vi.mocked(authApi.login).mockRejectedValue(new ApiError({ status: 503, code: "TU_API_UNAVAILABLE" }));
+    render(<LoginPage />);
+    await fill();
+    await userEvent.click(loginButton());
+    expect(screen.getByRole("alert")).toHaveTextContent("ไม่สามารถเชื่อมต่อระบบของมหาวิทยาลัยได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง");
+    expect(username()).not.toHaveAttribute("aria-invalid", "true");
+    expect(password()).not.toHaveAttribute("aria-invalid", "true");
+    expect(username()).toHaveValue("6809610000");
+    expect(password()).toHaveValue("demo-password");
+    expect(loginButton()).toBeEnabled();
+    expect(router.replace).not.toHaveBeenCalled();
+    expect(sessionStorage.getItem(AUTH_TOKEN_KEY)).toBeNull();
+  });
+
   it("UT-23 สำเร็จเก็บเฉพาะ token ใน sessionStorage", async () => {
     render(<LoginPage />);
     await fill();
