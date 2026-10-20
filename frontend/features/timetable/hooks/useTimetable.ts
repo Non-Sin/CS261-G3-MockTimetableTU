@@ -28,19 +28,24 @@ export const useTimetable = () => {
   const [conflictAlertDismissed, setConflictAlertDismissed] = useState(false);
   // ภาคเรียนที่เลือกล่าสุด ใช้ตรวจผล POST/DELETE ที่ตอบกลับหลังผู้ใช้เปลี่ยนภาคไปแล้ว
   const selectedTermRef = useRef({ academicYear: DEFAULT_ACADEMIC_YEAR, semester: DEFAULT_SEMESTER });
+  // นับครั้งที่เอาผล POST/DELETE ขึ้นจอ GET ที่เริ่มก่อนหน้านั้นถือว่าเก่ากว่า จึงไม่ใช้ผล
+  const writeCountRef = useRef(0);
 
   // โหลดตารางใหม่ทุกครั้งที่เปลี่ยนภาคเรียน และไม่ใช้ผลของภาคเก่าที่ตอบกลับมาช้า
+  // รวมถึงผล GET ที่ตอบหลังการเพิ่ม/ลบวิชา (เช่น สลับภาค 1 → 2 → 1 ระหว่างรอ หรือ reload หลัง 404)
   useEffect(() => {
     let ignore = false;
+    const writeCountAtStart = writeCountRef.current;
+    const isStale = () => ignore || writeCountRef.current !== writeCountAtStart;
 
     fetchTimetable({ academicYear, semester })
       .then((data) => {
-        if (ignore) return;
+        if (isStale()) return;
         setTimetable(data);
         setLoadError(false);
       })
       .catch(() => {
-        if (!ignore) setLoadError(true);
+        if (!isStale()) setLoadError(true);
       });
 
     return () => {
@@ -63,6 +68,13 @@ export const useTimetable = () => {
 
   const reload = () => setReloadKey((key) => key + 1);
 
+  // ตารางทั้งก้อนที่ POST/DELETE ตอบมาใหม่กว่า GET ที่ยังค้างอยู่ จึงนับไว้ให้ useEffect ข้ามผลนั้น
+  const showWriteResult = (updated: Timetable) => {
+    writeCountRef.current += 1;
+    setTimetable(updated);
+    setConflictAlertDismissed(false);
+  };
+
   // เพิ่มกลุ่มเรียนที่เลือก แล้วใช้ตารางทั้งก้อนที่ backend ตอบกลับมา (รวมผลตรวจเวลาชน)
   const addCourse = async (_course: Course, sectionId: number) => {
     setAddingSectionId(sectionId);
@@ -74,8 +86,7 @@ export const useTimetable = () => {
       const { academicYear: currentYear, semester: currentSemester } = selectedTermRef.current;
       if (updated.academicYear !== currentYear || updated.semester !== currentSemester) return;
 
-      setTimetable(updated);
-      setConflictAlertDismissed(false);
+      showWriteResult(updated);
     } catch (error) {
       // หน่วยกิตเกินหรือวิชาซ้ำ: ไม่แสดงข้อความตามที่ทีมตกลง แค่โหลดตารางล่าสุดให้ปุ่มกลับมาถูกสถานะ
       if (error instanceof ApiError && error.status === 409) {
@@ -89,6 +100,7 @@ export const useTimetable = () => {
   };
 
   // ลบ 1 วิชา หรือลบหลายวิชา/ทั้งหมด แล้วแทนที่ state ตารางด้วย response จาก backend ทันที
+  // คืน true เมื่อ checkbox ที่ติ๊กไว้ใช้ต่อไม่ได้ (ลบสำเร็จ หรือ 404) ให้ AddedCoursesList ล้าง ตาม US2-T06
   const executeDelete = async (request: () => Promise<Timetable>): Promise<boolean> => {
     setDeleteStatus("deleting");
     setDeleteError(null);
@@ -96,24 +108,21 @@ export const useTimetable = () => {
     try {
       const updated = await request();
       const { academicYear: currentYear, semester: currentSemester } = selectedTermRef.current;
-      if (updated.academicYear !== currentYear || updated.semester !== currentSemester) {
-        setDeleteStatus("idle");
-        return true;
+      if (updated.academicYear === currentYear && updated.semester === currentSemester) {
+        showWriteResult(updated);
       }
-
-      setTimetable(updated);
-      setConflictAlertDismissed(false);
       setDeleteStatus("idle");
       return true;
     } catch (error) {
       setDeleteStatus("error");
-      // 404 แปลว่าข้อมูลบนหน้าจอเก่า (เช่น ถูกลบจากอีกแท็บไปแล้ว) แจ้งผู้ใช้และโหลดตารางล่าสุดใหม่
+      // 404 แปลว่าข้อมูลบนหน้าจอเก่า (เช่น ถูกลบจากอีกแท็บไปแล้ว) แจ้งผู้ใช้ โหลดตารางล่าสุดใหม่ และให้เลือกใหม่
       if (error instanceof ApiError && error.status === 404) {
-        setDeleteError("ข้อมูลตารางเรียนมีการเปลี่ยนแปลง กำลังโหลดข้อมูลล่าสุด");
+        setDeleteError("ตารางเรียนมีการเปลี่ยนแปลงจากที่อื่น กรุณาตรวจตารางล่าสุดแล้วเลือกวิชาที่จะลบอีกครั้ง");
         reload();
-      } else {
-        setDeleteError("ลบวิชาไม่สำเร็จ กรุณาลองใหม่");
+        return true;
       }
+      // ข้อผิดพลาดอื่นเก็บ checkbox ไว้ กดลบซ้ำได้ทันที
+      setDeleteError("ลบวิชาไม่สำเร็จ กรุณาลองใหม่");
       return false;
     }
   };
@@ -146,8 +155,11 @@ export const useTimetable = () => {
     setSemester: (value: number) => changeTerm(academicYear, value),
     // ผลตรวจเวลาชนมาจาก backend ส่งต่อให้ทั้ง ConflictAlert และ TimetableGrid
     conflicts: timetable?.conflicts ?? [],
-    // กดเพิ่มไม่ได้ระหว่างโหลดตารางหรือระหว่างรอผลการเพิ่มวิชาก่อนหน้า
-    addDisabled: timetable === null || addingSectionId !== null,
+    // กดเพิ่มไม่ได้ระหว่างโหลดตาราง หรือระหว่างรอผลเพิ่ม/ลบวิชาก่อนหน้า
+    // ให้มีคำขอแก้ตารางทีละคำขอ ผลที่ตอบทีหลังจะได้ไม่ใช่ตารางที่เก่ากว่า
+    addDisabled: timetable === null || addingSectionId !== null || deleteStatus === "deleting",
+    // ปุ่มลบปิดระหว่างรอผลเพิ่มวิชา ด้วยเหตุผลเดียวกัน
+    deleteDisabled: addingSectionId !== null,
     addCourse,
     removeCourse,
     removeCourses,

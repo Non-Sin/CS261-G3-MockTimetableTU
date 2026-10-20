@@ -208,7 +208,7 @@ describe("US2-T07 ลบวิชาจากตารางเรียนจ�
     await userEvent.click(within(addedCard("CS180")).getByRole("button", { name: "ลบวิชา" }));
 
     expect(
-      await screen.findByText("ข้อมูลตารางเรียนมีการเปลี่ยนแปลง กำลังโหลดข้อมูลล่าสุด"),
+      await screen.findByText("ตารางเรียนมีการเปลี่ยนแปลงจากที่อื่น กรุณาตรวจตารางล่าสุดแล้วเลือกวิชาที่จะลบอีกครั้ง"),
     ).toBeInTheDocument();
     await waitFor(() => expect(fetchTimetable).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(timetableBox().getByText("หน่วยกิต 3 / 22")).toBeInTheDocument());

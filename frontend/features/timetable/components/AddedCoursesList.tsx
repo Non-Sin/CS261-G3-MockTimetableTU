@@ -7,6 +7,8 @@ type AddedCoursesListProps = {
   entries: TimetableEntry[];
   deleteStatus?: DeleteStatus;
   deleteError?: string | null;
+  // ปิดปุ่มลบและ checkbox ชั่วคราว เช่น ระหว่างรอผลเพิ่มวิชา
+  disabled?: boolean;
   onRemove?: (entryId: number) => Promise<boolean> | void;
   onRemoveMultiple?: (entryIds: number[]) => Promise<boolean> | void;
 };
@@ -17,6 +19,7 @@ const AddedCoursesList = ({
   entries,
   deleteStatus = "idle",
   deleteError = null,
+  disabled = false,
   onRemove,
   onRemoveMultiple,
 }: AddedCoursesListProps) => {
@@ -27,7 +30,7 @@ const AddedCoursesList = ({
   const activeSelectedIds = selectedIds.filter((id) => validIdSet.has(id));
 
   const isEmpty = entries.length === 0;
-  const isDeleting = deleteStatus === "deleting";
+  const isDeleting = deleteStatus === "deleting" || disabled;
   const canDeleteSingle = Boolean(onRemove) && !isEmpty && !isDeleting;
   const canDeleteSelected =
     Boolean(onRemoveMultiple) && !isEmpty && activeSelectedIds.length > 0 && !isDeleting;

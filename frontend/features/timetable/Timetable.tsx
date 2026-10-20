@@ -26,6 +26,7 @@ const Timetable = () => {
     selectedSemester,
     conflicts,
     addDisabled,
+    deleteDisabled,
     addCourse,
     removeCourse,
     removeCourses,
@@ -95,6 +96,7 @@ const Timetable = () => {
           entries={entries}
           deleteStatus={deleteStatus}
           deleteError={deleteError}
+          disabled={deleteDisabled}
           onRemove={removeCourse}
           onRemoveMultiple={removeCourses}
         />
