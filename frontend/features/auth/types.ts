@@ -10,7 +10,8 @@ export type AuthErrorCode =
   | "INVALID_CREDENTIALS"
   | "ACCOUNT_INACTIVE"
   | "NOT_CS_STUDENT"
-  | "ACCOUNT_LOCKED";
+  | "ACCOUNT_LOCKED"
+  | "TU_API_UNAVAILABLE";
 
 export type AuthErrorDetail = {
   status: number;

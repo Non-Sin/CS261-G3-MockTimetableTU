@@ -7,6 +7,8 @@ import type { LoginRequest } from "../types";
 
 export const INVALID_LOGIN_MESSAGE =
   "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง";
+export const TU_UNAVAILABLE_MESSAGE =
+  "ไม่สามารถเชื่อมต่อระบบของมหาวิทยาลัยได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง";
 export const DEFAULT_LOCK_SECONDS = 900;
 type FieldErrors = Partial<Record<keyof LoginRequest, string>>;
 
@@ -88,6 +90,10 @@ export const useLogin = () => {
           case "ACCOUNT_INACTIVE":
             // ใช้หน้าจอเดียวกันตามข้อสรุป T13 และเก็บค่าที่กรอกไว้ให้แก้ไขได้
             setError(INVALID_LOGIN_MESSAGE);
+            return;
+          case "TU_API_UNAVAILABLE":
+            // TU Login API ใช้งานไม่ได้ (T06): ไม่ใช่รหัสผิด เก็บค่าที่กรอกไว้ให้กดลองใหม่ได้
+            setError(TU_UNAVAILABLE_MESSAGE);
             return;
           case "NOT_CS_STUDENT":
             setFields({ username: "", password: "" });
