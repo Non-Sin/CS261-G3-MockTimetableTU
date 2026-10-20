@@ -62,6 +62,16 @@ class CourseRepositoryTest {
         assertEquals(List.of(), search("ถ่ายภาพ", null));
     }
 
+    /**
+     * Regression (CI flaky): ถ้า query เคย bind prefix เป็น null ก่อน การค้นภาษาไทยบน connection เดิมเคยไม่เจออะไรเลย
+     * เรียกต่อกันใน method เดียวเพื่อไม่ให้ผลขึ้นกับลำดับที่ JUnit รัน test
+     */
+    @Test
+    void search_thaiNameAfterSearchWithoutQuery_stillMatches() {
+        assertEquals(6, search(null, null).size());
+        assertEquals(List.of("FE001"), search("การถ่าย", null));
+    }
+
     /** UT-DAO-04 */
     @Test
     void search_byCategory_returnsOnlyThatCategory() {
