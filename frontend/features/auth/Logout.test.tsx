@@ -122,6 +122,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
 
     expect(await screen.findByRole("heading", { name: "จัดตารางเรียนจำลอง" })).toBeInTheDocument();
     expect(screen.getByText("Alysa Liu")).toBeInTheDocument();
+    const currentUserRequestCount = vi.mocked(userApi.getCurrentUser).mock.calls.length;
 
     // กดปุ่มออกจากระบบจนกลับมาหน้า Login
     await userEvent.click(screen.getByRole("button", { name: "ออกจากระบบ" }));
@@ -147,6 +148,7 @@ describe("US4-T07: ออกจากระบบ, ล้างข้อมู�
     expect(screen.queryByRole("heading", { name: "จัดตารางเรียนจำลอง" })).not.toBeInTheDocument();
     expect(screen.queryByText("Alysa Liu")).not.toBeInTheDocument();
     expect(screen.queryByText("6809610000")).not.toBeInTheDocument();
+    expect(userApi.getCurrentUser).toHaveBeenCalledTimes(currentUserRequestCount);
   });
 
   it("[UT-UI-04] ไม่มีการใช้งานเกินระยะเวลาที่กำหนด ระบบจะ Logout อัตโนมัติและหน้า Login แสดง banner สีเหลืองแจ้งเซสชันหมดอายุ", async () => {
