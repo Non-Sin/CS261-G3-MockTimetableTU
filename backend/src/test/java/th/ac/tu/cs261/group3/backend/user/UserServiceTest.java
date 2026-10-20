@@ -26,10 +26,10 @@ class UserServiceTest {
     @Test
     void getProfile_existingUser_returnsProfile() {
         when(userRepository.findById("6609000001")).thenReturn(Optional.of(
-                new User("6609000001", "สมชาย", "ใจดี", "ภาควิชาวิทยาการคอมพิวเตอร์", "ภาคปกติ")));
+                new User("6609000001", "Somchai", "Jaidee", "สมชาย", "ใจดี", "ภาควิชาวิทยาการคอมพิวเตอร์", "ภาคปกติ")));
 
         assertThat(userService.getProfile("6609000001"))
-                .isEqualTo(new UserProfileResponse("6609000001", "สมชาย", "ใจดี"));
+                .isEqualTo(new UserProfileResponse("6609000001", "Somchai", "Jaidee", "สมชาย", "ใจดี"));
     }
 
     @Test

@@ -30,15 +30,16 @@ class UserRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        em.persist(user("6809610001", "อลิษา", "หลิว"));
-        em.persist(user("6809610002", "เซเลอร์", "มูน"));
+        em.persist(user("6809610001", "Alysa", "Liu", "อลิษา", "หลิว"));
+        em.persist(user("6809610002", "Sailor", "Moon", "เซเลอร์", "มูน"));
         em.flush();
         em.clear();
     }
 
     /** updateProfile ใน constructor ตั้ง updatedAt เป็นเวลาปัจจุบัน จึงตั้งทับเป็น BASE_TIME */
-    private static User user(String studentId, String firstName, String lastName) {
-        User user = new User(studentId, firstName, lastName, CS, REGULAR);
+    private static User user(String studentId, String firstName, String lastName,
+                             String firstNameTh, String lastNameTh) {
+        User user = new User(studentId, firstName, lastName, firstNameTh, lastNameTh, CS, REGULAR);
         user.setUpdatedAt(BASE_TIME);
         return user;
     }
@@ -49,8 +50,10 @@ class UserRepositoryTest {
         User u1 = repository.findById("6809610001").orElseThrow();
 
         assertEquals("6809610001", u1.getStudentId());
-        assertEquals("อลิษา", u1.getFirstName());
-        assertEquals("หลิว", u1.getLastName());
+        assertEquals("Alysa", u1.getFirstName());
+        assertEquals("Liu", u1.getLastName());
+        assertEquals("อลิษา", u1.getFirstNameTh());
+        assertEquals("หลิว", u1.getLastNameTh());
         assertEquals(CS, u1.getDepartment());
         assertEquals(REGULAR, u1.getTrack());
         assertEquals(BASE_TIME.toInstant(), u1.getUpdatedAt().toInstant());
@@ -65,14 +68,16 @@ class UserRepositoryTest {
     /** UT-DAO-US3-03 */
     @Test
     void save_newUser_insertsRowAndPersistsAllFields() {
-        repository.save(user("6809619999", "ดลลี่", "แบร่"));
+        repository.save(user("6809619999", "Dolly", "Bear", "ดลลี่", "แบร่"));
         em.flush();
         em.clear();
 
         assertEquals(3, repository.count());
         User reloaded = repository.findById("6809619999").orElseThrow();
-        assertEquals("ดลลี่", reloaded.getFirstName());
-        assertEquals("แบร่", reloaded.getLastName());
+        assertEquals("Dolly", reloaded.getFirstName());
+        assertEquals("Bear", reloaded.getLastName());
+        assertEquals("ดลลี่", reloaded.getFirstNameTh());
+        assertEquals("แบร่", reloaded.getLastNameTh());
         assertEquals(CS, reloaded.getDepartment());
         assertEquals(REGULAR, reloaded.getTrack());
         assertEquals(BASE_TIME.toInstant(), reloaded.getUpdatedAt().toInstant());
@@ -83,7 +88,7 @@ class UserRepositoryTest {
     void save_existingUserAfterUpdateProfile_updatesRowWithoutCreatingDuplicate() {
         OffsetDateTime newUpdatedAt = BASE_TIME.plusHours(1);
         User u1 = repository.findById("6809610001").orElseThrow();
-        u1.updateProfile("อลิษา", "หลิวหลิว", CS, REGULAR);
+        u1.updateProfile("Alysa", "Liuliu", "อลิษา", "หลิวหลิว", CS, REGULAR);
         u1.setUpdatedAt(newUpdatedAt);
 
         repository.save(u1);
@@ -92,13 +97,14 @@ class UserRepositoryTest {
 
         assertEquals(2, repository.count());
         User reloaded = repository.findById("6809610001").orElseThrow();
-        assertEquals("อลิษา", reloaded.getFirstName());
-        assertEquals("หลิวหลิว", reloaded.getLastName());
+        assertEquals("Alysa", reloaded.getFirstName());
+        assertEquals("Liuliu", reloaded.getLastName());
+        assertEquals("หลิวหลิว", reloaded.getLastNameTh());
         assertEquals(newUpdatedAt.toInstant(), reloaded.getUpdatedAt().toInstant());
 
         User u2 = repository.findById("6809610002").orElseThrow();
-        assertEquals("เซเลอร์", u2.getFirstName());
-        assertEquals("มูน", u2.getLastName());
+        assertEquals("Sailor", u2.getFirstName());
+        assertEquals("Moon", u2.getLastName());
         assertEquals(BASE_TIME.toInstant(), u2.getUpdatedAt().toInstant());
     }
 }

@@ -15,6 +15,10 @@ const getInitials = (profile: UserProfileResponse | null) => {
 const getDisplayNames = (profile: UserProfileResponse | null) => {
   if (!profile) return { thaiName: "", englishName: "" };
   const full = `${profile.firstName} ${profile.lastName}`.trim();
+  const thaiFull = `${profile.firstNameTh ?? ""} ${profile.lastNameTh ?? ""}`.trim();
+  if (thaiFull) {
+    return { thaiName: thaiFull, englishName: full.toUpperCase() };
+  }
   if (
     profile.firstName?.trim().toLowerCase() === "alysa" &&
     profile.lastName?.trim().toLowerCase() === "liu"

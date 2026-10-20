@@ -98,20 +98,48 @@ public class AuthService {
         }
     }
 
-    /** {@code displayname_th} เป็น "ชื่อ นามสกุล" ตัดที่ช่องว่างแรก นามสกุลที่มีหลายคำจึงอยู่ครบ */
+    /**
+     * ชื่อหลักใช้ {@code displayname_en} TU API ส่งเป็นตัวพิมพ์เล็กทั้งหมด จึงทำตัวแรกของแต่ละคำเป็นตัวใหญ่
+     * ถ้าไม่มีชื่ออังกฤษใช้ {@code displayname_th} แทน ส่วนชื่อไทยเก็บแยกจาก {@code displayname_th}
+     */
     private User upsertUser(TuAuthDto tuResponse) {
-        String[] name = tuResponse.displaynameTh().trim().split("\s+", 2);
-        String firstName = name[0];
-        String lastName = name.length > 1 ? name[1] : "";
+        String[] name = splitName(isBlank(tuResponse.displaynameEn())
+                ? tuResponse.displaynameTh()
+                : capitalizeWords(tuResponse.displaynameEn()));
+        String[] nameTh = isBlank(tuResponse.displaynameTh())
+                ? new String[]{null, null}
+                : splitName(tuResponse.displaynameTh());
 
         User user = userRepository.findById(tuResponse.username())
                 .map(existing -> {
-                    existing.updateProfile(firstName, lastName, tuResponse.department(), REGULAR_TRACK);
+                    existing.updateProfile(name[0], name[1], nameTh[0], nameTh[1],
+                            tuResponse.department(), REGULAR_TRACK);
                     return existing;
                 })
-                .orElseGet(() -> new User(tuResponse.username(), firstName, lastName,
+                .orElseGet(() -> new User(tuResponse.username(), name[0], name[1], nameTh[0], nameTh[1],
                         tuResponse.department(), REGULAR_TRACK));
         return userRepository.save(user);
+    }
+
+    /** "ชื่อ นามสกุล" ตัดที่ช่องว่างแรก นามสกุลที่มีหลายคำจึงอยู่ครบ ไม่มีนามสกุลได้ "" */
+    private static String[] splitName(String displayName) {
+        String[] name = displayName.trim().split("\s+", 2);
+        return new String[]{name[0], name.length > 1 ? name[1] : ""};
+    }
+
+    private static boolean isBlank(String text) {
+        return text == null || text.isBlank();
+    }
+
+    /** "somchai na ayutthaya" → "Somchai Na Ayutthaya" ตัวอื่นคงเดิม */
+    static String capitalizeWords(String text) {
+        StringBuilder sb = new StringBuilder(text.length());
+        boolean wordStart = true;
+        for (char c : text.toCharArray()) {
+            sb.append(wordStart ? Character.toUpperCase(c) : c);
+            wordStart = Character.isWhitespace(c);
+        }
+        return sb.toString();
     }
 
     /**

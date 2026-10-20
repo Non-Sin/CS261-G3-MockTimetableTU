@@ -41,13 +41,15 @@ class UserControllerTest {
 
     @Test
     void getCurrentUser_returnsProfileOfCurrentStudent() throws Exception {
-        when(userService.getProfile(STUDENT)).thenReturn(new UserProfileResponse(STUDENT, "สมชาย", "ใจดี"));
+        when(userService.getProfile(STUDENT)).thenReturn(new UserProfileResponse(STUDENT, "Somchai", "Jaidee", "สมชาย", "ใจดี"));
 
         mockMvc.perform(get("/api/users/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.studentId").value(STUDENT))
-                .andExpect(jsonPath("$.firstName").value("สมชาย"))
-                .andExpect(jsonPath("$.lastName").value("ใจดี"));
+                .andExpect(jsonPath("$.firstName").value("Somchai"))
+                .andExpect(jsonPath("$.lastName").value("Jaidee"))
+                .andExpect(jsonPath("$.firstNameTh").value("สมชาย"))
+                .andExpect(jsonPath("$.lastNameTh").value("ใจดี"));
     }
 
     @Test

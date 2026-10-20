@@ -68,13 +68,13 @@ class SecurityConfigTest {
 
     @Test
     void me_withValidToken_usesStudentIdFromToken() throws Exception {
-        when(userService.getProfile("6609000001")).thenReturn(new UserProfileResponse("6609000001", "สมชาย", "ใจดี"));
+        when(userService.getProfile("6609000001")).thenReturn(new UserProfileResponse("6609000001", "Somchai", "Jaidee", "สมชาย", "ใจดี"));
 
         mockMvc.perform(get("/api/users/me")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtService.generateToken("6609000001")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.studentId").value("6609000001"))
-                .andExpect(jsonPath("$.firstName").value("สมชาย"));
+                .andExpect(jsonPath("$.firstName").value("Somchai"));
     }
 
     @Test
@@ -158,7 +158,7 @@ class SecurityConfigTest {
     void sameToken_afterLogout_stillWorks() throws Exception {
         // stateless JWT ไม่มี denylist token เดิมใช้ต่อได้จนหมดอายุ (US4-T13 IT-08) ถ้าเพิ่ม denylist ต้องเปลี่ยนเป็น 401
         String token = jwtService.generateToken("6609000001");
-        when(userService.getProfile("6609000001")).thenReturn(new UserProfileResponse("6609000001", "สมชาย", "ใจดี"));
+        when(userService.getProfile("6609000001")).thenReturn(new UserProfileResponse("6609000001", "Somchai", "Jaidee", "สมชาย", "ใจดี"));
 
         mockMvc.perform(post("/api/auth/logout").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isNoContent());

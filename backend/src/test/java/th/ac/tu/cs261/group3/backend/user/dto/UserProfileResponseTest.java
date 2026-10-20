@@ -20,12 +20,14 @@ class UserProfileResponseTest {
 
     @Test
     void from_mapsNameAndStudentIdOnly() throws Exception {
-        User user = new User("6609000001", "สมชาย", "ใจดี", "ภาควิชาวิทยาการคอมพิวเตอร์", "ภาคปกติ");
+        User user = new User("6609000001", "Somchai", "Jaidee", "สมชาย", "ใจดี",
+                "ภาควิชาวิทยาการคอมพิวเตอร์", "ภาคปกติ");
 
         JsonContent<UserProfileResponse> content = json.write(UserProfileResponse.from(user));
 
         assertThat(content).isEqualToJson("""
-                {"studentId": "6609000001", "firstName": "สมชาย", "lastName": "ใจดี"}
+                {"studentId": "6609000001", "firstName": "Somchai", "lastName": "Jaidee",
+                 "firstNameTh": "สมชาย", "lastNameTh": "ใจดี"}
                 """);
         assertThat(content).doesNotHaveJsonPath("$.department");
         assertThat(content).doesNotHaveJsonPath("$.track");
