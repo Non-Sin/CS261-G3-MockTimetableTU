@@ -27,6 +27,7 @@ const Timetable = ({ account }: { account?: ReactNode } = {}) => {
     selectedSemester,
     conflicts,
     addDisabled,
+    deleteDisabled,
     addCourse,
     removeCourse,
     removeCourses,
@@ -98,6 +99,7 @@ const Timetable = ({ account }: { account?: ReactNode } = {}) => {
           entries={entries}
           deleteStatus={deleteStatus}
           deleteError={deleteError}
+          disabled={deleteDisabled}
           onRemove={removeCourse}
           onRemoveMultiple={removeCourses}
         />
