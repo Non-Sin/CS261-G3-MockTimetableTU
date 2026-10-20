@@ -1,11 +1,12 @@
 import { useState } from "react";
 import type { useLogin } from "../hooks/useLogin";
 import { INVALID_LOGIN_MESSAGE } from "../hooks/useLogin";
+import { SESSION_EXPIRED_MESSAGE } from "../session";
 import AuthIcon from "./AuthIcon";
 
-type LoginFormProps = Pick<ReturnType<typeof useLogin>, "fields" | "fieldErrors" | "error" | "submitting" | "changeField" | "submit" | "unlocked">;
+type LoginFormProps = Pick<ReturnType<typeof useLogin>, "fields" | "fieldErrors" | "error" | "sessionExpired" | "submitting" | "changeField" | "submit" | "unlocked">;
 
-export default function LoginForm({ fields, fieldErrors, error, submitting, changeField, submit, unlocked }: LoginFormProps) {
+export default function LoginForm({ fields, fieldErrors, error, sessionExpired, submitting, changeField, submit, unlocked }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const credentialsInvalid = error === INVALID_LOGIN_MESSAGE;
 
@@ -23,6 +24,16 @@ export default function LoginForm({ fields, fieldErrors, error, submitting, chan
         </div>
       </div>
       <form className="border-t border-[#f0f3f8] px-[30px] pt-[26px] pb-[42px] max-[440px]:px-[22px] max-[440px]:pt-6 max-[440px]:pb-8" noValidate onSubmit={(event) => { event.preventDefault(); void submit(); }}>
+        {sessionExpired && (
+          <div
+            role="alert"
+            data-testid="session-expired-banner"
+            className="mb-[23px] flex items-center gap-[9px] rounded-[15px] border border-[#facc15] bg-[#fef9c3] p-[15px] text-[12px] font-semibold text-[#854d0e]"
+          >
+            <AuthIcon name="clock" width={18} height={18} className="shrink-0 text-[#ca8a04]" />
+            <p className="m-0">{SESSION_EXPIRED_MESSAGE}</p>
+          </div>
+        )}
         {error && (
           <div role="alert" className="mb-[23px] flex items-start gap-[9px] rounded-[15px] border border-[#ffbfc6] bg-[#fff3f4] p-[15px] text-[12px] text-[#ce1826]">
             <AuthIcon name="warning" width={18} height={18} className="mt-0.5 shrink-0" />

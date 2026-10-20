@@ -53,3 +53,7 @@ export async function demoCurrentUser(token: string): Promise<UserProfileRespons
   if (!/^demo-student-680961000[034]$/.test(token)) throw new ApiError({ status: 401 });
   return { studentId, firstName: "Alysa", lastName: "Liu" };
 }
+
+export async function demoLogout(): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, 100));
+}

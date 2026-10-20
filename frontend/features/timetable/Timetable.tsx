@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import CourseSearchPanel from "../courses/components/CourseSearchPanel";
 import AddedCoursesList from "./components/AddedCoursesList";
 import ConflictAlert from "./components/ConflictAlert";
@@ -7,7 +8,7 @@ import TimetableGrid from "./components/TimetableGrid";
 import { useTimetable } from "./hooks/useTimetable";
 
 // หน้าหลักประกอบแต่ละส่วนและส่งข้อมูล/เหตุการณ์ต่อกัน โดยไม่ถือกฎคำนวณตารางไว้ใน JSX
-const Timetable = () => {
+const Timetable = ({ account }: { account?: ReactNode } = {}) => {
   // useTimetable รวม state และการคำนวณไว้; ค่าที่ได้ด้านล่างถูกส่งเป็น props ให้ส่วนแสดงผล
   const {
     timetable,
@@ -51,9 +52,11 @@ const Timetable = () => {
             </h1>
             <p className="text-xs text-slate-500">ระบบช่วยจัดตารางเรียน</p>
           </div>
-          <span className="self-start rounded-full bg-slate-100 px-3 py-2 text-xs sm:self-auto">
-            DEMO · ข้อมูลจำลอง
-          </span>
+          {account ?? (
+            <span className="self-start rounded-full bg-slate-100 px-3 py-2 text-xs sm:self-auto">
+              DEMO · ข้อมูลจำลอง
+            </span>
+          )}
         </header>
 
         {/* สถานะการโหลดตารางจาก GET /api/timetable */}

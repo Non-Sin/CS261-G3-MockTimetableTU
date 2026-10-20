@@ -1,3 +1,5 @@
+import { SessionProvider } from "@/features/auth/session";
+
 // กำหนดฐาน URL ให้ทุก service ใช้ร่วมกัน: ค่าว่างจะเรียก /api/... ผ่าน rewrite
 // ใน next.config.ts; ตั้ง NEXT_PUBLIC_API_URL เมื่อต้องการชี้ตรงไปยัง backend
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
@@ -33,13 +35,22 @@ export class ApiError extends Error {
 }
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = !path.startsWith("/api/auth/login") ? SessionProvider.getToken() : null;
+  const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
   // ทุก feature service เรียกผ่านจุดนี้ เพื่อรวม base URL, JSON header และการแปลง error
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...init?.headers },
+    headers: { "Content-Type": "application/json", ...authHeader, ...init?.headers },
   });
 
   if (!res.ok) {
+    if (res.status === 401) {
+      if (path.startsWith("/api/auth/logout")) {
+        SessionProvider.clearSession();
+      } else if (!path.startsWith("/api/auth/login")) {
+        SessionProvider.expireSession();
+      }
+    }
     // พยายามอ่าน ProblemDetail; ถ้า response ไม่ใช่ JSON ก็ยังเก็บ HTTP status ไว้
     const problem: ProblemDetail = await res
       .json()

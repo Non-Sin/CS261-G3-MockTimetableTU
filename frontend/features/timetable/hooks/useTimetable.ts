@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ApiError } from "@/lib/api";
+import { SessionProvider } from "../../auth/session";
 import type { Course } from "../../courses/types";
 import { timetableDeleteApi } from "../../timetable-delete/api";
 import type { DeleteStatus } from "../../timetable-delete/types";
@@ -28,6 +29,15 @@ export const useTimetable = () => {
   const [conflictAlertDismissed, setConflictAlertDismissed] = useState(false);
   // ภาคเรียนที่เลือกล่าสุด ใช้ตรวจผล POST/DELETE ที่ตอบกลับหลังผู้ใช้เปลี่ยนภาคไปแล้ว
   const selectedTermRef = useRef({ academicYear: DEFAULT_ACADEMIC_YEAR, semester: DEFAULT_SEMESTER });
+
+  // ล้างข้อมูลตารางเรียนที่เก็บใน client ทันทีเมื่อออกจากระบบหรือเซสชันหมดอายุ (US4)
+  useEffect(() => {
+    return SessionProvider.subscribe(() => {
+      if (!SessionProvider.isAuthenticated()) {
+        setTimetable(null);
+      }
+    });
+  }, []);
 
   // โหลดตารางใหม่ทุกครั้งที่เปลี่ยนภาคเรียน และไม่ใช้ผลของภาคเก่าที่ตอบกลับมาช้า
   useEffect(() => {
