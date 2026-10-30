@@ -1,0 +1,108 @@
+newman
+
+US1-T17 Integration Test API (IT-13–19)
+
+Root 00 Setup POST login
+  POST http://localhost:8080/api/auth/login [200 OK, 635B, 76ms]
+  Pass  200 ได้ token
+
+Root 01 Setup GET courses 2568/1 เก็บ sectionId
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=1 [200 OK, 3.67kB, 27ms]
+  Pass  200 ได้ 9 วิชาของ 2568/1
+
+Root 02 Setup ล้างตาราง 2568/1 (ชุดข้อมูล B)
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 551B, 16ms]
+  Pass  ตาราง 2568/1 ว่างอยู่แล้ว
+
+Root IT-13a GET courses ไม่ส่ง academicYear → 400
+  GET http://localhost:8080/api/courses?semester=1 [400 Bad Request, 534B, 7ms]
+  Pass  400 ProblemDetail
+
+Root IT-13b GET courses ไม่ส่ง semester → 400
+  GET http://localhost:8080/api/courses?academicYear=2568 [400 Bad Request, 530B, 12ms]
+  Pass  400 ProblemDetail
+
+Root IT-14 POST entries body {} → 400
+  POST http://localhost:8080/api/timetable/entries [400 Bad Request, 554B, 13ms]
+  Pass  400 ProblemDetail มี errors.sectionId
+
+Root IT-15 POST entries sectionId ไม่มีอยู่ → 404
+  POST http://localhost:8080/api/timetable/entries [404 Not Found, 553B, 22ms]
+  Pass  404 ProblemDetail
+
+Root IT-16a GET courses 2560/1 → 200 []
+  GET http://localhost:8080/api/courses?academicYear=2560&semester=1 [200 OK, 416B, 18ms]
+  Pass  200 ลิสต์ว่าง ไม่ใช่ 400/404
+
+Root IT-16b GET timetable 2560/1 → 200 ตารางว่าง
+  GET http://localhost:8080/api/timetable?academicYear=2560&semester=1 [200 OK, 528B, 17ms]
+  Pass  200 ตารางว่างของ 2560/1
+
+Root 03 Setup เพิ่ม CS111 030001 (ชุดข้อมูล E)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 891B, 33ms]
+  Pass  201 ตารางมี CS111 030001
+
+Root IT-17a POST CS111 030002 (คนละกลุ่ม) → 409
+  POST http://localhost:8080/api/timetable/entries [409 Conflict, 741B, 23ms]
+  Pass  409 COURSE_ALREADY_IN_TIMETABLE
+
+Root IT-17b POST CS111 030001 (กลุ่มเดิม) → 409
+  POST http://localhost:8080/api/timetable/entries [409 Conflict, 741B, 24ms]
+  Pass  409 COURSE_ALREADY_IN_TIMETABLE
+
+Root IT-17c GET timetable ยังมี CS111 1 entry
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 886B, 17ms]
+  Pass  มี CS111 เพียง 1 entry คือ 030001
+
+Root 04 Setup เพิ่มอีก 6 วิชาให้ครบ 21 หน่วยกิต (ชุดข้อมูล D)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.17kB, 33ms]
+  Pass  เพิ่ม CS180_820001 ได้ 201
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.5kB, 33ms]
+  Pass  เพิ่ม MA211_020001 ได้ 201
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.78kB, 33ms]
+  Pass  เพิ่ม LAS101_780004 ได้ 201
+  POST http://localhost:8080/api/timetable/entries [201 Created, 2.06kB, 37ms]
+  Pass  เพิ่ม TU101_900001 ได้ 201
+  POST http://localhost:8080/api/timetable/entries [201 Created, 2.33kB, 32ms]
+  Pass  เพิ่ม TU106_540001 ได้ 201
+  POST http://localhost:8080/api/timetable/entries [201 Created, 2.73kB, 36ms]
+  Pass  เพิ่ม TU109_780001 ได้ 201
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 2.73kB, 17ms]
+  Pass  ตารางมี 7 วิชา 21 / 22 หน่วยกิต
+
+Root IT-18 POST CS111 030002 ตอนมี 21 หน่วยกิต → 409 วิชาซ้ำ
+  POST http://localhost:8080/api/timetable/entries [409 Conflict, 741B, 24ms]
+  Pass  409 COURSE_ALREADY_IN_TIMETABLE ไม่ใช่ CREDIT_LIMIT_EXCEEDED (ตรวจวิชาซ้ำก่อนหน่วยกิต)
+
+Root IT-19a POST ST216 ตอนมี 21 หน่วยกิต → 409 หน่วยกิตเกิน
+  POST http://localhost:8080/api/timetable/entries [409 Conflict, 768B, 25ms]
+  Pass  409 CREDIT_LIMIT_EXCEEDED 21 + 3 > 22
+
+Root IT-19b GET timetable ไม่เปลี่ยน
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 2.73kB, 19ms]
+  Pass  ยังเป็น 7 วิชา 21 หน่วยกิต และไม่มี ST216
+
+Root 99 Cleanup ล้างตาราง 2568/1
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 2.73kB, 18ms]
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=10057,10058,10059,10060,10061,10062,10063 [200 OK, 551B, 44ms]
+  Pass  ล้างตาราง 2568/1 เหลือ 0 วิชา
+
+-----------------------------------------------------------------
+|                         |         executed |           failed |
+--------------------------+------------------+-------------------
+|              iterations |                1 |                0 |
+--------------------------+------------------+-------------------
+|                requests |               25 |                0 |
+--------------------------+------------------+-------------------
+|            test-scripts |               18 |                0 |
+--------------------------+------------------+-------------------
+|      prerequest-scripts |                1 |                0 |
+--------------------------+------------------+-------------------
+|              assertions |               24 |                0 |
+-----------------------------------------------------------------
+| total run duration: 2.2s                                      |
+-----------------------------------------------------------------
+| total data received: 22.52kB (approx)                         |
+-----------------------------------------------------------------
+| average response time: 26ms [min: 7ms, max: 76ms, s.d.: 13ms] |
+-----------------------------------------------------------------
