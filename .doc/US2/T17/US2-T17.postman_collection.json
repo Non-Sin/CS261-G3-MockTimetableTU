@@ -1,0 +1,1182 @@
+{
+  "info": {
+    "name": "US2-T17 Integration Test API (IT-19–30)",
+    "description": "ทดสอบสัญญา API ลบวิชาของ US2 ตาม US2-T13 Integration Test Cases หัวข้อ 6 (IT-19 ถึง IT-30)\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย profile stub-tu และ DB มี seed V20261014_2010__seed_courses_2568_1.sql (มี CS223 ของ 2568/2)\n- บัญชี {{username}} และ {{otherUsername}} ยังไม่ถูกล็อก\n\nชุดข้อมูล (US2-T13 หัวข้อ 2):\n- A ตารางหลัก 2568/1 ของ {{username}}: CS111 030001 (e1), MA211 (e2), CS180 (e3), LAS101 (e4)\n- C entry ของนักศึกษาอีกคน {{otherUsername}}: CS111 030001 (entryC)\n- D {{username}} มี entry 2 ภาคเรียน: เพิ่ม CS223 ของ 2568/2 (entryD2)\n\ncollection นี้ **ลบตาราง 2568/1 และ 2568/2 ของ {{username}} และตาราง 2568/1 ของ {{otherUsername}} ทั้งหมด** ตอนเริ่มและตอนจบ จึงไม่ใช้บัญชี demo 6609000000\nต้องรันตามลำดับ (Run collection) เพราะ request ถัดไปใช้ token, sectionId และ entryId ที่ request ก่อนหน้าสร้างไว้",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00a Setup POST login (ผู้ใช้หลัก)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ได้ token', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.collectionVariables.set('token', pm.response.json().token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{username}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "00b Setup POST login (ผู้ใช้อีกคน ชุดข้อมูล C)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ได้ token', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.collectionVariables.set('tokenC', pm.response.json().token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{otherUsername}}\", \"password\": \"{{password}}\"}"
+        }
+      }
+    },
+    {
+      "name": "01a Setup GET courses 2568/1 เก็บ sectionId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ได้ 9 วิชาของ 2568/1', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json()).to.have.lengthOf(9);",
+              "});",
+              "// เก็บเป็นตัวแปร sec_<รหัสวิชา>_<กลุ่ม> เช่น sec_CS111_030001 เพราะ sectionId เป็น IDENTITY ไม่คงที่",
+              "pm.response.json().forEach((course) => course.sections.forEach((section) =>",
+              "  pm.collectionVariables.set(`sec_${course.courseCode}_${section.sectionNo}`, section.sectionId)));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "01b Setup GET courses 2568/2 เก็บ sectionId ของ CS223",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 มี CS223 ใน 2568/2', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const cs223 = pm.response.json().find((c) => c.courseCode === 'CS223');",
+              "  pm.expect(cs223).to.not.eql(undefined);",
+              "  pm.collectionVariables.set('sec_CS223_2568_2', cs223.sections[0].sectionId);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester=2"
+      }
+    },
+    {
+      "name": "02a Setup ล้างตาราง 2568/1 ของผู้ใช้หลัก",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const entryIds = pm.response.json().entries.map((e) => e.entryId);",
+              "if (entryIds.length > 0) {",
+              "  pm.sendRequest({",
+              "    url: `${pm.collectionVariables.get('baseUrl')}/api/timetable/entries?entryIds=${entryIds.join(',')}`,",
+              "    method: 'DELETE',",
+              "    header: { Authorization: `Bearer ${pm.collectionVariables.get('token')}` }",
+              "  }, (err, res) => {",
+              "    pm.test('ล้างตารางเหลือ 0 วิชา', () => {",
+              "      pm.expect(err).to.eql(null);",
+              "      pm.expect(res.code).to.eql(200);",
+              "      pm.expect(res.json().entries).to.eql([]);",
+              "    });",
+              "  });",
+              "} else {",
+              "  pm.test('ตารางว่างอยู่แล้ว', () => pm.response.to.have.status(200));",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "02b Setup ล้างตาราง 2568/2 ของผู้ใช้หลัก",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const entryIds = pm.response.json().entries.map((e) => e.entryId);",
+              "if (entryIds.length > 0) {",
+              "  pm.sendRequest({",
+              "    url: `${pm.collectionVariables.get('baseUrl')}/api/timetable/entries?entryIds=${entryIds.join(',')}`,",
+              "    method: 'DELETE',",
+              "    header: { Authorization: `Bearer ${pm.collectionVariables.get('token')}` }",
+              "  }, (err, res) => {",
+              "    pm.test('ล้างตารางเหลือ 0 วิชา', () => {",
+              "      pm.expect(err).to.eql(null);",
+              "      pm.expect(res.code).to.eql(200);",
+              "      pm.expect(res.json().entries).to.eql([]);",
+              "    });",
+              "  });",
+              "} else {",
+              "  pm.test('ตารางว่างอยู่แล้ว', () => pm.response.to.have.status(200));",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=2"
+      }
+    },
+    {
+      "name": "02c Setup ล้างตาราง 2568/1 ของผู้ใช้อีกคน",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const entryIds = pm.response.json().entries.map((e) => e.entryId);",
+              "if (entryIds.length > 0) {",
+              "  pm.sendRequest({",
+              "    url: `${pm.collectionVariables.get('baseUrl')}/api/timetable/entries?entryIds=${entryIds.join(',')}`,",
+              "    method: 'DELETE',",
+              "    header: { Authorization: `Bearer ${pm.collectionVariables.get('tokenC')}` }",
+              "  }, (err, res) => {",
+              "    pm.test('ล้างตารางเหลือ 0 วิชา', () => {",
+              "      pm.expect(err).to.eql(null);",
+              "      pm.expect(res.code).to.eql(200);",
+              "      pm.expect(res.json().entries).to.eql([]);",
+              "    });",
+              "  });",
+              "} else {",
+              "  pm.test('ตารางว่างอยู่แล้ว', () => pm.response.to.have.status(200));",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenC}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "03a Setup POST CS111 030001 (e1)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 มีวิชาในตาราง', () => {",
+              "  pm.response.to.have.status(201);",
+              "  const entry = pm.response.json().entries.find((e) => e.sectionId === Number(pm.collectionVariables.get('sec_CS111_030001')));",
+              "  pm.expect(entry).to.not.eql(undefined);",
+              "  pm.collectionVariables.set('e1', entry.entryId);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"sectionId\": {{sec_CS111_030001}}}"
+        }
+      }
+    },
+    {
+      "name": "03b Setup POST MA211 (e2)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 มีวิชาในตาราง', () => {",
+              "  pm.response.to.have.status(201);",
+              "  const entry = pm.response.json().entries.find((e) => e.sectionId === Number(pm.collectionVariables.get('sec_MA211_020001')));",
+              "  pm.expect(entry).to.not.eql(undefined);",
+              "  pm.collectionVariables.set('e2', entry.entryId);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"sectionId\": {{sec_MA211_020001}}}"
+        }
+      }
+    },
+    {
+      "name": "03c Setup POST CS180 (e3)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 มีวิชาในตาราง', () => {",
+              "  pm.response.to.have.status(201);",
+              "  const entry = pm.response.json().entries.find((e) => e.sectionId === Number(pm.collectionVariables.get('sec_CS180_820001')));",
+              "  pm.expect(entry).to.not.eql(undefined);",
+              "  pm.collectionVariables.set('e3', entry.entryId);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"sectionId\": {{sec_CS180_820001}}}"
+        }
+      }
+    },
+    {
+      "name": "03d Setup POST LAS101 (e4)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 มีวิชาในตาราง', () => {",
+              "  pm.response.to.have.status(201);",
+              "  const entry = pm.response.json().entries.find((e) => e.sectionId === Number(pm.collectionVariables.get('sec_LAS101_780004')));",
+              "  pm.expect(entry).to.not.eql(undefined);",
+              "  pm.collectionVariables.set('e4', entry.entryId);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"sectionId\": {{sec_LAS101_780004}}}"
+        }
+      }
+    },
+    {
+      "name": "IT-19 DELETE /entries/abc → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().status).to.eql(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries/abc"
+      }
+    },
+    {
+      "name": "IT-20 DELETE /entries ไม่ส่ง entryIds → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().status).to.eql(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries"
+      }
+    },
+    {
+      "name": "IT-21 DELETE /entries?entryIds= (ว่าง) → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().status).to.eql(400);",
+              "  pm.expect(pm.response.json().detail).to.eql('ต้องระบุ entryIds อย่างน้อย 1 ตัว');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds="
+      }
+    },
+    {
+      "name": "IT-22 DELETE /entries?entryIds={e1},abc → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().status).to.eql(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{e1}},abc"
+      }
+    },
+    {
+      "name": "IT-19–22 GET timetable ไม่มีวิชาใดถูกลบ",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('ตารางยังมี e1, e2, e3, e4 ครบ 4 วิชา', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['e1', 'e2', 'e3', 'e4'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "IT-23 DELETE /entries?entryIds={e1},{e1} → 200 เหมือนส่ง e1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 เหลือเฉพาะวิชาที่ไม่ได้ลบ', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['e2', 'e3', 'e4'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "  pm.expect(pm.response.json().totalCredits).to.eql(expected.length * 3);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{e1}},{{e1}}"
+      }
+    },
+    {
+      "name": "IT-24 DELETE /entries?entryIds={e2}&entryIds={e3} → 200 เหมือน e2,e3",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 เหลือเฉพาะวิชาที่ไม่ได้ลบ', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['e4'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "  pm.expect(pm.response.json().totalCredits).to.eql(expected.length * 3);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{e2}}&entryIds={{e3}}"
+      }
+    },
+    {
+      "name": "04 Setup ผู้ใช้อีกคน POST CS111 030001 (entryC ชุดข้อมูล C)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 มีวิชาในตาราง', () => {",
+              "  pm.response.to.have.status(201);",
+              "  const entry = pm.response.json().entries.find((e) => e.sectionId === Number(pm.collectionVariables.get('sec_CS111_030001')));",
+              "  pm.expect(entry).to.not.eql(undefined);",
+              "  pm.collectionVariables.set('entryC', entry.entryId);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenC}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"sectionId\": {{sec_CS111_030001}}}"
+        }
+      }
+    },
+    {
+      "name": "IT-25 ลบ entryC ของผู้ใช้อีกคน → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 ProblemDetail', () => {",
+              "  pm.response.to.have.status(404);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().status).to.eql(404);",
+              "  pm.expect(pm.response.json().detail).to.eql(`ไม่พบวิชาในตารางเรียนของคุณ: entryId ${pm.collectionVariables.get('entryC')}`);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries/{{entryC}}"
+      }
+    },
+    {
+      "name": "IT-25 GET timetable ของผู้ใช้อีกคน entryC ยังอยู่",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('ตารางยังมี entryC ครบ 1 วิชา', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['entryC'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenC}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "05 Setup POST CS223 2568/2 (entryD2 ชุดข้อมูล D)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 มีวิชาในตาราง', () => {",
+              "  pm.response.to.have.status(201);",
+              "  const entry = pm.response.json().entries.find((e) => e.sectionId === Number(pm.collectionVariables.get('sec_CS223_2568_2')));",
+              "  pm.expect(entry).to.not.eql(undefined);",
+              "  pm.collectionVariables.set('entryD2', entry.entryId);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"sectionId\": {{sec_CS223_2568_2}}}"
+        }
+      }
+    },
+    {
+      "name": "IT-26 ลบ e4 (2568/1) กับ entryD2 (2568/2) พร้อมกัน → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().status).to.eql(400);",
+              "  pm.expect(pm.response.json().detail).to.eql('entryIds ต้องเป็นวิชาในตารางเดียวกัน (ปีการศึกษาและภาคเรียนเดียวกัน)');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{e4}},{{entryD2}}"
+      }
+    },
+    {
+      "name": "IT-26 GET timetable 2568/1 e4 ยังอยู่",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('ตารางยังมี e4 ครบ 1 วิชา', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['e4'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "IT-26 GET timetable 2568/2 entryD2 ยังอยู่",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('ตารางยังมี entryD2 ครบ 1 วิชา', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['entryD2'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=2"
+      }
+    },
+    {
+      "name": "IT-27 ลบ e4, entryD2 (คนละภาค) ปน entryC (ของคนอื่น) → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 ProblemDetail', () => {",
+              "  pm.response.to.have.status(404);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().status).to.eql(404);",
+              "  // ตรวจความเป็นเจ้าของก่อนตรวจภาคเรียน detail บอกเฉพาะ id ที่ไม่ใช่ของผู้ใช้",
+              "  pm.expect(pm.response.json().detail).to.eql(`ไม่พบวิชาในตารางเรียนของคุณ: entryId ${pm.collectionVariables.get('entryC')}`);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{e4}},{{entryD2}},{{entryC}}"
+      }
+    },
+    {
+      "name": "IT-27 GET timetable 2568/1 e4 ยังอยู่",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('ตารางยังมี e4 ครบ 1 วิชา', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['e4'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "IT-27 GET timetable 2568/2 entryD2 ยังอยู่",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('ตารางยังมี entryD2 ครบ 1 วิชา', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['entryD2'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=2"
+      }
+    },
+    {
+      "name": "IT-27 GET timetable ของผู้ใช้อีกคน entryC ยังอยู่",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('ตารางยังมี entryC ครบ 1 วิชา', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['entryC'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenC}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "IT-28 ลบ e1 ซ้ำ (ลบไปแล้วใน IT-23) → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 ProblemDetail', () => {",
+              "  pm.response.to.have.status(404);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().status).to.eql(404);",
+              "  pm.expect(pm.response.json().detail).to.eql(`ไม่พบวิชาในตารางเรียนของคุณ: entryId ${pm.collectionVariables.get('e1')}`);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries/{{e1}}"
+      }
+    },
+    {
+      "name": "IT-29 DELETE /entries/?entryIds={e4} (มี / ก่อน ?) → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 ไม่ถือเป็น path เดียวกับ /entries', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries/?entryIds={{e4}}"
+      }
+    },
+    {
+      "name": "IT-29 GET timetable e4 ยังอยู่",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('ตารางยังมี e4 ครบ 1 วิชา', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const ids = pm.response.json().entries.map((e) => e.entryId);",
+              "  const expected = ['e4'].map((v) => Number(pm.collectionVariables.get(v)));",
+              "  pm.expect(ids).to.have.members(expected);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "IT-30a ลบ entry สุดท้าย (e4) → 200 entries ว่าง",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 entries: [] totalCredits: 0', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().entries).to.eql([]);",
+              "  pm.expect(pm.response.json().totalCredits).to.eql(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{e4}}"
+      }
+    },
+    {
+      "name": "IT-30b GET timetable หลังลบจนว่าง",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 entries: [] และ updatedAt ไม่เป็น null (แถว timetable ไม่ถูกลบ)', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.entries).to.eql([]);",
+              "  pm.expect(body.conflicts).to.eql([]);",
+              "  pm.expect(body.totalCredits).to.eql(0);",
+              "  pm.expect(body.updatedAt).to.be.a('string');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "99a Cleanup ล้างตาราง 2568/2 ของผู้ใช้หลัก",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const entryIds = pm.response.json().entries.map((e) => e.entryId);",
+              "if (entryIds.length > 0) {",
+              "  pm.sendRequest({",
+              "    url: `${pm.collectionVariables.get('baseUrl')}/api/timetable/entries?entryIds=${entryIds.join(',')}`,",
+              "    method: 'DELETE',",
+              "    header: { Authorization: `Bearer ${pm.collectionVariables.get('token')}` }",
+              "  }, (err, res) => {",
+              "    pm.test('ล้างตารางเหลือ 0 วิชา', () => {",
+              "      pm.expect(err).to.eql(null);",
+              "      pm.expect(res.code).to.eql(200);",
+              "      pm.expect(res.json().entries).to.eql([]);",
+              "    });",
+              "  });",
+              "} else {",
+              "  pm.test('ตารางว่างอยู่แล้ว', () => pm.response.to.have.status(200));",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=2"
+      }
+    },
+    {
+      "name": "99b Cleanup ล้างตาราง 2568/1 ของผู้ใช้อีกคน",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const entryIds = pm.response.json().entries.map((e) => e.entryId);",
+              "if (entryIds.length > 0) {",
+              "  pm.sendRequest({",
+              "    url: `${pm.collectionVariables.get('baseUrl')}/api/timetable/entries?entryIds=${entryIds.join(',')}`,",
+              "    method: 'DELETE',",
+              "    header: { Authorization: `Bearer ${pm.collectionVariables.get('tokenC')}` }",
+              "  }, (err, res) => {",
+              "    pm.test('ล้างตารางเหลือ 0 วิชา', () => {",
+              "      pm.expect(err).to.eql(null);",
+              "      pm.expect(res.code).to.eql(200);",
+              "      pm.expect(res.json().entries).to.eql([]);",
+              "    });",
+              "  });",
+              "} else {",
+              "  pm.test('ตารางว่างอยู่แล้ว', () => pm.response.to.have.status(200));",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenC}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "username",
+      "value": "6609000001"
+    },
+    {
+      "key": "otherUsername",
+      "value": "6609000004"
+    },
+    {
+      "key": "password",
+      "value": "Passw0rd!"
+    },
+    {
+      "key": "academicYear",
+      "value": "2568"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tokenC",
+      "value": ""
+    }
+  ]
+}
