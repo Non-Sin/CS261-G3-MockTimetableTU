@@ -1,0 +1,357 @@
+{
+  "id": "ST-US2-02",
+  "title": "ลบหลายรายวิชาสำเร็จ",
+  "startedAt": "2026-10-31T14:17:49.591Z",
+  "before": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:17:49Z",
+      "entryId": 30101,
+      "course": "LAS101"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:17:49Z",
+      "entryId": 30102,
+      "course": "TU109"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:17:49Z",
+      "entryId": 30103,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:17:49Z",
+      "entryId": 30104,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:17:16Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "uiBefore": {
+    "courses": [
+      "LAS101",
+      "TU109",
+      "CS180",
+      "MA211"
+    ],
+    "checked": [],
+    "checkboxesDisabled": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "deleteButtonsDisabled": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": false
+    },
+    "emptyText": false,
+    "alerts": [
+      "!ตรวจพบเวลาเรียนซ้อนทับกันต้องจัดใหม่เวลาเรียนชนกันLAS101 และ TU109 · พุธ 09:30-12:30กรุณาสลับกลุ่มเรียนหรือเลือกรายวิชาอื่น×"
+    ],
+    "credits": "หน่วยกิต 12 / 22",
+    "summary": "วิชาในตารางเรียน: 4 วิชา (12.0 หน่วยกิต)",
+    "conflictBanner": true,
+    "gridHeaders": true
+  },
+  "uiSelected": {
+    "courses": [
+      "LAS101",
+      "TU109",
+      "CS180",
+      "MA211"
+    ],
+    "checked": [
+      "TU109",
+      "CS180"
+    ],
+    "checkboxesDisabled": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "deleteButtonsDisabled": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก (2)",
+      "disabled": false
+    },
+    "deleteAll": {
+      "disabled": false
+    },
+    "emptyText": false,
+    "alerts": [
+      "!ตรวจพบเวลาเรียนซ้อนทับกันต้องจัดใหม่เวลาเรียนชนกันLAS101 และ TU109 · พุธ 09:30-12:30กรุณาสลับกลุ่มเรียนหรือเลือกรายวิชาอื่น×"
+    ],
+    "credits": "หน่วยกิต 12 / 22",
+    "summary": "วิชาในตารางเรียน: 4 วิชา (12.0 หน่วยกิต)",
+    "conflictBanner": true,
+    "gridHeaders": true
+  },
+  "uiDuring": {
+    "courses": [
+      "LAS101",
+      "TU109",
+      "CS180",
+      "MA211"
+    ],
+    "checked": [
+      "TU109",
+      "CS180"
+    ],
+    "checkboxesDisabled": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "deleteButtonsDisabled": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก (2)",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": true
+    },
+    "emptyText": false,
+    "alerts": [
+      "!ตรวจพบเวลาเรียนซ้อนทับกันต้องจัดใหม่เวลาเรียนชนกันLAS101 และ TU109 · พุธ 09:30-12:30กรุณาสลับกลุ่มเรียนหรือเลือกรายวิชาอื่น×"
+    ],
+    "credits": "หน่วยกิต 12 / 22",
+    "summary": "วิชาในตารางเรียน: 4 วิชา (12.0 หน่วยกิต)",
+    "conflictBanner": true,
+    "gridHeaders": true
+  },
+  "response": {
+    "request": "DELETE /api/timetable/entries?entryIds=30102,30103",
+    "status": 200,
+    "body": {
+      "academicYear": 2568,
+      "semester": 1,
+      "entries": [
+        {
+          "entryId": 30101,
+          "courseCode": "LAS101",
+          "courseName": "Critical Thinking, Reading, and Writing",
+          "category": "GENERAL_EDUCATION",
+          "credits": 3,
+          "sectionId": 4,
+          "sectionNo": "780004",
+          "schedules": [
+            {
+              "dayOfWeek": "WEDNESDAY",
+              "startTime": "09:30",
+              "endTime": "12:30",
+              "room": "SC-1026"
+            }
+          ],
+          "conflictWith": []
+        },
+        {
+          "entryId": 30104,
+          "courseCode": "MA211",
+          "courseName": "Calculus 1",
+          "category": "MAJOR",
+          "credits": 3,
+          "sectionId": 2,
+          "sectionNo": "020001",
+          "schedules": [
+            {
+              "dayOfWeek": "TUESDAY",
+              "startTime": "09:30",
+              "endTime": "11:00",
+              "room": "SC-3015"
+            },
+            {
+              "dayOfWeek": "THURSDAY",
+              "startTime": "09:30",
+              "endTime": "11:00",
+              "room": "SC-3015"
+            }
+          ],
+          "conflictWith": []
+        }
+      ],
+      "totalCredits": 6,
+      "maxCredits": 22,
+      "conflicts": [],
+      "updatedAt": "2026-10-31T21:17:54+07:00"
+    }
+  },
+  "after": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:17:54Z",
+      "entryId": 30101,
+      "course": "LAS101"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:17:54Z",
+      "entryId": 30104,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:17:16Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "uiAfter": {
+    "courses": [
+      "LAS101",
+      "MA211"
+    ],
+    "checked": [],
+    "checkboxesDisabled": [
+      false,
+      false
+    ],
+    "deleteButtonsDisabled": [
+      false,
+      false
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": false
+    },
+    "emptyText": false,
+    "alerts": [],
+    "credits": "หน่วยกิต 6 / 22",
+    "summary": "วิชาในตารางเรียน: 2 วิชา (6.0 หน่วยกิต)",
+    "conflictBanner": false,
+    "gridHeaders": true
+  },
+  "backendSql": {
+    "deletes": [
+      "delete from timetable_entry where entry_id=?",
+      "delete from timetable_entry where entry_id=?"
+    ],
+    "updates": [
+      "update timetable set academic_year=?, semester=?, student_id=?, updated_at=? where timetable_id=?"
+    ]
+  },
+  "checks": [
+    {
+      "label": "UI ส่ง DELETE ?entryIds= ของ TU109, CS180 ในคำขอเดียว",
+      "pass": true,
+      "actual": "DELETE /api/timetable/entries?entryIds=30102,30103"
+    },
+    {
+      "label": "ระหว่างประมวลผล ปุ่มลบ/ลบที่เลือก/checkbox ถูกปิด",
+      "pass": true,
+      "actual": {
+        "deleteSelected": {
+          "text": "ลบที่เลือก (2)",
+          "disabled": true
+        },
+        "deleteButtons": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "checkboxes": [
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "HTTP 200 + TimetableResponse",
+      "pass": true,
+      "actual": 200
+    },
+    {
+      "label": "TU109, CS180 ถูกลบจาก DB",
+      "pass": true,
+      "actual": [
+        "LAS101",
+        "MA211"
+      ]
+    },
+    {
+      "label": "LAS101, MA211 ยังอยู่",
+      "pass": true,
+      "actual": [
+        "LAS101",
+        "MA211"
+      ]
+    },
+    {
+      "label": "updated_at เปลี่ยน",
+      "pass": true,
+      "actual": "2026-10-31T14:17:49Z → 2026-10-31T14:17:54Z"
+    },
+    {
+      "label": "เวลาชนคำนวณใหม่: ก่อนลบมีแถบเตือน หลังลบ conflicts=[] และแถบเตือนหาย",
+      "pass": true,
+      "actual": {
+        "bannerBefore": true,
+        "conflicts": [],
+        "bannerAfter": false
+      }
+    },
+    {
+      "label": "หน้าเว็บแสดง LAS101, MA211 และหน่วยกิต 6 / 22",
+      "pass": true,
+      "actual": "LAS101,MA211 | หน่วยกิต 6 / 22"
+    },
+    {
+      "label": "checkbox ถูกล้าง สถานะกลับเป็น idle",
+      "pass": true,
+      "actual": {
+        "checked": [],
+        "alerts": []
+      }
+    }
+  ]
+}

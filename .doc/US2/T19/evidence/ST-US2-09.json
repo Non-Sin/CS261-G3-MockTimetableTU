@@ -1,0 +1,199 @@
+{
+  "id": "ST-US2-09",
+  "title": "ส่ง Entry ID ซ้ำกัน",
+  "startedAt": "2026-10-31T14:18:21.975Z",
+  "before": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:22Z",
+      "entryId": 30121,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:22Z",
+      "entryId": 30122,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:22Z",
+      "entryId": 30123,
+      "course": "CS111"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:18:22Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "response": {
+    "request": "DELETE /api/timetable/entries?entryIds=30121,30121",
+    "status": 200,
+    "contentType": "application/json",
+    "body": {
+      "academicYear": 2568,
+      "semester": 1,
+      "entries": [
+        {
+          "entryId": 30122,
+          "courseCode": "MA211",
+          "courseName": "Calculus 1",
+          "category": "MAJOR",
+          "credits": 3,
+          "sectionId": 2,
+          "sectionNo": "020001",
+          "schedules": [
+            {
+              "dayOfWeek": "TUESDAY",
+              "startTime": "09:30",
+              "endTime": "11:00",
+              "room": "SC-3015"
+            },
+            {
+              "dayOfWeek": "THURSDAY",
+              "startTime": "09:30",
+              "endTime": "11:00",
+              "room": "SC-3015"
+            }
+          ],
+          "conflictWith": []
+        },
+        {
+          "entryId": 30123,
+          "courseCode": "CS111",
+          "courseName": "Object-Oriented Concepts",
+          "category": "MAJOR",
+          "credits": 3,
+          "sectionId": 3,
+          "sectionNo": "030001",
+          "schedules": [
+            {
+              "dayOfWeek": "TUESDAY",
+              "startTime": "11:00",
+              "endTime": "12:30",
+              "room": "LC3-121"
+            },
+            {
+              "dayOfWeek": "THURSDAY",
+              "startTime": "11:00",
+              "endTime": "12:30",
+              "room": "LC3-121"
+            }
+          ],
+          "conflictWith": []
+        }
+      ],
+      "totalCredits": 6,
+      "maxCredits": 22,
+      "conflicts": [],
+      "updatedAt": "2026-10-31T21:18:23+07:00"
+    }
+  },
+  "after": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:23Z",
+      "entryId": 30122,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:23Z",
+      "entryId": 30123,
+      "course": "CS111"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:18:22Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "backendSql": {
+    "deletes": [
+      "delete from timetable_entry where entry_id=?"
+    ],
+    "updates": [
+      "update timetable set academic_year=?, semester=?, student_id=?, updated_at=? where timetable_id=?"
+    ]
+  },
+  "uiAfter": {
+    "courses": [
+      "MA211",
+      "CS111"
+    ],
+    "checked": [],
+    "checkboxesDisabled": [
+      false,
+      false
+    ],
+    "deleteButtonsDisabled": [
+      false,
+      false
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": false
+    },
+    "emptyText": false,
+    "alerts": [],
+    "credits": "หน่วยกิต 6 / 22",
+    "summary": "วิชาในตารางเรียน: 2 วิชา (6.0 หน่วยกิต)",
+    "conflictBanner": false,
+    "gridHeaders": true
+  },
+  "checks": [
+    {
+      "label": "HTTP 200 + TimetableResponse",
+      "pass": true,
+      "actual": "200 DELETE /api/timetable/entries?entryIds=30121,30121"
+    },
+    {
+      "label": "CS180 ถูกลบ MA211, CS111 ยังอยู่",
+      "pass": true,
+      "actual": [
+        "MA211",
+        "CS111"
+      ]
+    },
+    {
+      "label": "response ตรงกับรายวิชาที่เหลือ และ updatedAt เปลี่ยน",
+      "pass": true,
+      "actual": {
+        "entries": [
+          "MA211",
+          "CS111"
+        ],
+        "totalCredits": 6,
+        "updatedAt": "2026-10-31T21:18:23+07:00"
+      }
+    },
+    {
+      "label": "หน้าเว็บแสดงตารางใหม่ ไม่มี checkbox ค้าง",
+      "pass": true,
+      "actual": [
+        "MA211",
+        "CS111"
+      ]
+    }
+  ]
+}
