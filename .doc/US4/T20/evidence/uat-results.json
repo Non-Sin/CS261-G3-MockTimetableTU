@@ -1,0 +1,152 @@
+{
+  "runAt": "2026-11-01T18:15:08.823Z",
+  "baseUrl": "http://localhost:3000",
+  "browser": "Chrome/131.0.6778.204",
+  "username": "6609000000",
+  "results": [
+    {
+      "id": "UAT-US4-01",
+      "title": "กด Logout แล้วออกจากระบบและกลับหน้า Login ทันที",
+      "browser": "chrome",
+      "startedAt": "2026-11-01T17:59:51.081Z",
+      "steps": [
+        {
+          "no": 1,
+          "expected": "เข้าสู่ระบบสำเร็จ เห็นหน้าหลัก",
+          "actual": "อยู่ที่ / Navbar แสดง 6609000000",
+          "result": "Pass",
+          "evidence": [
+            "uat01-1-logged-in.png"
+          ]
+        },
+        {
+          "no": 2,
+          "expected": "กด Logout แล้วระบบออกจากระบบสำเร็จ (token ถูกล้าง)",
+          "actual": "กด \"ออกจากระบบ\" แล้ว token ใน session ถูกล้าง",
+          "result": "Pass",
+          "evidence": [
+            "uat01-2-account-menu.png"
+          ]
+        },
+        {
+          "no": 3,
+          "expected": "นำทางกลับไปหน้า Login ทันที",
+          "actual": "อยู่ที่ /login เห็นหัวข้อ Login ใช้เวลา 87 ms หลังกด",
+          "result": "Pass",
+          "evidence": [
+            "uat01-3-after-logout.png"
+          ]
+        }
+      ],
+      "notes": [],
+      "result": "Pass",
+      "finishedAt": "2026-11-01T17:59:53.924Z"
+    },
+    {
+      "id": "UAT-US4-02",
+      "title": "หลัง Logout กด Back ต้องไม่แสดงข้อมูลเดิม",
+      "browser": "chrome",
+      "startedAt": "2026-11-01T17:59:53.945Z",
+      "steps": [
+        {
+          "no": 1,
+          "expected": "เข้าสู่ระบบและเห็นตารางเรียนกับข้อมูลส่วนตัว",
+          "actual": "เห็น CS180 ในตาราง และรหัส 6609000000 บน Navbar",
+          "result": "Pass",
+          "evidence": [
+            "uat02-1-timetable-before-logout.png"
+          ]
+        },
+        {
+          "no": 2,
+          "expected": "Logout แล้วอยู่หน้า Login",
+          "actual": "อยู่ที่ /login",
+          "result": "Pass",
+          "evidence": [
+            "uat02-2-after-logout.png"
+          ]
+        },
+        {
+          "no": 3,
+          "expected": "กด Back (กลับไปหน้าตารางเดิมใน history) แล้วระบบพากลับหน้า Login",
+          "actual": "กด Back แล้วอยู่ที่ /login",
+          "result": "Pass",
+          "evidence": [
+            "uat02-3-after-back.png"
+          ]
+        },
+        {
+          "no": 4,
+          "expected": "ไม่แสดงตารางเรียนหรือข้อมูลส่วนตัวเดิม",
+          "actual": "ไม่พบ CS180 หรือ 6609000000 บนหน้าจอ",
+          "result": "Pass",
+          "evidence": []
+        },
+        {
+          "no": 5,
+          "expected": "เข้าข้อมูลเดิมด้วยสถานะการเข้าสู่ระบบเดิมไม่ได้ (พิมพ์ URL หน้าหลักตรง ๆ)",
+          "actual": "/ → /login, /dashboard → /login",
+          "result": "Pass",
+          "evidence": [
+            "uat02-4-direct-url.png"
+          ]
+        }
+      ],
+      "notes": [
+        "เตรียมข้อมูล: เพิ่ม CS180 820001 ผ่าน POST /api/timetable/entries (status 409 มีอยู่แล้ว)",
+        "ข้อมูลเสริม: GET /api/timetable ไม่มี token ได้ 401, ใช้ token เดิมที่คัดลอกไว้ก่อน Logout ได้ 200 (backend ยังไม่เพิกถอน token ตอน logout ใช้ได้จนหมดอายุ 3 ชม.)"
+      ],
+      "result": "Pass",
+      "finishedAt": "2026-11-01T18:00:04.437Z"
+    },
+    {
+      "id": "UAT-US4-03",
+      "title": "ไม่มีการใช้งานเกินเวลาที่กำหนด ระบบ Logout อัตโนมัติ",
+      "browser": "chrome",
+      "startedAt": "2026-11-01T18:00:04.457Z",
+      "steps": [
+        {
+          "no": 1,
+          "expected": "เข้าสู่ระบบสำเร็จ",
+          "actual": "เข้าสู่ระบบเวลา 01:00:06",
+          "result": "Pass",
+          "evidence": [
+            "uat03-1-logged-in.png"
+          ]
+        },
+        {
+          "no": 2,
+          "expected": "ก่อนครบเวลาที่กำหนด ผู้ใช้ยังอยู่ในระบบ",
+          "actual": "ผ่านไป 870 วินาที อยู่ที่ / ยังเข้าสู่ระบบอยู่",
+          "result": "Pass",
+          "evidence": [
+            "uat03-2-before-timeout.png"
+          ]
+        },
+        {
+          "no": 3,
+          "expected": "เกินเวลาที่กำหนด ระบบ Logout อัตโนมัติและกลับหน้า Login",
+          "actual": "ถูก Logout หลังไม่ใช้งาน 899 วินาที token ถูกล้าง มีข้อความแจ้งเซสชันหมดอายุ",
+          "result": "Fail",
+          "evidence": [
+            "uat03-3-auto-logout.png"
+          ]
+        },
+        {
+          "no": 4,
+          "expected": "หลัง Logout อัตโนมัติ กด Back แล้วไม่กลับเข้าระบบ",
+          "actual": "กด Back แล้วอยู่ที่ /login",
+          "result": "Pass",
+          "evidence": [
+            "uat03-4-after-back.png"
+          ]
+        }
+      ],
+      "notes": [
+        "Inactivity Timeout ที่ใช้ทดสอบ: 900 วินาที"
+      ],
+      "result": "Fail",
+      "finishedAt": "2026-11-01T18:15:08.574Z"
+    }
+  ]
+}
