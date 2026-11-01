@@ -49,6 +49,29 @@ class StubTuApiClientTest {
     }
 
     @Test
+    void inactiveNonCsAccount_isBothInactiveAndOtherDepartment() {
+        TuAuthDto result = stub.verifyCredentials("6609000007", StubTuApiClient.PASSWORD);
+
+        assertThat(result.status()).isTrue();
+        assertThat(result.tuStatus()).isNotEqualTo("ปกติ");
+        assertThat(result.department()).isNotEqualTo("ภาควิชาวิทยาการคอมพิวเตอร์");
+    }
+
+    @Test
+    void changedPasswordAccount_acceptsNewPasswordOnly() {
+        TuAuthDto withNew = stub.verifyCredentials(
+                StubTuApiClient.CHANGED_PASSWORD_USERNAME, StubTuApiClient.CHANGED_PASSWORD);
+        TuAuthDto withOld = stub.verifyCredentials(
+                StubTuApiClient.CHANGED_PASSWORD_USERNAME, StubTuApiClient.PASSWORD);
+
+        assertThat(withNew.status()).isTrue();
+        assertThat(withNew.tuStatus()).isEqualTo("ปกติ");
+        assertThat(withNew.department()).isEqualTo("ภาควิชาวิทยาการคอมพิวเตอร์");
+        assertThat(withOld.status()).isFalse();
+        assertThat(withOld.message()).isEqualTo("Users or Password Invalid!");
+    }
+
+    @Test
     void wrongPasswordOrUnknownUser_statusFalseLikeRealApi() {
         TuAuthDto wrong = stub.verifyCredentials("6609000001", "wrong-pass");
         TuAuthDto unknown = stub.verifyCredentials("0000000000", StubTuApiClient.PASSWORD);
