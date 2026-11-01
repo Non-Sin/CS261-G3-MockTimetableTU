@@ -1,0 +1,112 @@
+{
+  "ranAt": "2026-11-01T16:54:23.509Z",
+  "pass": 12,
+  "fail": 0,
+  "results": [
+    {
+      "id": "IT-06",
+      "pass": true,
+      "actual": "หลัง login แอปส่ง GET /api/users/me พร้อม Bearer <token> → 200 {\"studentId\":\"6609000001\",\"firstName\":\"Somchai\",\"lastName\":\"Jaidee\",\"firstNameTh\":\"สมชาย\",\"lastNameTh\":\"ใจดี\"} · Navbar แสดง \"SJ Somchai Jaidee 6609000001\"",
+      "shots": [
+        "it06-before-logout.png"
+      ]
+    },
+    {
+      "id": "IT-01",
+      "pass": true,
+      "actual": "กด \"ออกจากระบบ\" → ส่ง POST /api/auth/logout 1 ครั้ง · Authorization = Bearer <token ที่ได้จาก login>: true · body ไม่มี",
+      "shots": [
+        "it01-account-menu.png"
+      ]
+    },
+    {
+      "id": "IT-02",
+      "pass": true,
+      "actual": "API ตอบ 204 · response body ว่าง",
+      "shots": [
+        "it04-after-logout.png"
+      ]
+    },
+    {
+      "id": "IT-03",
+      "pass": true,
+      "actual": "หลัง 204: sessionStorage/localStorage ไม่มี \"mocktimetable.auth.token\" (true) และไม่มี \"mocktimetable.auth.expired\" (true)",
+      "shots": [
+        "it04-after-logout.png"
+      ],
+      "storage": {
+        "sessionToken": null,
+        "localToken": null,
+        "sessionExpired": null,
+        "localExpired": null
+      }
+    },
+    {
+      "id": "IT-04",
+      "pass": true,
+      "actual": "URL /login · หน้าจอไม่มีรหัส/ชื่อผู้ใช้เดิม true · ไม่มีข้อความเซสชันหมดอายุ true",
+      "shots": [
+        "it04-after-logout.png"
+      ]
+    },
+    {
+      "id": "IT-05",
+      "pass": true,
+      "actual": "request ไปที่ http://localhost:3000/api/auth/logout (same-origin /api/* แบบที่ apiFetch() ใช้) · ใช้ header Authorization ที่ authApi.logout() ส่งมา · เส้นทางโค้ด UserNavbar → useLogout → authApi.logout() → apiFetch() ดูหมายเหตุในเอกสารผล",
+      "shots": [
+        "it01-account-menu.png"
+      ]
+    },
+    {
+      "id": "IT-07",
+      "pass": true,
+      "actual": "หลัง logout เรียก GET /api/users/me แบบแอป: ส่ง Authorization ไม่มี → 401 {\"type\":\"about:blank\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"กรุณาเข้าสู่ระบบก่อนใช้งาน\"}",
+      "shots": []
+    },
+    {
+      "id": "IT-08",
+      "pass": true,
+      "actual": "ใช้ token เดิมเรียก GET /api/users/me โดยตรง → 200 {\"studentId\":\"6609000001\",\"firstName\":\"Somchai\",\"lastName\":\"Jaidee\",\"firstNameTh\":\"สมชาย\",\"lastNameTh\":\"ใจดี\"} (ตามข้อจำกัด stateless JWT)",
+      "shots": []
+    },
+    {
+      "id": "IT-09",
+      "pass": true,
+      "actual": "เปิด / → /login · กด back → /login · ไม่แสดงข้อมูลผู้ใช้เดิม true · แอปเรียก users/me 0 ครั้ง (ไม่มี token จึงพากลับหน้า login ก่อนเรียก API) · ผลจาก API เมื่อไม่มี token ดู IT-07 (401)",
+      "shots": [
+        "it09-open-home-after-logout.png",
+        "it09-back-after-logout.png"
+      ]
+    },
+    {
+      "id": "IT-10",
+      "pass": true,
+      "actual": "API (mock) ตอบ 500 · ปุ่มไม่ค้าง \"กำลังออกจากระบบ…\" true · ล้าง token true · URL /login · ไม่แสดงข้อมูลผู้ใช้เดิม true · ไม่แสดงกล่อง error (ตาม US4-T06 ล้าง session เสมอ) · unhandled error ใน console 0",
+      "shots": [
+        "it10-logout-500.png"
+      ]
+    },
+    {
+      "id": "IT-11",
+      "pass": true,
+      "actual": "request ล้มเหลว (net::ERR_INTERNET_DISCONNECTED) · ปุ่มไม่ค้าง \"กำลังออกจากระบบ…\" true · ล้าง token true · URL /login · ไม่แสดงข้อมูลผู้ใช้เดิม true · ไม่แสดงกล่อง error (ตาม US4-T06 ล้าง session เสมอ) · unhandled error ใน console 0",
+      "shots": [
+        "it11-logout-network-error.png"
+      ]
+    },
+    {
+      "id": "IT-12",
+      "pass": true,
+      "actual": "token หมดอายุ (exp ย้อนหลัง 1 ชม. เซ็นด้วย secret เดียวกับ backend) · เรียกตรง → 401 · แอปเรียก GET /api/users/me → 401 · URL /login · แสดง \"เซสชันของคุณหมดอายุแล้ว…\" true · ล้าง token true",
+      "shots": [
+        "it12-session-expired.png"
+      ]
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+    "Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+  ]
+}
