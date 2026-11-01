@@ -1,0 +1,10 @@
+# ใช้ซ้อนกับ compose.yaml ตอนทดสอบ Flow 2 (Session หมดอายุ) ของ US4-T19
+# ย่ออายุ token จาก 3 ชั่วโมงเหลือ SHORT_JWT_MS (ค่าเริ่มต้น 30 วินาที) ตามข้อเสนอใน US4-T15 หัวข้อ 3.2
+# Spring อ่าน APP_AUTH_JWT_EXPIRATIONMS เป็น app.auth.jwt.expiration-ms (relaxed binding)
+#
+#   docker compose -f compose.yaml -f .doc/US4/T19/system-test/compose.short-jwt.yaml up -d backend
+#   docker compose up -d backend      # คืนค่าเดิม 3 ชั่วโมง
+services:
+  backend:
+    environment:
+      APP_AUTH_JWT_EXPIRATIONMS: "${SHORT_JWT_MS:-30000}"
