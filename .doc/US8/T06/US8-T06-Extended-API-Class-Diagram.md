@@ -9,6 +9,7 @@ classDiagram
     class StudyPlanService {
         <<US8 Service · readOnly>>
         -studyPlanRepository StudyPlanRepository
+        -studyMinorRepository StudyMinorRepository
         -userRepository UserRepository
         +getPlans(studentId, studyYear, semester) StudyPlanListResponse
     }
@@ -16,13 +17,15 @@ classDiagram
         <<US8 Service · Transactional>>
         -maxCredits int
         -studyPlanRepository StudyPlanRepository
+        -studyMinorRepository StudyMinorRepository
         -sectionRepository SectionRepository
         -timetableRepository TimetableRepository
         -timetableEntryRepository TimetableEntryRepository
         -timetableService TimetableService
         -planScheduler PlanScheduler
         +applyPlan(studentId, request) ApplyPlanResponse
-        -loadCandidates(plan, academicYear) List~PlanCourseCandidate~
+        -loadMinor(minorId, plan) StudyMinor
+        -loadCandidates(plan, minor, academicYear) List~PlanCourseCandidate~
         -saveAdded(studentId, plan, academicYear, sections) void
     }
     class PlanScheduler {
@@ -38,6 +41,9 @@ classDiagram
     }
 
     class StudyPlanRepository {
+        <<US8 interface>>
+    }
+    class StudyMinorRepository {
         <<US8 interface>>
     }
     class UserRepository {
@@ -59,6 +65,13 @@ classDiagram
     class StudyPlanCourse {
         <<US8 Entity>>
     }
+    class StudyMinor {
+        <<US8 Entity>>
+        +coursesOf(studyYear, semester) List~Course~
+    }
+    class StudyMinorCourse {
+        <<US8 Entity>>
+    }
     class Timetable {
         <<US1 Entity>>
         +touch() void
@@ -69,10 +82,15 @@ classDiagram
     class ResourceNotFoundException {
         <<มีอยู่แล้ว · 404>>
     }
+    class BusinessRuleException {
+        <<มีอยู่แล้ว · status + code>>
+    }
 
     StudyPlanService --> StudyPlanRepository : findByDepartmentAndStudyYearAndSemester
+    StudyPlanService --> StudyMinorRepository : findByDepartmentAndTerm
     StudyPlanService --> UserRepository : findById
     ApplyPlanService --> StudyPlanRepository : findWithCoursesById
+    ApplyPlanService --> StudyMinorRepository : findWithCoursesById (มี minorId)
     ApplyPlanService --> SectionRepository : findByCourseCodesAndTerm
     ApplyPlanService --> TimetableRepository : findBy...AndSemester, save
     ApplyPlanService --> TimetableEntryRepository : findByTimetableId, saveAll
@@ -82,28 +100,34 @@ classDiagram
     TimetableService --> TimetableEntryRepository
 
     StudyPlanRepository ..> StudyPlan : คืน
+    StudyMinorRepository ..> StudyMinor : คืน
     StudyPlan "1" *-- "1..*" StudyPlanCourse
+    StudyMinor "1" *-- "1..*" StudyMinorCourse
     ApplyPlanService ..> Timetable : สร้าง/touch() (Confirm)
     ApplyPlanService ..> TimetableEntry : สร้าง (Confirm)
     StudyPlanService ..> ResourceNotFoundException : throws ไม่พบ user
-    ApplyPlanService ..> ResourceNotFoundException : throws ไม่พบ planId
+    ApplyPlanService ..> ResourceNotFoundException : throws ไม่พบ planId / minorId
+    ApplyPlanService ..> BusinessRuleException : throws MINOR_NOT_ALLOWED / MINOR_PLAN_MISMATCH
 ```
 
 | Service method | เรียก repository / class | ใช้ใน |
 | --- | --- | --- |
-| `StudyPlanService.getPlans` | `userRepository.findById` → `studyPlanRepository.findByDepartmentAndStudyYearAndSemester` → `StudyPlanResponse.of` | `GET /api/study-plans` |
-| `ApplyPlanService.applyPlan` | `studyPlanRepository.findWithCoursesById` → `loadCandidates` → `planScheduler.schedule` → (`dryRun: false`) `saveAdded` → `timetableService.getTimetable` | Preview / Confirm |
-| `ApplyPlanService.loadCandidates` | `timetableRepository.findByStudentIdAndAcademicYearAndSemester` → `timetableEntryRepository.findByTimetableId` (ถ้ามีตาราง) → `sectionRepository.findByCourseCodesAndTerm` | Preview / Confirm |
+| `StudyPlanService.getPlans` | `userRepository.findById` → `studyPlanRepository.findByDepartmentAndStudyYearAndSemester` → เรียง `curriculumName` แล้ว `planType` → `StudyPlanResponse.of` → `studyMinorRepository.findByDepartmentAndTerm` → `StudyMinorResponse.of(minor, minor.coursesOf(studyYear, semester))` | `GET /api/study-plans` |
+| `ApplyPlanService.applyPlan` | `studyPlanRepository.findWithCoursesById` → (`minorId` ไม่ใช่ `null`) `loadMinor` → `loadCandidates` → `planScheduler.schedule` → (`dryRun: false`) `saveAdded` → `timetableService.getTimetable` | Preview / Confirm |
+| `ApplyPlanService.loadMinor` | `plan.studyYear` 1–2 → `BusinessRuleException(400, "MINOR_NOT_ALLOWED")` → `studyMinorRepository.findWithCoursesById` (ไม่พบ → `ResourceNotFoundException`) → `department` / `curriculumName` ไม่ตรงกับ preset → `BusinessRuleException(400, "MINOR_PLAN_MISMATCH")` | Preview / Confirm เมื่อส่ง `minorId` |
+| `ApplyPlanService.loadCandidates` | รวมวิชาของแผน (`PLAN`) กับ `minor.coursesOf(plan.studyYear, plan.semester)` (`MINOR`, ตัดรหัสที่ซ้ำกับแผน) → `timetableRepository.findByStudentIdAndAcademicYearAndSemester` → `timetableEntryRepository.findByTimetableId` (ถ้ามีตาราง) → `sectionRepository.findByCourseCodesAndTerm` | Preview / Confirm |
 | `ApplyPlanService.saveAdded` | `new Timetable` (ถ้ายังไม่มี) → `timetable.touch()` → `timetableRepository.save` → `timetableEntryRepository.saveAll` | Confirm เมื่อ `added` ไม่ว่าง |
 
-- **ไม่เพิ่ม field ใหม่จาก T05** field ของทั้งสอง service ออกแบบไว้ครบแล้วใน T05 เอกสารนี้ต่อเส้นไปถึง entity และระบุ method ของ repository ที่เรียก ส่วน signature ของ method ใน repository อยู่ใน [DAO Class Diagram](./US8-T06-DAO-Class-Diagram.md)
-- **`StudyPlanService` เป็น `@Transactional(readOnly = true)`** ไม่มีการเขียน และ `StudyPlanResponse.of` อ่าน `plan.getCourses()` กับ `course` ที่ fetch มาแล้วใน query เดียว
+- **field ตรงกับ T05 ฉบับปรับปรุง** T05 เพิ่ม `studyMinorRepository` ให้ทั้งสอง service และ `loadMinor` / พารามิเตอร์ `minor` ของ `loadCandidates` แล้ว เอกสารนี้ต่อเส้นไปถึง entity และระบุ method ของ repository ที่เรียก ส่วน signature ของ method ใน repository อยู่ใน [DAO Class Diagram](./US8-T06-DAO-Class-Diagram.md)
+- **`StudyPlanService` เป็น `@Transactional(readOnly = true)`** ไม่มีการเขียน และ `StudyPlanResponse.of` / `StudyMinorResponse.of` อ่านวิชาที่ fetch มาแล้วใน query ของแต่ละ repository (รวม 3 query ต่อ request ไม่ขึ้นกับจำนวนแผน/วิชาโท)
 - **`ApplyPlanService` เป็น `@Transactional`** ที่ระดับ class ทั้ง Preview และ Confirm อยู่ใน transaction เดียวกับ `getTimetable` Preview ไม่เรียก `saveAdded` จึงไม่มีการเขียน ส่วน Confirm บันทึกแบบ all-or-nothing และ Hibernate flush ก่อน query ใน `getTimetable`
-- **`saveAdded` เขียนผ่าน repository โดยตรง** ไม่เรียก `TimetableService.addEntry` ของ US1 เพราะ `addEntry` ทำงานทีละ section, query ซ้ำ และไม่ตรวจเวลาชน (ดูหมายเหตุใน [Sequence Diagram — Confirm](./US8-T06-Sequence-Diagram-Confirm.md))
+- **`loadMinor` ตรวจก่อนอ่าน entry และ section** `MINOR_NOT_ALLOWED` ตรวจจาก `plan.studyYear` ก่อนหาวิชาโท (ไม่ query `study_minor` เลย) และทุก error ของ `loadMinor` เกิดก่อนเขียน DB จึงไม่มีการเขียนแม้เป็น Confirm ตามเทสต์ที่ T05 เสนอ
+- **`PlanCourseCandidate.source`** `loadCandidates` ตั้ง `PLAN` / `MINOR` ให้แต่ละวิชา วิชาที่อยู่ทั้งในแผนและวิชาโทเป็น `PLAN` ตัวเดียว `PlanScheduler` ใช้ `source` ในเกณฑ์ "ดีที่สุด" แล้วส่งต่อไปที่ `AddedPlanCourseResponse.from(section, source)` / factory ของ `SkippedPlanCourseResponse`
+- **`saveAdded` เขียนผ่าน repository โดยตรง** ไม่เรียก `TimetableService.addEntry` ของ US1 เพราะ `addEntry` ทำงานทีละ section, query ซ้ำ และไม่ตรวจเวลาชน (ดูหมายเหตุใน [Sequence Diagram — Confirm](./US8-T06-Sequence-Diagram-Confirm.md)) วิชา `PLAN` และ `MINOR` บันทึกเป็น `TimetableEntry` แบบเดียวกัน ไม่เก็บ `source`
 - **`PlanScheduler` ไม่มี repository เป็น field** รับข้อมูลที่ `loadCandidates` เตรียมไว้ จึง unit test ได้โดยไม่มี DB · `maxNodes` อ่านจาก `app.study-plan.max-search-nodes` (default `50000`)
 - **`maxCredits`** ของ `ApplyPlanService` อ่านจาก `app.timetable.max-credits` (22) ค่าเดียวกับ `TimetableService` ส่วน `ApplyPlanService` และ `PlanScheduler` เขียน constructor เองเพราะมีค่าจาก `@Value` แบบ `TimetableService` service อื่นใช้ `@RequiredArgsConstructor`
 - **`TimetableService`** วาดเฉพาะส่วนที่ US8 ใช้ ส่วน `sectionRepository`, `maxCredits`, `addEntry` และ private method ดูได้ใน [Extended API Class Diagram ของ US1-T06](../../US1/T06/US1-T06-Extended-API-Class-Diagram.md) การย้ายสูตรเวลาชนไป `ScheduleOverlap` เป็น PR refactor แยกตาม T05
-- **ไม่มี exception ใหม่** 404 ใช้ `ResourceNotFoundException` เดิม 400 มาจาก validation ของ Spring ทั้งหมดแปลงเป็น ProblemDetail โดย `GlobalExceptionHandler` เดิม
+- **ไม่มี exception class ใหม่** 404 ใช้ `ResourceNotFoundException` เดิม `MINOR_NOT_ALLOWED` / `MINOR_PLAN_MISMATCH` เป็น `code` ใหม่ที่ส่งผ่าน `BusinessRuleException` เดิม 400 จาก validation มาจาก Spring ทั้งหมดแปลงเป็น ProblemDetail โดย `GlobalExceptionHandler` เดิม (`handleBusinessRule` ใส่ `code` ลง ProblemDetail ให้แล้ว)
 
 ## เอกสารที่เกี่ยวข้อง
 
