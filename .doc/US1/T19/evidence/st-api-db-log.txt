@@ -1,0 +1,130 @@
+== Setup ==
+  $ curl -X POST http://localhost:8080/api/auth/login -d '{"username": "6609000000", "password": "Passw0rd!"}'
+  -> HTTP 200
+  cleared timetable of 6609000000
+  $ curl -X GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=CS111 -H 'Authorization: Bearer $TOKEN'
+  sectionId CS111 030001 = 3
+  $ curl -X GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=MA211 -H 'Authorization: Bearer $TOKEN'
+  sectionId MA211 020001 = 2
+  $ curl -X GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=CS111 -H 'Authorization: Bearer $TOKEN'
+  sectionId CS111 030002 = 8
+  $ curl -X GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=LAS101 -H 'Authorization: Bearer $TOKEN'
+  sectionId LAS101 780004 = 4
+  $ curl -X GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=TU109 -H 'Authorization: Bearer $TOKEN'
+  sectionId TU109 780001 = 7
+  $ curl -X GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=CS180 -H 'Authorization: Bearer $TOKEN'
+  sectionId CS180 820001 = 1
+  $ curl -X GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=TU101 -H 'Authorization: Bearer $TOKEN'
+  sectionId TU101 900001 = 5
+  $ curl -X GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=TU106 -H 'Authorization: Bearer $TOKEN'
+  sectionId TU106 540001 = 6
+  $ curl -X GET http://localhost:8080/api/courses?academicYear=2568&semester=1&q=ST216 -H 'Authorization: Bearer $TOKEN'
+  sectionId ST216 040001 = 9
+
+== ST-01 ==
+  $ curl -X GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 -H 'Authorization: Bearer $TOKEN'
+  -> HTTP 200
+  {"academicYear": 2568, "semester": 1, "entries": [], "totalCredits": 0, "maxCredits": 22, "conflicts": [], "updatedAt": null}
+  [PASS] GET ก่อนเพิ่มได้ entries [] และ updatedAt null
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 3}'
+  -> HTTP 201
+  {"academicYear": 2568, "semester": 1, "entries": [{"entryId": 20009, "courseCode": "CS111", "courseName": "Object-Oriented Concepts", "category": "MAJOR", "credits": 3, "sectionId": 3, "sectionNo": "030001", "schedules": [{"dayOfWeek": "TUESDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}, {"dayOfWeek": "THURSDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}], "conflictWith": []}], "totalCredits": 3, "maxCredits": 22, "conflicts": [], "updatedAt": "2026-10-31T12:24:42+07:00"}
+  [PASS] 201, entries 1, totalCredits 3, conflicts [], updatedAt ไม่ null
+  DB[ST-01]: {"timetable_rows": 1, "timetable_ids": ["10003"], "updated_at": "2026-10-31T12:24:42+07:00", "entries": ["CS111 030001"]}
+  [PASS] DB: timetable 1 แถว updated_at ไม่ null และ entry CS111 030001
+
+== ST-02 ==
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 2}'
+  -> HTTP 201
+  {"academicYear": 2568, "semester": 1, "entries": [{"entryId": 20009, "courseCode": "CS111", "courseName": "Object-Oriented Concepts", "category": "MAJOR", "credits": 3, "sectionId": 3, "sectionNo": "030001", "schedules": [{"dayOfWeek": "TUESDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}, {"dayOfWeek": "THURSDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}], "conflictWith": []}, {"entryId": 20010, "courseCode": "MA211", "courseName": "Calculus 1", "category": "MAJOR", "credits": 3, "sectionId": 2, "sectionNo": "020001", "schedules": [{"dayOfWeek": "TUESDAY", "startTime": "09:30", "endTime": "11:00", "room": "SC-3015"}, {"dayOfWeek": "THURSDAY", "startTime": "09:30", "endTime": "11:00", "room": "SC-3015"}], "conflictWith": []}], "totalCredits": 6, "maxCredits": 22, "conflicts": [], "updatedAt": "2026-10-31T12:24:44+07:00"}
+  [PASS] 201, entries 2, totalCredits 6, conflicts []
+  DB[ST-02]: {"timetable_rows": 1, "timetable_ids": ["10003"], "updated_at": "2026-10-31T12:24:44+07:00", "entries": ["CS111 030001", "MA211 020001"]}
+  [PASS] DB: timetable_id เดิม, entry 2 แถว
+  [PASS] DB: updated_at ใหม่กว่า ST-01 -- 2026-10-31T12:24:42+07:00 -> 2026-10-31T12:24:44+07:00
+
+== ST-03 ==
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 8}'
+  -> HTTP 409
+  {"detail": "CS111 อยู่ในตารางแล้ว (Sec 030001) 1 วิชาเพิ่มได้ 1 กลุ่มเรียน", "instance": "/api/timetable/entries", "status": 409, "title": "Conflict", "code": "COURSE_ALREADY_IN_TIMETABLE", "courseCode": "CS111", "existingSectionNo": "030001"}
+  [PASS] 409 code COURSE_ALREADY_IN_TIMETABLE, courseCode CS111, existingSectionNo 030001
+  DB[ST-03]: {"timetable_rows": 1, "timetable_ids": ["10003"], "updated_at": "2026-10-31T12:24:44+07:00", "entries": ["CS111 030001", "MA211 020001"]}
+  [PASS] DB: entry และ updated_at เท่าเดิม
+
+== ST-04 ==
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 4}'
+  -> HTTP 201
+  {"academicYear": 2568, "semester": 1, "entries": [{"entryId": 20009, "courseCode": "CS111", "courseName": "Object-Oriented Concepts", "category": "MAJOR", "credits": 3, "sectionId": 3, "sectionNo": "030001", "schedules": [{"dayOfWeek": "TUESDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}, {"dayOfWeek": "THURSDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}], "conflictWith": []}, {"entryId": 20010, "courseCode": "MA211", "courseName": "Calculus 1", "category": "MAJOR", "credits": 3, "sectionId": 2, "sectionNo": "020001", "schedules": [{"dayOfWeek": "TUESDAY", "startTime": "09:30", "endTime": "11:00", "room": "SC-3015"}, {"dayOfWeek": "THURSDAY", "startTime": "09:30", "endTime": "11:00", "room": "SC-3015"}], "conflictWith": []}, {"entryId": 20011, "courseCode": "LAS101", "courseName": "Critical Thinking, Reading, and Writing", "category": "GENERAL_EDUCATION", "credits": 3, "sectionId": 4, "sectionNo": "780004", "schedules": [{"dayOfWeek": "WEDNESDAY", "startTime": "09:30", "endTime": "12:30", "room": "SC-1026"}], "conflictWith": []}], "totalCredits": 9, "maxCredits": 22, "conflicts": [], "updatedAt": "2026-10-31T12:24:45+07:00"}
+  [PASS] LAS101 201 conflicts []
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 7}'
+  -> HTTP 201
+  {"academicYear": 2568, "semester": 1, "entries": [{"entryId": 20009, "courseCode": "CS111", "courseName": "Object-Oriented Concepts", "category": "MAJOR", "credits": 3, "sectionId": 3, "sectionNo": "030001", "schedules": [{"dayOfWeek": "TUESDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}, {"dayOfWeek": "THURSDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}], "conflictWith": []}, {"entryId": 20010, "courseCode": "MA211", "courseName": "Calculus 1", "category": "MAJOR", "credits": 3, "sectionId": 2, "sectionNo": "020001", "schedules": [{"dayOfWeek": "TUESDAY", "startTime": "09:30", "endTime": "11:00", "room": "SC-3015"}, {"dayOfWeek": "THURSDAY", "startTime": "09:30", "endTime": "11:00", "room": "SC-3015"}], "conflictWith": []}, {"entryId": 20011, "courseCode": "LAS101", "courseName": "Critical Thinking, Reading, and Writing", "category": "GENERAL_EDUCATION", "credits": 3, "sectionId": 4, "sectionNo": "780004", "schedules": [{"dayOfWeek": "WEDNESDAY", "startTime": "09:30", "endTime": "12:30", "room": "SC-1026"}], "conflictWith": ["TU109"]}, {"entryId": 20012, "courseCode": "TU109", "courseName": "Innovation and Entrepreneurial Mindset", "category": "GENERAL_EDUCATION", "credits": 3, "sectionId": 7, "sectionNo": "780001", "schedules": [{"dayOfWeek": "WEDNESDAY", "startTime": "09:30", "endTime": "12:30", "room": "SC3-413"}], "conflictWith": ["LAS101"]}], "totalCredits": 12, "maxCredits": 22, "conflicts": [{"dayOfWeek": "WEDNESDAY", "overlapStart": "09:30", "overlapEnd": "12:30", "courseCodes": ["LAS101", "TU109"]}], "updatedAt": "2026-10-31T12:24:45+07:00"}
+  [PASS] 201, entries 4, totalCredits 12
+  [PASS] conflicts 1 รายการ WEDNESDAY 09:30-12:30 LAS101+TU109 -- [{"dayOfWeek": "WEDNESDAY", "overlapStart": "09:30", "overlapEnd": "12:30", "courseCodes": ["LAS101", "TU109"]}]
+  [PASS] conflictWith TU109=[LAS101], LAS101=[TU109] -- TU109=['LAS101'] LAS101=['TU109']
+  DB[ST-04]: {"timetable_rows": 1, "timetable_ids": ["10003"], "updated_at": "2026-10-31T12:24:45+07:00", "entries": ["CS111 030001", "MA211 020001", "LAS101 780004", "TU109 780001"]}
+  [PASS] DB: entry 4 แถว มี LAS101 และ TU109
+
+== ST-05 ==
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 1}'
+  -> HTTP 201
+  [PASS] CS180 201
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 5}'
+  -> HTTP 201
+  [PASS] TU101 201
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 6}'
+  -> HTTP 201
+  [PASS] TU106 201
+  last response: {"academicYear": 2568, "semester": 1, "entries": [{"entryId": 20009, "courseCode": "CS111", "courseName": "Object-Oriented Concepts", "category": "MAJOR", "credits": 3, "sectionId": 3, "sectionNo": "030001", "schedules": [{"dayOfWeek": "TUESDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}, {"dayOfWeek": "THURSDAY", "startTime": "11:00", "endTime": "12:30", "room": "LC3-121"}], "conflictWith": []}, {"entryId": 20010, "courseCode": "MA211", "courseName": "Calculus 1", "category": "MAJOR", "credits": 3, "sectionId": 2, "sectionNo": "020001", "schedules": [{"dayOfWeek": "TUESDAY", "startTime": "09:30", "endTime": "11:00", "room": "SC-3015"}, {"dayOfWeek": "THURSDAY", "startTime": "09:30", "endTime": "11:00", "room": "SC-3015"}], "conflictWith": []}, {"entryId": 20011, "courseCode": "LAS101", "courseName": "Critical Thinking, Reading, and Writing", "category": "GENERAL_EDUCATION", "credits": 3, "sectionId": 4, "sectionNo": "780004", "schedules": [{"dayOfWeek": "WEDNESDAY", "startTime": "09:30", "endTime": "12:30", "room": "SC-1026"}], "conflictWith": ["TU109"]}, {"entryId": 20012, "courseCode": "TU109", "courseName": "Innovation and Entrepreneurial Mindset", "category": "GENERAL_EDUCATION", "credits": 3, "sectionId": 7, "sectionNo": "780001", "schedules": [{"dayOfWeek": "WEDNESDAY", "startTime": "09:30", "endTime": "12:30", "room": "SC3-413"}], "conflictWith": ["LAS101"]}, {"entryId": 20013, "courseCode": "CS180", "courseName": "Introduction to User Interface and User Experience", "category": "MAJOR", "credits": 3, "sectionId": 1, "sectionNo": "820001", "schedules": [{"dayOfWeek": "MONDAY", "startTime": "13:30", "endTime": "16:30", "room": "LC5-S202"}], "conflictWith": []}, {"entryId": 20014, "courseCode": "TU101", "courseName": "Thailand, ASEAN, and the World", "category": "GENERAL_EDUCATION", "credits": 3, "sectionId": 5, "sectionNo": "900001", "schedules": [{"dayOfWeek": "WEDNESDAY", "startTime": "13:30", "endTime": "16:30", "room": "SC-1058"}], "conflictWith": []}, {"entryId": 20015, "courseCode": "TU106", "courseName": "Creativity and Communication", "category": "GENERAL_EDUCATION", "credits": 3, "sectionId": 6, "sectionNo": "540001", "schedules": [{"dayOfWeek": "THURSDAY", "startTime": "13:30", "endTime": "16:30", "room": "LC2-203"}], "conflictWith": []}], "totalCredits": 21, "maxCredits": 22, "conflicts": [{"dayOfWeek": "WEDNESDAY", "overlapStart": "09:30", "overlapEnd": "12:30", "courseCodes": ["LAS101", "TU109"]}], "updatedAt": "2026-10-31T12:24:46+07:00"}
+  [PASS] entries 7, totalCredits 21, maxCredits 22
+  [PASS] conflicts ยังมีแค่คู่ LAS101/TU109
+  DB[ST-05]: {"timetable_rows": 1, "timetable_ids": ["10003"], "updated_at": "2026-10-31T12:24:46+07:00", "entries": ["CS111 030001", "MA211 020001", "LAS101 780004", "TU109 780001", "CS180 820001", "TU101 900001", "TU106 540001"]}
+  [PASS] DB: entry 7 แถวใน timetable เดิม
+
+== ST-06 ==
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 9}'
+  -> HTTP 409
+  {"detail": "เพิ่ม ST216 (3 หน่วยกิต) แล้วจะเป็น 24 หน่วยกิต เกินกำหนด 22 หน่วยกิต", "instance": "/api/timetable/entries", "status": 409, "title": "Conflict", "code": "CREDIT_LIMIT_EXCEEDED", "currentCredits": 21, "courseCredits": 3, "maxCredits": 22}
+  [PASS] 409 CREDIT_LIMIT_EXCEEDED currentCredits 21 courseCredits 3 maxCredits 22
+  DB[ST-06]: {"timetable_rows": 1, "timetable_ids": ["10003"], "updated_at": "2026-10-31T12:24:46+07:00", "entries": ["CS111 030001", "MA211 020001", "LAS101 780004", "TU109 780001", "CS180 820001", "TU101 900001", "TU106 540001"]}
+  [PASS] DB: entry และ updated_at เท่าเดิม
+
+== ST-07 ==
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{"sectionId": 999999}'
+  -> HTTP 404
+  {"detail": "Section not found with id: 999999", "instance": "/api/timetable/entries", "status": 404, "title": "Not Found"}
+  [PASS] 404 ProblemDetail detail กล่าวถึง 999999
+  DB[ST-07]: {"timetable_rows": 1, "timetable_ids": ["10003"], "updated_at": "2026-10-31T12:24:46+07:00", "entries": ["CS111 030001", "MA211 020001", "LAS101 780004", "TU109 780001", "CS180 820001", "TU101 900001", "TU106 540001"]}
+  [PASS] DB: เท่าเดิม
+
+== ST-08 ==
+  $ curl -X POST http://localhost:8080/api/timetable/entries -H 'Authorization: Bearer $TOKEN' -d '{}'
+  -> HTTP 400
+  {"detail": "Validation failed", "instance": "/api/timetable/entries", "status": 400, "title": "Bad Request", "errors": {"sectionId": "must not be null"}}
+  [PASS] 400 มี errors.sectionId
+  DB[ST-08]: {"timetable_rows": 1, "timetable_ids": ["10003"], "updated_at": "2026-10-31T12:24:46+07:00", "entries": ["CS111 030001", "MA211 020001", "LAS101 780004", "TU109 780001", "CS180 820001", "TU101 900001", "TU106 540001"]}
+  [PASS] DB: เท่าเดิม
+
+== ST-09 ==
+  $ curl -X GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 -H 'Authorization: Bearer $TOKEN'
+  -> HTTP 200 entries=['CS111', 'CS180', 'LAS101', 'MA211', 'TU101', 'TU106', 'TU109'] conflicts=1
+  [PASS] GET 1/2568 entries 7 และ conflict LAS101/TU109 ยังอยู่
+  $ curl -X GET http://localhost:8080/api/timetable?academicYear=2568&semester=2 -H 'Authorization: Bearer $TOKEN'
+  -> HTTP 200
+  {"academicYear": 2568, "semester": 2, "entries": [], "totalCredits": 0, "maxCredits": 22, "conflicts": [], "updatedAt": null}
+  [PASS] GET 2/2568 entries [] updatedAt null
+  $ curl -X GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 -H 'Authorization: Bearer $TOKEN'
+  -> HTTP 200 entries=['CS111', 'CS180', 'LAS101', 'MA211', 'TU101', 'TU106', 'TU109']
+  [PASS] GET 1/2568 อีกครั้งได้ 7 วิชาเหมือนเดิม
+  [PASS] DB: ไม่มี timetable ภาค 2/2568 ถูกสร้าง -- count=0
+  DB[ST-09]: {"timetable_rows": 1, "timetable_ids": ["10003"], "updated_at": "2026-10-31T12:24:46+07:00", "entries": ["CS111 030001", "MA211 020001", "LAS101 780004", "TU109 780001", "CS180 820001", "TU101 900001", "TU106 540001"]}
+
+== Summary ==
+  ST-01: PASS (3/3)
+  ST-02: PASS (3/3)
+  ST-03: PASS (2/2)
+  ST-04: PASS (5/5)
+  ST-05: PASS (6/6)
+  ST-06: PASS (2/2)
+  ST-07: PASS (2/2)
+  ST-08: PASS (2/2)
+  ST-09: PASS (4/4)
