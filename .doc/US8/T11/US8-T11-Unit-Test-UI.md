@@ -25,6 +25,7 @@ US8: จัดตารางเรียนจำลองตามแผนใ
 
 - US8-T05: [DTO & API Spec](../T05/US8-DTO-API-Spec.md), [DTO Class Diagram](../T05/US8-DTO-Class-Diagram.md), [API Class Diagram](../T05/US8-API-Class-Diagram.md)
 - US8-T06: sequence diagram การเลือกแผน, preview และ confirm
+- [UI Prototype US8 บน Canva](https://canva.link/u11toczswv126t2): หน้า 1 สำหรับปี 1–2 และหน้า 2 สำหรับปี 3–4; ใช้อ้างอิงชื่อปุ่มและลำดับเปิดหน้าต่างตามคอมเมนต์รีวิว
 - Frontend ใช้ Vitest และ React Testing Library ที่มีอยู่ใน `frontend/package.json`; ไม่เพิ่ม dependency จากงานออกแบบนี้
 
 US8-T05 และ US8-T06 ถูก merge เข้า `develop` แล้ว เอกสารนี้จึงอ้างอิง API contract และ sequence diagram ใน branch ปัจจุบัน สำหรับการตรวจวิชาซ้ำจะทดสอบเฉพาะวิชาที่มีอยู่ในตารางปัจจุบัน (`COURSE_ALREADY_IN_TIMETABLE`) ไม่ทดสอบประวัติวิชาที่เรียนผ่าน เพราะไม่มีข้อมูล transcript ใน API contract ของ US8
@@ -36,6 +37,7 @@ US8-T05 และ US8-T06 ถูก merge เข้า `develop` แล้ว �
 - ใช้ user interaction ผ่าน React Testing Library; ตรวจองค์ประกอบด้วย accessible role/name หรือข้อความที่แสดงต่อผู้ใช้
 - เมื่อเลือกค่าที่จำเป็นครบ UI เรียก `dryRun: true` เอง ไม่ต้องมีปุ่ม `ดูสรุป`; ใช้ `dryRun: false` เมื่อกด `เพิ่มลงตารางเรียน`
 - ตรวจว่า preview ไม่ทำให้ตารางเปลี่ยน และหลังยืนยัน UI ใช้ `timetable` ที่ได้จาก response ของ confirm
+- คำเตือนเวลาชนตาม Prototype แสดงหลังคลิก `เพิ่มลงตารางเรียน` และได้รับผลยืนยัน การตอบ API ยังคงตาม T05: `200` พร้อม `skipped` ไม่ใช่ HTTP error หรือการปฏิเสธทั้งแผน; วิชาอื่นใน `added` ยังเพิ่มได้
 - ชื่อ component, route และข้อความ UI ให้ปรับตาม implementation จริง โดยคงพฤติกรรมที่ระบุใน Expected Result
 - เอกสารนี้เป็นการออกแบบ test cases เท่านั้น ยังไม่ได้รันทดสอบจริง
 
@@ -150,7 +152,7 @@ US8-T05 และ US8-T06 ถูก merge เข้า `develop` แล้ว �
 
 **Related CoS:** CoS 2 — วิชาที่มีในตารางแล้วต้องไม่ถูกเพิ่มซ้ำ
 
-**Preconditions:** ตารางมี `CS301` อยู่แล้วใน section เดิม; mock preview คืน `CS301` ใน `skipped` ด้วยเหตุผล `COURSE_ALREADY_IN_TIMETABLE` และข้อมูล `existingSectionNo`
+**Preconditions:** ตารางมี `CS301` อยู่แล้วใน section เดิม; mock preview คืน `CS301` ใน `skipped` ด้วยเหตุผล `COURSE_ALREADY_IN_TIMETABLE` และข้อมูล `existingSectionNo` โดย `added` มีวิชาอื่นที่เพิ่มได้อย่างน้อย 1 วิชา; mock confirm คืน `skipped` เดิมและ `timetable` ที่มี `CS301` section เดิมเพียงรายการเดียวพร้อมวิชาใหม่ เพื่อทดสอบว่า UI ไม่รวมผลจนแสดงวิชาซ้ำ
 
 **Test Steps:**
 1. เปิดหน้าต่าง `จัดตามแผนหลักสูตร` และเลือกแผนที่มี `CS301`
@@ -167,19 +169,28 @@ US8-T05 และ US8-T06 ถูก merge เข้า `develop` แล้ว �
 
 **Related CoS:** CoS 3 — แจ้งเมื่อไม่สามารถเพิ่มวิชาเนื่องจากเวลาชน
 
-**Preconditions:** ตารางมี `RE468` วันจันทร์ 09:30–12:30; แผนที่เลือกมี `CS301` ซึ่งมีเวลาเรียนชนกัน; mock response/state ให้ UI แสดง conflict alert ตาม prototype
+**Preconditions:** ตารางมี `RE468` วันจันทร์ 09:30–12:30; ใช้แผน mock ที่มี `CS301` และไม่มี section อื่นที่หลบเวลาชนได้ ไม่ตั้ง state ให้เปิดคำเตือนไว้ล่วงหน้า
+
+**Test Data:**
+- Preview ตอบ `200 ApplyPlanResponse` มี `dryRun: true`, `added: []`, `timetable: null` และ `skipped` ของ `CS301` โดยมี field วิชาตาม `SkippedPlanCourse`, `source: "PLAN"`, `reason: "TIME_CONFLICT"`, `conflictWith: ["RE468"]`, `message: "CS301 ชนกับ RE468 วันจันทร์ 09:30–12:30"`
+- Confirm ตอบ `200 ApplyPlanResponse` มี `dryRun: false`, `added: []`, `skipped` เหตุผลเดียวกัน และ `timetable` ที่ยังมี `RE468` แต่ไม่มี `CS301`
+- ใช้ `message` ใน mock เป็นแหล่งข้อความวัน/เวลา ไม่เพิ่ม field overlap ลงใน DTO เพราะ T05 ระบุเพียง `conflictWith` และ `message` สำหรับเหตุผลเวลาชน
 
 **Test Steps:**
 1. เปิดหน้าต่าง `จัดตามแผนหลักสูตร` และเลือกแผนที่มี `CS301`
 2. เลือกชั้นปี/ภาคเรียนให้ครบและรอ preview อัตโนมัติ
-3. ตรวจ dialog แจ้งเวลาเรียนชน
-4. กดปุ่ม `ตกลง`
+3. ตรวจว่า preview แสดงเหตุผลที่ข้าม `CS301` และยังไม่มีหน้าต่างคำเตือนเวลาชนเปิดขึ้น
+4. กดปุ่ม `เพิ่มลงตารางเรียน`
+5. ตรวจ request ยืนยัน `dryRun: false`; ให้ mock confirm resolve แล้วตรวจหน้าต่างแจ้งเวลาเรียนชน
+6. กดปุ่ม `ตกลง`
 
 **Expected Result:**
 - UI เปิดหน้าต่างแจ้งเตือนข้อความ `ตรวจพบเวลาเรียนซ้อนทับกัน ไม่สามารถเพิ่มได้`
 - ข้อความ/รายละเอียดระบุว่า `CS301` ชนกับ `RE468` วันจันทร์ 09:30–12:30
 - `CS301` ไม่ถูกเพิ่ม และ `RE468` ที่มีอยู่ยังคงอยู่ในตาราง
 - เมื่อกด `ตกลง` หน้าต่างแจ้งเตือนปิดตาม UI Prototype
+- ก่อนกดเพิ่มต้องไม่มี request `dryRun: false` และการกด `ตกลง` ไม่ส่งคำขอเพิ่มซ้ำ
+- เคสนี้มีเฉพาะวิชาที่เพิ่มไม่ได้จึงคงตารางเดิม หาก response อื่นมีวิชาที่เพิ่มสำเร็จด้วย UI ต้องแสดงวิชาเหล่านั้นจาก `response.timetable` ตาม T05
 
 ### [UT-UI-08] ปิดหน้าต่างได้ทั้งปุ่มยกเลิกและปุ่ม X
 
@@ -264,6 +275,23 @@ US8-T05 และ US8-T06 ถูก merge เข้า `develop` แล้ว �
 - ปุ่ม/สถานะกลับมาพร้อมให้ retry หลัง error
 - เมื่อ retry สำเร็จ UI แสดง timetable จาก response สำเร็จ
 
+### [UT-UI-13] เปลี่ยนภาคเรียนแล้วใช้แผนและวิชาโทของภาคใหม่
+
+**Related CoS:** ตัวเลือกแผนการศึกษาและวิชาโทตาม US8-T05
+
+**Preconditions:** หน้าต่างเปิดที่ปี 3 ภาค 1 โดยเลือก `CO_OP` และ `minorId: 3`; mock รายการแผนภาค 1 และภาค 2 ให้ `CO_OP` ใช้ `planId` ต่างกัน และมีข้อมูลวิชาของแต่ละภาคต่างกัน
+
+**Test Steps:**
+1. เปลี่ยนจากภาค 1 เป็นภาค 2 โดย mock ภาค 2 ยังมี `minorId: 3`
+2. รอให้โหลดแผนภาค 2 และ preview อัตโนมัติเสร็จ
+3. ทดสอบซ้ำจากสถานะเริ่มต้น โดย mock ภาค 2 ไม่มี `minorId: 3` แต่มีวิชาโทอื่นให้เลือก
+
+**Expected Result:**
+- UI โหลดแผนด้วย `studyYear: 3`, `semester: 2` และยังเลือก `CO_OP` อยู่
+- Preview ใช้ `planId` ของ `CO_OP` ภาค 2 ไม่ใช้ `planId` ของภาค 1; UI แสดงหัวข้อและวิชาของภาค 2
+- กรณียังมีวิชาโทเดิม ให้คง `minorId: 3` และส่งไปกับ preview
+- กรณีไม่มีวิชาโทเดิม ให้กลับเป็น `ไม่เรียนวิชาโท` และไม่ส่ง `minorId` เดิม (ละ field หรือส่ง `null` ตาม T05)
+
 ## สรุปความครอบคลุม
 
 | Test Case | เรื่องที่ทดสอบ | ปกติ | ว่าง | ผิดพลาด |
@@ -280,6 +308,7 @@ US8-T05 และ US8-T06 ถูก merge เข้า `develop` แล้ว �
 | UT-UI-10 | เพิ่มวิชาลงตาราง | ✓ | | |
 | UT-UI-11 | โหลดแผน/preview error และ retry | | | ✓ |
 | UT-UI-12 | เพิ่มวิชา error และ retry | | | ✓ |
+| UT-UI-13 | เปลี่ยนภาคเรียนและคง/ล้างตัวเลือกให้ถูกต้อง | ✓ | | |
 
 ## สิ่งที่อยู่นอกขอบเขต Unit Test UI
 
