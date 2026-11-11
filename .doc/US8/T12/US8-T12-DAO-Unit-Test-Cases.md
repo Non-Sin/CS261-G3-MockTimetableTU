@@ -2,7 +2,7 @@
 
 ## ขอบเขตการทดสอบ
 
-ออกแบบ Unit Test ชั้น DAO จำนวน 30 เคส สำหรับ repository และ entity ที่ US8 เพิ่ม (`StudyPlanRepository`, `StudyMinorRepository`, `StudyMinor.coursesOf`) และ repository เดิมของ US1 ที่ `ApplyPlanService` ใช้ในแบบใหม่ (หา section ของวิชาในแผน และบันทึกหลายวิชาในครั้งเดียว) ตามที่ออกแบบไว้ใน DAO Class Diagram และ ER Diagram ของ US8-T06 (PR #84 ฉบับ `76b4950`) เพื่อใช้เป็นข้อกำหนดในการเขียนโค้ดและชุดทดสอบใน US8-T09
+ออกแบบ Unit Test ชั้น DAO จำนวน 30 เคส สำหรับ repository และ entity ที่ US8 เพิ่ม (`StudyPlanRepository`, `StudyMinorRepository`, `StudyMinor.coursesOf`) และ repository เดิมของ US1 ที่ `ApplyPlanService` ใช้ในแบบใหม่ (หา section ของวิชาในแผน และบันทึกหลายวิชาในครั้งเดียว) ตามที่ออกแบบไว้ใน [US8-T06 DAO Class Diagram](../T06/US8-T06-DAO-Class-Diagram.md) และ [US8-T06 ER Diagram](../T06/US8-T06-ER-Diagram.md) เพื่อใช้เป็นข้อกำหนดในการเขียนโค้ดและชุดทดสอบใน US8-T09
 
 - **User Story:** US8 จัดตารางเรียนจำลองตามแผนในเล่มหลักสูตร
 - **Branch:** `docs/US8-T12-design-unit-test-dao`
@@ -562,7 +562,7 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 
 ## สิ่งที่ต้องแก้ใน T06 / T09
 
-ตรวจ SQL ใน ER Diagram ของ US8-T06 (PR #84 ฉบับ `76b4950`) กับ SQL Server 2025 (`mcr.microsoft.com/mssql/server:2025-latest`) โดย insert ข้อมูลตั้งต้นของเอกสารนี้แล้วลองทุกค่าในส่วนที่ 5: constraint ทุกตัวปฏิเสธตามที่คาด ยกเว้น 1 ข้อ
+ตรวจ SQL ใน [ER Diagram ของ US8-T06](../T06/US8-T06-ER-Diagram.md) กับ SQL Server 2025 (`mcr.microsoft.com/mssql/server:2025-latest`) โดย insert ข้อมูลตั้งต้นของเอกสารนี้แล้วลองทุกค่าในส่วนที่ 5: constraint ทุกตัวปฏิเสธตามที่คาด ยกเว้น 1 ข้อ
 
 1. **`ck_study_plan_plan_type` ยอมให้ชั้นปี 3–4 มี `plan_type = NULL`** เพราะ `NULL IN ('SPECIAL_PROJECT', 'CO_OP')` ได้ผล UNKNOWN และ CHECK ของ SQL Server ถือว่า UNKNOWN ผ่าน ขัดกับที่ ER เขียนว่า "ปี 3–4 ต้องเป็น `SPECIAL_PROJECT` หรือ `CO_OP` เท่านั้น" ถ้า seed ลืมใส่ `plan_type` ของปี 3–4 จะได้แผนที่ `planType = null` ปนกับแผนหัวข้อพิเศษ/สหกิจ เสนอให้ migration ของ T09 เขียนเป็น
 
@@ -612,8 +612,13 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 
 ## เอกสารที่เกี่ยวข้อง
 
-- DAO Class Diagram, ER Diagram (DB), Sequence Diagram ทั้ง 3 ไฟล์ (US8-T06 · PR #84)
-- DTO & API Spec, API Class Diagram (US8-T05 · PR #83)
+- [DAO Class Diagram](../T06/US8-T06-DAO-Class-Diagram.md) (US8-T06)
+- [ER Diagram (DB)](../T06/US8-T06-ER-Diagram.md) (US8-T06)
+- [Sequence Diagram ยืนยันจัดตาราง (Confirm)](../T06/US8-T06-Sequence-Diagram-Confirm.md) (US8-T06)
+- [Sequence Diagram ดูสรุป (Preview)](../T06/US8-T06-Sequence-Diagram-Preview.md) (US8-T06)
+- [Sequence Diagram ดูแผนการเรียน](../T06/US8-T06-Sequence-Diagram-StudyPlans.md) (US8-T06)
+- [DTO & API Spec](../T05/US8-DTO-API-Spec.md) (US8-T05)
+- [API Class Diagram](../T05/US8-API-Class-Diagram.md) (US8-T05)
 - Integration Test Cases ระหว่าง API กับ DAO (US8-T14 · PR #86)
 - UAT Test Cases (US8-T16 · PR #85)
 - [US1-T06 DAO Class Diagram](../../US1/T06/US1-T06-DAO-Class-Diagram.md)
