@@ -1,0 +1,172 @@
+(node:25704) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+newman
+
+US2-T17 Integration Test API (IT-19–30)
+
+→ 00a Setup POST login (ผู้ใช้หลัก)
+  POST http://localhost:8080/api/auth/login [200 OK, 635B, 2.8s]
+  √  200 ได้ token
+
+→ 00b Setup POST login (ผู้ใช้อีกคน ชุดข้อมูล C)
+  POST http://localhost:8080/api/auth/login [200 OK, 635B, 162ms]
+  √  200 ได้ token
+
+→ 01a Setup GET courses 2568/1 เก็บ sectionId
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=1 [200 OK, 3.67kB, 949ms]
+  √  200 ได้ 9 วิชาของ 2568/1
+
+→ 01b Setup GET courses 2568/2 เก็บ sectionId ของ CS223
+  GET http://localhost:8080/api/courses?academicYear=2568&semester=2 [200 OK, 1.1kB, 56ms]
+  √  200 มี CS223 ใน 2568/2
+
+→ 02a Setup ล้างตาราง 2568/1 ของผู้ใช้หลัก
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 2.73kB, 273ms]
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=20023,20024,20025,20026,20027,20028,20029 [200 OK, 551B, 198ms]
+  √  ล้างตารางเหลือ 0 วิชา
+
+→ 02b Setup ล้างตาราง 2568/2 ของผู้ใช้หลัก
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=2 [200 OK, 528B, 19ms]
+  √  ตารางว่างอยู่แล้ว
+
+→ 02c Setup ล้างตาราง 2568/1 ของผู้ใช้อีกคน
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 528B, 18ms]
+  √  ตารางว่างอยู่แล้ว
+
+→ 03a Setup POST CS111 030001 (e1)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 891B, 228ms]
+  √  201 มีวิชาในตาราง
+
+→ 03b Setup POST MA211 (e2)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.21kB, 46ms]
+  √  201 มีวิชาในตาราง
+
+→ 03c Setup POST CS180 (e3)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.5kB, 69ms]
+  √  201 มีวิชาในตาราง
+
+→ 03d Setup POST LAS101 (e4)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 1.78kB, 51ms]
+  √  201 มีวิชาในตาราง
+
+→ IT-19 DELETE /entries/abc → 400
+  DELETE http://localhost:8080/api/timetable/entries/abc [400 Bad Request, 544B, 75ms]
+  √  400 ProblemDetail
+
+→ IT-20 DELETE /entries ไม่ส่ง entryIds → 400
+  DELETE http://localhost:8080/api/timetable/entries [400 Bad Request, 540B, 19ms]
+  √  400 ProblemDetail
+
+→ IT-21 DELETE /entries?entryIds= (ว่าง) → 400
+  DELETE http://localhost:8080/api/timetable/entries?entryIds= [400 Bad Request, 568B, 87ms]
+  √  400 ProblemDetail
+
+→ IT-22 DELETE /entries?entryIds={e1},abc → 400
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=30002,abc [400 Bad Request, 547B, 20ms]
+  √  400 ProblemDetail
+
+→ IT-19–22 GET timetable ไม่มีวิชาใดถูกลบ
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 1.78kB, 38ms]
+  √  ตารางยังมี e1, e2, e3, e4 ครบ 4 วิชา
+
+→ IT-23 DELETE /entries?entryIds={e1},{e1} → 200 เหมือนส่ง e1
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=30002,30002 [200 OK, 1.44kB, 70ms]
+  √  200 เหลือเฉพาะวิชาที่ไม่ได้ลบ
+
+→ IT-24 DELETE /entries?entryIds={e2}&entryIds={e3} → 200 เหมือน e2,e3
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=30003&entryIds=30004 [200 OK, 836B, 46ms]
+  √  200 เหลือเฉพาะวิชาที่ไม่ได้ลบ
+
+→ 04 Setup ผู้ใช้อีกคน POST CS111 030001 (entryC ชุดข้อมูล C)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 891B, 40ms]
+  √  201 มีวิชาในตาราง
+
+→ IT-25 ลบ entryC ของผู้ใช้อีกคน → 404
+  DELETE http://localhost:8080/api/timetable/entries/30006 [404 Not Found, 622B, 32ms]
+  √  404 ProblemDetail
+
+→ IT-25 GET timetable ของผู้ใช้อีกคน entryC ยังอยู่
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 886B, 24ms]
+  √  ตารางยังมี entryC ครบ 1 วิชา
+
+→ 05 Setup POST CS223 2568/2 (entryD2 ชุดข้อมูล D)
+  POST http://localhost:8080/api/timetable/entries [201 Created, 809B, 46ms]
+  √  201 มีวิชาในตาราง
+
+→ IT-26 ลบ e4 (2568/1) กับ entryD2 (2568/2) พร้อมกัน → 400
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=30005,30007 [400 Bad Request, 675B, 31ms]
+  √  400 ProblemDetail
+
+→ IT-26 GET timetable 2568/1 e4 ยังอยู่
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 836B, 36ms]
+  √  ตารางยังมี e4 ครบ 1 วิชา
+
+→ IT-26 GET timetable 2568/2 entryD2 ยังอยู่
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=2 [200 OK, 804B, 54ms]
+  √  ตารางยังมี entryD2 ครบ 1 วิชา
+
+→ IT-27 ลบ e4, entryD2 (คนละภาค) ปน entryC (ของคนอื่น) → 404
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=30005,30007,30006 [404 Not Found, 616B, 34ms]
+  √  404 ProblemDetail
+
+→ IT-27 GET timetable 2568/1 e4 ยังอยู่
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 836B, 24ms]
+  √  ตารางยังมี e4 ครบ 1 วิชา
+
+→ IT-27 GET timetable 2568/2 entryD2 ยังอยู่
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=2 [200 OK, 804B, 24ms]
+  √  ตารางยังมี entryD2 ครบ 1 วิชา
+
+→ IT-27 GET timetable ของผู้ใช้อีกคน entryC ยังอยู่
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 886B, 25ms]
+  √  ตารางยังมี entryC ครบ 1 วิชา
+
+→ IT-28 ลบ e1 ซ้ำ (ลบไปแล้วใน IT-23) → 404
+  DELETE http://localhost:8080/api/timetable/entries/30002 [404 Not Found, 622B, 16ms]
+  √  404 ProblemDetail
+
+→ IT-29 DELETE /entries/?entryIds={e4} (มี / ก่อน ?) → 404
+  DELETE http://localhost:8080/api/timetable/entries/?entryIds=30005 [404 Not Found, 562B, 35ms]
+  √  404 ไม่ถือเป็น path เดียวกับ /entries
+
+→ IT-29 GET timetable e4 ยังอยู่
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 836B, 29ms]
+  √  ตารางยังมี e4 ครบ 1 วิชา
+
+→ IT-30a ลบ entry สุดท้าย (e4) → 200 entries ว่าง
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=30005 [200 OK, 551B, 38ms]
+  √  200 entries: [] totalCredits: 0
+
+→ IT-30b GET timetable หลังลบจนว่าง
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 551B, 21ms]
+  √  200 entries: [] และ updatedAt ไม่เป็น null (แถว timetable ไม่ถูกลบ)
+
+→ 99a Cleanup ล้างตาราง 2568/2 ของผู้ใช้หลัก
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=2 [200 OK, 804B, 33ms]
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=30007 [200 OK, 551B, 46ms]
+  √  ล้างตารางเหลือ 0 วิชา
+
+→ 99b Cleanup ล้างตาราง 2568/1 ของผู้ใช้อีกคน
+  GET http://localhost:8080/api/timetable?academicYear=2568&semester=1 [200 OK, 886B, 21ms]
+  DELETE http://localhost:8080/api/timetable/entries?entryIds=30006 [200 OK, 551B, 38ms]
+  √  ล้างตารางเหลือ 0 วิชา
+
+┌─────────────────────────┬────────────────────┬───────────────────┐
+│                         │           executed │            failed │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│              iterations │                  1 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│                requests │                 39 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│            test-scripts │                 36 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│      prerequest-scripts │                  0 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│              assertions │                 36 │                 0 │
+├─────────────────────────┴────────────────────┴───────────────────┤
+│ total run duration: 8.9s                                         │
+├──────────────────────────────────────────────────────────────────┤
+│ total data received: 20.27kB (approx)                            │
+├──────────────────────────────────────────────────────────────────┤
+│ average response time: 152ms [min: 16ms, max: 2.8s, s.d.: 466ms] │
+└──────────────────────────────────────────────────────────────────┘
