@@ -1,0 +1,237 @@
+{
+  "id": "ST-US2-06",
+  "title": "ลบ Entry ID ที่ไม่มีอยู่จริง",
+  "startedAt": "2026-10-31T14:18:03.730Z",
+  "missingId": 130112,
+  "before": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:03Z",
+      "entryId": 30111,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:03Z",
+      "entryId": 30112,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:03Z",
+      "entryId": 30113,
+      "course": "CS111"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:17:16Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "response": {
+    "request": "DELETE /api/timetable/entries/130112",
+    "status": 404,
+    "contentType": "application/problem+json",
+    "body": {
+      "detail": "ไม่พบวิชาในตารางเรียนของคุณ: entryId 130112",
+      "instance": "/api/timetable/entries/130112",
+      "status": 404,
+      "title": "Not Found"
+    }
+  },
+  "afterApi": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:03Z",
+      "entryId": 30111,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:03Z",
+      "entryId": 30112,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:03Z",
+      "entryId": 30113,
+      "course": "CS111"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:17:16Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "backendSql": {
+    "deletes": [],
+    "updates": []
+  },
+  "uiTab2Before": {
+    "courses": [
+      "CS180",
+      "MA211",
+      "CS111"
+    ],
+    "checked": [
+      "MA211"
+    ],
+    "checkboxesDisabled": [
+      false,
+      false,
+      false
+    ],
+    "deleteButtonsDisabled": [
+      false,
+      false,
+      false
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก (1)",
+      "disabled": false
+    },
+    "deleteAll": {
+      "disabled": false
+    },
+    "emptyText": false,
+    "alerts": [],
+    "credits": "หน่วยกิต 9 / 22",
+    "summary": "วิชาในตารางเรียน: 3 วิชา (9.0 หน่วยกิต)",
+    "conflictBanner": false,
+    "gridHeaders": true
+  },
+  "uiTab2After": {
+    "courses": [
+      "MA211",
+      "CS111"
+    ],
+    "checked": [],
+    "checkboxesDisabled": [
+      false,
+      false
+    ],
+    "deleteButtonsDisabled": [
+      false,
+      false
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": false
+    },
+    "emptyText": false,
+    "alerts": [
+      "ตารางเรียนมีการเปลี่ยนแปลงจากที่อื่น กรุณาตรวจตารางล่าสุดแล้วเลือกวิชาที่จะลบอีกครั้ง"
+    ],
+    "credits": "หน่วยกิต 6 / 22",
+    "summary": "วิชาในตารางเรียน: 2 วิชา (6.0 หน่วยกิต)",
+    "conflictBanner": false,
+    "gridHeaders": true
+  },
+  "uiRequests": [
+    "DELETE /api/timetable/entries/30111",
+    "GET /api/timetable?academicYear=2568&semester=1"
+  ],
+  "afterUi": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:09Z",
+      "entryId": 30112,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:09Z",
+      "entryId": 30113,
+      "course": "CS111"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:17:16Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "checks": [
+    {
+      "label": "Entry ID 130112 ไม่มีใน DB ก่อนทดสอบ",
+      "pass": true,
+      "actual": 130112
+    },
+    {
+      "label": "HTTP 404 + ProblemDetail",
+      "pass": true,
+      "actual": "404 {\"detail\":\"ไม่พบวิชาในตารางเรียนของคุณ: entryId 130112\",\"instance\":\"/api/timetable/entries/130112\",\"status\":404,\"title\":\"Not Found\"}"
+    },
+    {
+      "label": "DB ไม่เปลี่ยน ไม่มี delete/update",
+      "pass": true,
+      "actual": {
+        "deletes": [],
+        "updates": []
+      }
+    },
+    {
+      "label": "UI ได้ HTTP 404 จากการลบรายการที่ไม่มีแล้ว",
+      "pass": true,
+      "actual": "404 /api/timetable/entries/30111"
+    },
+    {
+      "label": "UI แจ้งว่าตารางเรียนมีการเปลี่ยนแปลง",
+      "pass": true,
+      "actual": [
+        "ตารางเรียนมีการเปลี่ยนแปลงจากที่อื่น กรุณาตรวจตารางล่าสุดแล้วเลือกวิชาที่จะลบอีกครั้ง"
+      ]
+    },
+    {
+      "label": "UI ส่ง GET /api/timetable โหลดข้อมูลล่าสุด",
+      "pass": true,
+      "actual": [
+        "DELETE /api/timetable/entries/30111",
+        "GET /api/timetable?academicYear=2568&semester=1"
+      ]
+    },
+    {
+      "label": "รายการบนจอตรงกับ DB และ checkbox ถูกล้าง",
+      "pass": true,
+      "actual": {
+        "ui": [
+          "MA211",
+          "CS111"
+        ],
+        "db": [
+          "MA211",
+          "CS111"
+        ],
+        "checked": []
+      }
+    }
+  ]
+}
