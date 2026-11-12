@@ -1,0 +1,231 @@
+{
+  "id": "ST-US2-08",
+  "title": "ลบ Entry ID จากคนละตารางเรียน",
+  "startedAt": "2026-10-31T14:18:19.538Z",
+  "entryIds": {
+    "CS180 (1/2568)": 30118,
+    "CS111 (2/2568)": 30120
+  },
+  "before": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:19Z",
+      "entryId": 30118,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:19Z",
+      "entryId": 30119,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:18:19Z",
+      "entryId": 30120,
+      "course": "CS111"
+    }
+  ],
+  "response": {
+    "request": "DELETE /api/timetable/entries?entryIds=30118,30120",
+    "status": 400,
+    "contentType": "application/problem+json",
+    "body": {
+      "detail": "entryIds ต้องเป็นวิชาในตารางเดียวกัน (ปีการศึกษาและภาคเรียนเดียวกัน)",
+      "instance": "/api/timetable/entries",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  "after": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:19Z",
+      "entryId": 30118,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:19Z",
+      "entryId": 30119,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:18:19Z",
+      "entryId": 30120,
+      "course": "CS111"
+    }
+  ],
+  "backendSql": {
+    "deletes": [],
+    "updates": []
+  },
+  "getTerm1": {
+    "request": "GET /api/timetable?academicYear=2568&semester=1",
+    "status": 200,
+    "contentType": "application/json",
+    "body": {
+      "academicYear": 2568,
+      "semester": 1,
+      "entries": [
+        {
+          "entryId": 30118,
+          "courseCode": "CS180",
+          "courseName": "Introduction to User Interface and User Experience",
+          "category": "MAJOR",
+          "credits": 3,
+          "sectionId": 1,
+          "sectionNo": "820001",
+          "schedules": [
+            {
+              "dayOfWeek": "MONDAY",
+              "startTime": "13:30",
+              "endTime": "16:30",
+              "room": "LC5-S202"
+            }
+          ],
+          "conflictWith": []
+        },
+        {
+          "entryId": 30119,
+          "courseCode": "MA211",
+          "courseName": "Calculus 1",
+          "category": "MAJOR",
+          "credits": 3,
+          "sectionId": 2,
+          "sectionNo": "020001",
+          "schedules": [
+            {
+              "dayOfWeek": "TUESDAY",
+              "startTime": "09:30",
+              "endTime": "11:00",
+              "room": "SC-3015"
+            },
+            {
+              "dayOfWeek": "THURSDAY",
+              "startTime": "09:30",
+              "endTime": "11:00",
+              "room": "SC-3015"
+            }
+          ],
+          "conflictWith": []
+        }
+      ],
+      "totalCredits": 6,
+      "maxCredits": 22,
+      "conflicts": [],
+      "updatedAt": "2026-10-31T21:18:19+07:00"
+    }
+  },
+  "getTerm2": {
+    "request": "GET /api/timetable?academicYear=2568&semester=2",
+    "status": 200,
+    "contentType": "application/json",
+    "body": {
+      "academicYear": 2568,
+      "semester": 2,
+      "entries": [
+        {
+          "entryId": 30120,
+          "courseCode": "CS111",
+          "courseName": "Object-Oriented Concepts",
+          "category": "MAJOR",
+          "credits": 3,
+          "sectionId": 11,
+          "sectionNo": "030001",
+          "schedules": [
+            {
+              "dayOfWeek": "MONDAY",
+              "startTime": "09:30",
+              "endTime": "11:00",
+              "room": "LC3-121"
+            },
+            {
+              "dayOfWeek": "WEDNESDAY",
+              "startTime": "09:30",
+              "endTime": "11:00",
+              "room": "LC3-121"
+            }
+          ],
+          "conflictWith": []
+        }
+      ],
+      "totalCredits": 3,
+      "maxCredits": 22,
+      "conflicts": [],
+      "updatedAt": "2026-10-31T21:18:19+07:00"
+    }
+  },
+  "checks": [
+    {
+      "label": "ก่อนทดสอบ 2 รายการอยู่คนละ timetable_id",
+      "pass": true,
+      "actual": [
+        {
+          "timetableId": 10004,
+          "studentId": "6609000000",
+          "term": "1/2568",
+          "updatedAt": "2026-10-31T14:18:19Z",
+          "entryId": 30118,
+          "course": "CS180"
+        },
+        {
+          "timetableId": 10004,
+          "studentId": "6609000000",
+          "term": "1/2568",
+          "updatedAt": "2026-10-31T14:18:19Z",
+          "entryId": 30119,
+          "course": "MA211"
+        },
+        {
+          "timetableId": 20004,
+          "studentId": "6609000000",
+          "term": "2/2568",
+          "updatedAt": "2026-10-31T14:18:19Z",
+          "entryId": 30120,
+          "course": "CS111"
+        }
+      ]
+    },
+    {
+      "label": "HTTP 400 + ProblemDetail",
+      "pass": true,
+      "actual": "400 {\"detail\":\"entryIds ต้องเป็นวิชาในตารางเดียวกัน (ปีการศึกษาและภาคเรียนเดียวกัน)\",\"instance\":\"/api/timetable/entries\",\"status\":400,\"title\":\"Bad Request\"}"
+    },
+    {
+      "label": "ไม่มีรายการถูกลบจากทั้งสองตาราง updated_at ไม่เปลี่ยน",
+      "pass": true,
+      "actual": {
+        "1/2568": [
+          "CS180",
+          "MA211"
+        ],
+        "2/2568": [
+          "CS111"
+        ],
+        "sql": {
+          "deletes": [],
+          "updates": []
+        }
+      }
+    },
+    {
+      "label": "หน่วยกิตทั้งสองตารางเท่าเดิม (6 และ 3)",
+      "pass": true,
+      "actual": "6, 3"
+    }
+  ]
+}

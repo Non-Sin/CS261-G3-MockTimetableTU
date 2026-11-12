@@ -1,0 +1,187 @@
+{
+  "id": "ST-US2-10",
+  "title": "ลบรายวิชาสุดท้ายจนตารางว่าง",
+  "startedAt": "2026-10-31T14:18:26.321Z",
+  "before": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:26Z",
+      "entryId": 30124,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:18:22Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "uiDuring": {
+    "courses": [
+      "CS180"
+    ],
+    "checked": [],
+    "checkboxesDisabled": [
+      true
+    ],
+    "deleteButtonsDisabled": [
+      true
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": true
+    },
+    "emptyText": false,
+    "alerts": [],
+    "credits": "หน่วยกิต 3 / 22",
+    "summary": "วิชาในตารางเรียน: 1 วิชา (3.0 หน่วยกิต)",
+    "conflictBanner": false,
+    "gridHeaders": true
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "academicYear": 2568,
+      "semester": 1,
+      "entries": [],
+      "totalCredits": 0,
+      "maxCredits": 22,
+      "conflicts": [],
+      "updatedAt": "2026-10-31T21:18:30+07:00"
+    }
+  },
+  "after": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:30Z",
+      "entryId": null,
+      "course": null
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:18:22Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "uiAfter": {
+    "courses": [],
+    "checked": [],
+    "checkboxesDisabled": [],
+    "deleteButtonsDisabled": [],
+    "deleteSelected": {
+      "text": "ลบที่เลือก",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": true
+    },
+    "emptyText": true,
+    "alerts": [],
+    "credits": "หน่วยกิต 0 / 22",
+    "summary": "วิชาในตารางเรียน: 0 วิชา (0.0 หน่วยกิต)",
+    "conflictBanner": false,
+    "gridHeaders": true
+  },
+  "checks": [
+    {
+      "label": "ระหว่างรอ ปุ่มลบถูกปิด",
+      "pass": true,
+      "actual": {
+        "courses": [
+          "CS180"
+        ],
+        "checked": [],
+        "checkboxesDisabled": [
+          true
+        ],
+        "deleteButtonsDisabled": [
+          true
+        ],
+        "deleteSelected": {
+          "text": "ลบที่เลือก",
+          "disabled": true
+        },
+        "deleteAll": {
+          "disabled": true
+        },
+        "emptyText": false,
+        "alerts": [],
+        "credits": "หน่วยกิต 3 / 22",
+        "summary": "วิชาในตารางเรียน: 1 วิชา (3.0 หน่วยกิต)",
+        "conflictBanner": false,
+        "gridHeaders": true
+      }
+    },
+    {
+      "label": "HTTP 200 entries=[] totalCredits=0 conflicts=[]",
+      "pass": true,
+      "actual": {
+        "academicYear": 2568,
+        "semester": 1,
+        "entries": [],
+        "totalCredits": 0,
+        "maxCredits": 22,
+        "conflicts": [],
+        "updatedAt": "2026-10-31T21:18:30+07:00"
+      }
+    },
+    {
+      "label": "updatedAt ใน response ไม่เป็น null และ updated_at ใน DB เปลี่ยน",
+      "pass": true,
+      "actual": "2026-10-31T14:18:26Z → 2026-10-31T14:18:30Z (response 2026-10-31T21:18:30+07:00)"
+    },
+    {
+      "label": "แถว timetable 1/2568 ยังอยู่ใน DB แต่ไม่มี entry",
+      "pass": true,
+      "actual": [
+        {
+          "timetableId": 10004,
+          "studentId": "6609000000",
+          "term": "1/2568",
+          "updatedAt": "2026-10-31T14:18:30Z",
+          "entryId": null,
+          "course": null
+        }
+      ]
+    },
+    {
+      "label": "UI แสดงตารางว่าง ยังมีหัววัน หน่วยกิต 0 / 22",
+      "pass": true,
+      "actual": {
+        "empty": true,
+        "headers": true,
+        "credits": "หน่วยกิต 0 / 22"
+      }
+    },
+    {
+      "label": "ปุ่ม ลบที่เลือก / ลบทั้งหมด ถูกปิด",
+      "pass": true,
+      "actual": {
+        "deleteSelected": {
+          "text": "ลบที่เลือก",
+          "disabled": true
+        },
+        "deleteAll": {
+          "disabled": true
+        }
+      }
+    },
+    {
+      "label": "ไม่มี error (สถานะกลับเป็น idle)",
+      "pass": true,
+      "actual": []
+    }
+  ]
+}

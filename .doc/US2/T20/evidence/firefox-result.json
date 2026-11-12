@@ -1,0 +1,154 @@
+{
+  "browser": "firefox",
+  "version": "firefox/159.0",
+  "user": "6609000001",
+  "results": {
+    "UAT-US2-01": [
+      {
+        "step": 1,
+        "expected": "เห็น 3 วิชาบนตาราง",
+        "actual": "ตาราง: CS111 Sec 030001 พฤหัสบดี 11:00-12:30 LC3-121 | CS111 Sec 030001 อังคาร 11:00-12:30 LC3-121 | CS180 Sec 820001 จันทร์ 13:30-16:30 LC5-S202 | MA211 Sec 020001 พฤหัสบดี 09:30-11:00 SC-3015 | MA211 Sec 020001 อังคาร 09:30-11:00 SC-3015 · หน่วยกิต 9 / 22",
+        "pass": true,
+        "shot": "firefox-uat01-1-before.png"
+      },
+      {
+        "step": 2,
+        "expected": "กดลบ CS180",
+        "actual": "กดปุ่ม \"ลบวิชา\" ของ CS180",
+        "pass": true,
+        "shot": null
+      },
+      {
+        "step": 3,
+        "expected": "CS180 หายทันที ไม่มี error",
+        "actual": "รายการ: MA211, CS111 · ไม่มี CS180 ในตาราง: true · alert: ไม่มี",
+        "pass": true,
+        "shot": "firefox-uat01-3-after-delete.png"
+      },
+      {
+        "step": 4,
+        "expected": "MA211, CS111 วัน เวลา Sec เดิม",
+        "actual": "ก่อน: CS111 Sec 030001 พฤหัสบดี 11:00-12:30 LC3-121 | CS111 Sec 030001 อังคาร 11:00-12:30 LC3-121 | MA211 Sec 020001 พฤหัสบดี 09:30-11:00 SC-3015 | MA211 Sec 020001 อังคาร 09:30-11:00 SC-3015 · หลังรีโหลด: CS111 Sec 030001 พฤหัสบดี 11:00-12:30 LC3-121 | CS111 Sec 030001 อังคาร 11:00-12:30 LC3-121 | MA211 Sec 020001 พฤหัสบดี 09:30-11:00 SC-3015 | MA211 Sec 020001 อังคาร 09:30-11:00 SC-3015 · หน่วยกิต 6 / 22",
+        "pass": true,
+        "shot": "firefox-uat01-4-after-reload.png"
+      }
+    ],
+    "UAT-US2-02": [
+      {
+        "step": 1,
+        "expected": "เห็น 3 วิชาบนตาราง",
+        "actual": "ตาราง: CS111 Sec 030001 พฤหัสบดี 11:00-12:30 LC3-121 | CS111 Sec 030001 อังคาร 11:00-12:30 LC3-121 | CS180 Sec 820001 จันทร์ 13:30-16:30 LC5-S202 | MA211 Sec 020001 พฤหัสบดี 09:30-11:00 SC-3015 | MA211 Sec 020001 อังคาร 09:30-11:00 SC-3015",
+        "pass": true,
+        "shot": "firefox-uat02-1-before.png"
+      },
+      {
+        "step": 2,
+        "expected": "กดลบ CS180 และ MA211 ตามลำดับ",
+        "actual": "กด \"ลบวิชา\" CS180 แล้ว MA211",
+        "pass": true,
+        "shot": null
+      },
+      {
+        "step": 3,
+        "expected": "CS180 และ MA211 หายทั้งหมด ไม่มี error",
+        "actual": "รายการ: CS111 · alert: ไม่มี",
+        "pass": true,
+        "shot": "firefox-uat02-3-after-delete.png"
+      },
+      {
+        "step": 4,
+        "expected": "CS111 ยังอยู่วันเวลาเดิม",
+        "actual": "ก่อน: CS111 Sec 030001 พฤหัสบดี 11:00-12:30 LC3-121 | CS111 Sec 030001 อังคาร 11:00-12:30 LC3-121 · หลังรีโหลด: CS111 Sec 030001 พฤหัสบดี 11:00-12:30 LC3-121 | CS111 Sec 030001 อังคาร 11:00-12:30 LC3-121 · หน่วยกิต 3 / 22",
+        "pass": true,
+        "shot": "firefox-uat02-4-after-reload.png"
+      }
+    ],
+    "UAT-US2-03": [
+      {
+        "step": 1,
+        "expected": "ลบทุกวิชาจนหมด",
+        "actual": "กด \"ลบวิชา\" ทีละวิชา CS180, MA211, CS111 · เหลือ 0 วิชา",
+        "pass": true,
+        "shot": null
+      },
+      {
+        "step": 2,
+        "expected": "ตารางเปล่า แสดงหัววันและเวลา",
+        "actual": "บล็อกวิชา 0 · แถววัน 6 · หัวเวลา 13 ช่อง · หน่วยกิต 0 / 22",
+        "pass": true,
+        "shot": "firefox-uat03-2-empty.png"
+      },
+      {
+        "step": 3,
+        "expected": "ไม่ค้าง ไม่มี error ค้นหาและเพิ่มวิชาใหม่ได้",
+        "actual": "ค้นหา CS180 แล้วกด \"+ เพิ่มวิชา\" ได้ ตาราง: CS180 Sec 820001 จันทร์ 13:30-16:30 LC5-S202 · alert: ไม่มี",
+        "pass": true,
+        "shot": "firefox-uat03-3-add-again.png"
+      }
+    ],
+    "UAT-US2-04": [
+      {
+        "step": 1,
+        "expected": "เปิดตารางเปล่า",
+        "actual": "บล็อกวิชา 0 · รายการ \"ยังไม่มีวิชาในตาราง\" · หน่วยกิต 0 / 22",
+        "pass": true,
+        "shot": "firefox-uat04-1-empty.png"
+      },
+      {
+        "step": 2,
+        "expected": "ตรวจปุ่มลบ",
+        "actual": "\"ลบวิชา\" 0 ปุ่ม · \"ลบที่เลือก\" disabled · \"ลบทั้งหมด\" disabled",
+        "pass": true,
+        "shot": null
+      },
+      {
+        "step": 3,
+        "expected": "ปุ่มลบ disabled / ซ่อน กดไม่ได้ ไม่มี error",
+        "actual": "ลองคลิกทั้ง 2 ปุ่ม: ไม่มีคำขอ DELETE (0 ครั้ง) · กล่องยืนยัน: ไม่ขึ้น · alert: ไม่มี",
+        "pass": true,
+        "shot": "firefox-uat04-3-buttons-disabled.png"
+      }
+    ]
+  },
+  "consoleErrors": [],
+  "deleteCalls": [
+    {
+      "at": "UAT-US2-01",
+      "url": "/api/timetable/entries/30142",
+      "status": 200
+    },
+    {
+      "at": "UAT-US2-02",
+      "url": "/api/timetable/entries/30145",
+      "status": 200
+    },
+    {
+      "at": "UAT-US2-02",
+      "url": "/api/timetable/entries/30143",
+      "status": 200
+    },
+    {
+      "at": "UAT-US2-03",
+      "url": "/api/timetable/entries/30144",
+      "status": 200
+    },
+    {
+      "at": "UAT-US2-03",
+      "url": "/api/timetable/entries/30146",
+      "status": 200
+    },
+    {
+      "at": "UAT-US2-03",
+      "url": "/api/timetable/entries/30147",
+      "status": 200
+    },
+    {
+      "at": "UAT-US2-04",
+      "url": "/api/timetable/entries/30148",
+      "status": 200
+    }
+  ],
+  "log": [
+    "login 6609000001 -> http://localhost:3000/"
+  ]
+}

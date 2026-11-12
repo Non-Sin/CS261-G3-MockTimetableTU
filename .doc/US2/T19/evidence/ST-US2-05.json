@@ -1,0 +1,95 @@
+{
+  "id": "ST-US2-05",
+  "title": "ส่งรายการ Entry ID ว่าง",
+  "startedAt": "2026-10-31T14:18:01.327Z",
+  "before": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:01Z",
+      "entryId": 30109,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:01Z",
+      "entryId": 30110,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:17:16Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "response": {
+    "request": "DELETE /api/timetable/entries?entryIds=",
+    "status": 400,
+    "contentType": "application/problem+json",
+    "body": {
+      "detail": "ต้องระบุ entryIds อย่างน้อย 1 ตัว",
+      "instance": "/api/timetable/entries",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  "after": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:01Z",
+      "entryId": 30109,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:01Z",
+      "entryId": 30110,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:17:16Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "backendSql": {
+    "deletes": [],
+    "updates": []
+  },
+  "checks": [
+    {
+      "label": "HTTP 400 + ProblemDetail",
+      "pass": true,
+      "actual": "400 application/problem+json {\"detail\":\"ต้องระบุ entryIds อย่างน้อย 1 ตัว\",\"instance\":\"/api/timetable/entries\",\"status\":400,\"title\":\"Bad Request\"}"
+    },
+    {
+      "label": "backend ไม่รัน delete/update ใน DB",
+      "pass": true,
+      "actual": {
+        "deletes": [],
+        "updates": []
+      }
+    },
+    {
+      "label": "ข้อมูลตารางเรียนใน DB เหมือนเดิมทุกแถว (รวม updated_at)",
+      "pass": true,
+      "actual": [
+        "CS180",
+        "MA211"
+      ]
+    }
+  ]
+}

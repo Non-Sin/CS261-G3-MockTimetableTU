@@ -1,0 +1,209 @@
+{
+  "id": "ST-US2-11",
+  "title": "ลบทีละวิชาต่อเนื่อง 2 รายการ",
+  "startedAt": "2026-10-31T14:18:32.077Z",
+  "entryIds": {
+    "CS180": 30125,
+    "MA211": 30126,
+    "CS111": 30127
+  },
+  "before": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:32Z",
+      "entryId": 30125,
+      "course": "CS180"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:32Z",
+      "entryId": 30126,
+      "course": "MA211"
+    },
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:32Z",
+      "entryId": 30127,
+      "course": "CS111"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:18:22Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "uiBefore": {
+    "courses": [
+      "CS180",
+      "MA211",
+      "CS111"
+    ],
+    "checked": [],
+    "checkboxesDisabled": [
+      false,
+      false,
+      false
+    ],
+    "deleteButtonsDisabled": [
+      false,
+      false,
+      false
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": false
+    },
+    "emptyText": false,
+    "alerts": [],
+    "credits": "หน่วยกิต 9 / 22",
+    "summary": "วิชาในตารางเรียน: 3 วิชา (9.0 หน่วยกิต)",
+    "conflictBanner": false,
+    "gridHeaders": true
+  },
+  "uiAfter1": {
+    "courses": [
+      "MA211",
+      "CS111"
+    ],
+    "checked": [],
+    "checkboxesDisabled": [
+      false,
+      false
+    ],
+    "deleteButtonsDisabled": [
+      false,
+      false
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": false
+    },
+    "emptyText": false,
+    "alerts": [],
+    "credits": "หน่วยกิต 6 / 22",
+    "summary": "วิชาในตารางเรียน: 2 วิชา (6.0 หน่วยกิต)",
+    "conflictBanner": false,
+    "gridHeaders": true
+  },
+  "uiAfter2": {
+    "courses": [
+      "CS111"
+    ],
+    "checked": [],
+    "checkboxesDisabled": [
+      false
+    ],
+    "deleteButtonsDisabled": [
+      false
+    ],
+    "deleteSelected": {
+      "text": "ลบที่เลือก",
+      "disabled": true
+    },
+    "deleteAll": {
+      "disabled": false
+    },
+    "emptyText": false,
+    "alerts": [],
+    "credits": "หน่วยกิต 3 / 22",
+    "summary": "วิชาในตารางเรียน: 1 วิชา (3.0 หน่วยกิต)",
+    "conflictBanner": false,
+    "gridHeaders": true
+  },
+  "deleteRequests": [
+    "/api/timetable/entries/30125",
+    "/api/timetable/entries/30126"
+  ],
+  "after": [
+    {
+      "timetableId": 10004,
+      "studentId": "6609000000",
+      "term": "1/2568",
+      "updatedAt": "2026-10-31T14:18:36Z",
+      "entryId": 30127,
+      "course": "CS111"
+    },
+    {
+      "timetableId": 20004,
+      "studentId": "6609000000",
+      "term": "2/2568",
+      "updatedAt": "2026-10-31T14:18:22Z",
+      "entryId": null,
+      "course": null
+    }
+  ],
+  "checks": [
+    {
+      "label": "ส่ง DELETE แยก 2 ครั้ง /entries/{id} ได้ 200 ทั้งคู่",
+      "pass": true,
+      "actual": {
+        "deletes": [
+          "/api/timetable/entries/30125",
+          "/api/timetable/entries/30126"
+        ],
+        "status": [
+          200,
+          200
+        ]
+      }
+    },
+    {
+      "label": "หลังลบ CS180: response และจอเหลือ MA211, CS111 หน่วยกิต 6",
+      "pass": true,
+      "actual": {
+        "response": [
+          "MA211",
+          "CS111"
+        ],
+        "ui": [
+          "MA211",
+          "CS111"
+        ],
+        "credits": "หน่วยกิต 6 / 22"
+      }
+    },
+    {
+      "label": "หลังลบ MA211: response และจอเหลือ CS111 หน่วยกิต 3",
+      "pass": true,
+      "actual": {
+        "response": [
+          "CS111"
+        ],
+        "ui": [
+          "CS111"
+        ],
+        "credits": "หน่วยกิต 3 / 22"
+      }
+    },
+    {
+      "label": "DB เหลือ CS111 เท่านั้น",
+      "pass": true,
+      "actual": [
+        "CS111"
+      ]
+    },
+    {
+      "label": "ไม่มี error และกลับเป็น idle หลังแต่ละคำขอ",
+      "pass": true,
+      "actual": {
+        "alerts1": [],
+        "alerts2": []
+      }
+    }
+  ]
+}

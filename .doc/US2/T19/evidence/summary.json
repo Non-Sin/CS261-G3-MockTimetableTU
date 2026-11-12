@@ -1,0 +1,617 @@
+[
+  {
+    "id": "ST-US2-01",
+    "title": "ลบรายวิชาเดียวสำเร็จ",
+    "pass": true,
+    "checks": [
+      {
+        "label": "UI ส่ง DELETE /api/timetable/entries/{entryId ของ CS180}",
+        "pass": true,
+        "actual": "DELETE /api/timetable/entries/30098"
+      },
+      {
+        "label": "HTTP 200 + TimetableResponse",
+        "pass": true,
+        "actual": "200 keys=academicYear,semester,entries,totalCredits,maxCredits,conflicts,updatedAt"
+      },
+      {
+        "label": "entry ของ CS180 ถูกลบจาก DB",
+        "pass": true,
+        "actual": "entry 30098 exists=false"
+      },
+      {
+        "label": "MA211, CS111 ยังอยู่ใน DB",
+        "pass": true,
+        "actual": [
+          "MA211",
+          "CS111"
+        ]
+      },
+      {
+        "label": "updated_at ใน DB เปลี่ยน และ response มี updatedAt",
+        "pass": true,
+        "actual": "2026-10-31T14:17:43Z → 2026-10-31T14:17:47Z (response 2026-10-31T21:17:47+07:00)"
+      },
+      {
+        "label": "หน้าเว็บแสดง MA211, CS111 และหน่วยกิต 6 / 22",
+        "pass": true,
+        "actual": "MA211,CS111 | หน่วยกิต 6 / 22"
+      },
+      {
+        "label": "ระหว่างรอ ปุ่มลบถูกปิด (deleting)",
+        "pass": true,
+        "actual": [
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "label": "หลังลบ checkbox ว่าง ปุ่มลบกดได้ (idle) ไม่มี error",
+        "pass": true,
+        "actual": {
+          "checked": [],
+          "deleteDisabled": [
+            false,
+            false
+          ],
+          "alerts": []
+        }
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-02",
+    "title": "ลบหลายรายวิชาสำเร็จ",
+    "pass": true,
+    "checks": [
+      {
+        "label": "UI ส่ง DELETE ?entryIds= ของ TU109, CS180 ในคำขอเดียว",
+        "pass": true,
+        "actual": "DELETE /api/timetable/entries?entryIds=30102,30103"
+      },
+      {
+        "label": "ระหว่างประมวลผล ปุ่มลบ/ลบที่เลือก/checkbox ถูกปิด",
+        "pass": true,
+        "actual": {
+          "deleteSelected": {
+            "text": "ลบที่เลือก (2)",
+            "disabled": true
+          },
+          "deleteButtons": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "checkboxes": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      {
+        "label": "HTTP 200 + TimetableResponse",
+        "pass": true,
+        "actual": 200
+      },
+      {
+        "label": "TU109, CS180 ถูกลบจาก DB",
+        "pass": true,
+        "actual": [
+          "LAS101",
+          "MA211"
+        ]
+      },
+      {
+        "label": "LAS101, MA211 ยังอยู่",
+        "pass": true,
+        "actual": [
+          "LAS101",
+          "MA211"
+        ]
+      },
+      {
+        "label": "updated_at เปลี่ยน",
+        "pass": true,
+        "actual": "2026-10-31T14:17:49Z → 2026-10-31T14:17:54Z"
+      },
+      {
+        "label": "เวลาชนคำนวณใหม่: ก่อนลบมีแถบเตือน หลังลบ conflicts=[] และแถบเตือนหาย",
+        "pass": true,
+        "actual": {
+          "bannerBefore": true,
+          "conflicts": [],
+          "bannerAfter": false
+        }
+      },
+      {
+        "label": "หน้าเว็บแสดง LAS101, MA211 และหน่วยกิต 6 / 22",
+        "pass": true,
+        "actual": "LAS101,MA211 | หน่วยกิต 6 / 22"
+      },
+      {
+        "label": "checkbox ถูกล้าง สถานะกลับเป็น idle",
+        "pass": true,
+        "actual": {
+          "checked": [],
+          "alerts": []
+        }
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-03",
+    "title": "ส่ง Entry ID ที่ไม่ใช่ตัวเลข",
+    "pass": true,
+    "checks": [
+      {
+        "label": "HTTP 400 + ProblemDetail",
+        "pass": true,
+        "actual": "400 application/problem+json {\"detail\":\"Failed to convert 'entryId' with value: 'abc'\",\"instance\":\"/api/timetable/entries/abc\",\"status\":400,\"title\":\"Bad Request\"}"
+      },
+      {
+        "label": "backend ไม่รัน delete/update ใน DB",
+        "pass": true,
+        "actual": {
+          "deletes": [],
+          "updates": []
+        }
+      },
+      {
+        "label": "ข้อมูลตารางเรียนใน DB เหมือนเดิมทุกแถว (รวม updated_at)",
+        "pass": true,
+        "actual": [
+          "CS180",
+          "MA211"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-04",
+    "title": "ไม่ส่ง Entry ID",
+    "pass": true,
+    "checks": [
+      {
+        "label": "HTTP 400 + ProblemDetail",
+        "pass": true,
+        "actual": "400 application/problem+json {\"detail\":\"Required parameter 'entryIds' is not present.\",\"instance\":\"/api/timetable/entries\",\"status\":400,\"title\":\"Bad Request\"}"
+      },
+      {
+        "label": "backend ไม่รัน delete/update ใน DB",
+        "pass": true,
+        "actual": {
+          "deletes": [],
+          "updates": []
+        }
+      },
+      {
+        "label": "ข้อมูลตารางเรียนใน DB เหมือนเดิมทุกแถว (รวม updated_at)",
+        "pass": true,
+        "actual": [
+          "CS180",
+          "MA211"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-05",
+    "title": "ส่งรายการ Entry ID ว่าง",
+    "pass": true,
+    "checks": [
+      {
+        "label": "HTTP 400 + ProblemDetail",
+        "pass": true,
+        "actual": "400 application/problem+json {\"detail\":\"ต้องระบุ entryIds อย่างน้อย 1 ตัว\",\"instance\":\"/api/timetable/entries\",\"status\":400,\"title\":\"Bad Request\"}"
+      },
+      {
+        "label": "backend ไม่รัน delete/update ใน DB",
+        "pass": true,
+        "actual": {
+          "deletes": [],
+          "updates": []
+        }
+      },
+      {
+        "label": "ข้อมูลตารางเรียนใน DB เหมือนเดิมทุกแถว (รวม updated_at)",
+        "pass": true,
+        "actual": [
+          "CS180",
+          "MA211"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-06",
+    "title": "ลบ Entry ID ที่ไม่มีอยู่จริง",
+    "pass": true,
+    "checks": [
+      {
+        "label": "Entry ID 130112 ไม่มีใน DB ก่อนทดสอบ",
+        "pass": true,
+        "actual": 130112
+      },
+      {
+        "label": "HTTP 404 + ProblemDetail",
+        "pass": true,
+        "actual": "404 {\"detail\":\"ไม่พบวิชาในตารางเรียนของคุณ: entryId 130112\",\"instance\":\"/api/timetable/entries/130112\",\"status\":404,\"title\":\"Not Found\"}"
+      },
+      {
+        "label": "DB ไม่เปลี่ยน ไม่มี delete/update",
+        "pass": true,
+        "actual": {
+          "deletes": [],
+          "updates": []
+        }
+      },
+      {
+        "label": "UI ได้ HTTP 404 จากการลบรายการที่ไม่มีแล้ว",
+        "pass": true,
+        "actual": "404 /api/timetable/entries/30111"
+      },
+      {
+        "label": "UI แจ้งว่าตารางเรียนมีการเปลี่ยนแปลง",
+        "pass": true,
+        "actual": [
+          "ตารางเรียนมีการเปลี่ยนแปลงจากที่อื่น กรุณาตรวจตารางล่าสุดแล้วเลือกวิชาที่จะลบอีกครั้ง"
+        ]
+      },
+      {
+        "label": "UI ส่ง GET /api/timetable โหลดข้อมูลล่าสุด",
+        "pass": true,
+        "actual": [
+          "DELETE /api/timetable/entries/30111",
+          "GET /api/timetable?academicYear=2568&semester=1"
+        ]
+      },
+      {
+        "label": "รายการบนจอตรงกับ DB และ checkbox ถูกล้าง",
+        "pass": true,
+        "actual": {
+          "ui": [
+            "MA211",
+            "CS111"
+          ],
+          "db": [
+            "MA211",
+            "CS111"
+          ],
+          "checked": []
+        }
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-07",
+    "title": "ลบ Entry ID ของนักศึกษาคนอื่น",
+    "pass": true,
+    "checks": [
+      {
+        "label": "HTTP 404 + ProblemDetail",
+        "pass": true,
+        "actual": "404 {\"detail\":\"ไม่พบวิชาในตารางเรียนของคุณ: entryId 30116\",\"instance\":\"/api/timetable/entries/30116\",\"status\":404,\"title\":\"Not Found\"}"
+      },
+      {
+        "label": "entry ของ B ยังอยู่ ข้อมูล A และ B ไม่เปลี่ยน (รวม updated_at)",
+        "pass": true,
+        "actual": {
+          "A": [
+            "CS180",
+            "MA211"
+          ],
+          "B": [
+            "CS111",
+            "LAS101"
+          ]
+        }
+      },
+      {
+        "label": "Response ไม่เปิดเผยข้อมูลของ B (รหัสนักศึกษา วิชา section)",
+        "pass": true,
+        "actual": "{\"detail\":\"ไม่พบวิชาในตารางเรียนของคุณ: entryId 30116\",\"instance\":\"/api/timetable/entries/30116\",\"status\":404,\"title\":\"Not Found\"}"
+      },
+      {
+        "label": "UI ได้ HTTP 404",
+        "pass": true,
+        "actual": "404 /api/timetable/entries/30114"
+      },
+      {
+        "label": "UI แจ้งว่าตารางเปลี่ยน และโหลดตารางของ A ใหม่",
+        "pass": true,
+        "actual": {
+          "alerts": [
+            "ตารางเรียนมีการเปลี่ยนแปลงจากที่อื่น กรุณาตรวจตารางล่าสุดแล้วเลือกวิชาที่จะลบอีกครั้ง"
+          ],
+          "requests": [
+            "DELETE /api/timetable/entries/30114",
+            "GET /api/timetable?academicYear=2568&semester=1"
+          ]
+        }
+      },
+      {
+        "label": "จอแสดงตารางของ A (CS180, MA211) ไม่มีวิชาของ B และ checkbox ถูกล้าง",
+        "pass": true,
+        "actual": {
+          "courses": [
+            "CS180",
+            "MA211"
+          ],
+          "checked": []
+        }
+      },
+      {
+        "label": "หลังทดสอบ UI ข้อมูล A และ B ใน DB ยังเหมือนเดิม",
+        "pass": true,
+        "actual": ""
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-08",
+    "title": "ลบ Entry ID จากคนละตารางเรียน",
+    "pass": true,
+    "checks": [
+      {
+        "label": "ก่อนทดสอบ 2 รายการอยู่คนละ timetable_id",
+        "pass": true,
+        "actual": [
+          {
+            "timetableId": 10004,
+            "studentId": "6609000000",
+            "term": "1/2568",
+            "updatedAt": "2026-10-31T14:18:19Z",
+            "entryId": 30118,
+            "course": "CS180"
+          },
+          {
+            "timetableId": 10004,
+            "studentId": "6609000000",
+            "term": "1/2568",
+            "updatedAt": "2026-10-31T14:18:19Z",
+            "entryId": 30119,
+            "course": "MA211"
+          },
+          {
+            "timetableId": 20004,
+            "studentId": "6609000000",
+            "term": "2/2568",
+            "updatedAt": "2026-10-31T14:18:19Z",
+            "entryId": 30120,
+            "course": "CS111"
+          }
+        ]
+      },
+      {
+        "label": "HTTP 400 + ProblemDetail",
+        "pass": true,
+        "actual": "400 {\"detail\":\"entryIds ต้องเป็นวิชาในตารางเดียวกัน (ปีการศึกษาและภาคเรียนเดียวกัน)\",\"instance\":\"/api/timetable/entries\",\"status\":400,\"title\":\"Bad Request\"}"
+      },
+      {
+        "label": "ไม่มีรายการถูกลบจากทั้งสองตาราง updated_at ไม่เปลี่ยน",
+        "pass": true,
+        "actual": {
+          "1/2568": [
+            "CS180",
+            "MA211"
+          ],
+          "2/2568": [
+            "CS111"
+          ],
+          "sql": {
+            "deletes": [],
+            "updates": []
+          }
+        }
+      },
+      {
+        "label": "หน่วยกิตทั้งสองตารางเท่าเดิม (6 และ 3)",
+        "pass": true,
+        "actual": "6, 3"
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-09",
+    "title": "ส่ง Entry ID ซ้ำกัน",
+    "pass": true,
+    "checks": [
+      {
+        "label": "HTTP 200 + TimetableResponse",
+        "pass": true,
+        "actual": "200 DELETE /api/timetable/entries?entryIds=30121,30121"
+      },
+      {
+        "label": "CS180 ถูกลบ MA211, CS111 ยังอยู่",
+        "pass": true,
+        "actual": [
+          "MA211",
+          "CS111"
+        ]
+      },
+      {
+        "label": "response ตรงกับรายวิชาที่เหลือ และ updatedAt เปลี่ยน",
+        "pass": true,
+        "actual": {
+          "entries": [
+            "MA211",
+            "CS111"
+          ],
+          "totalCredits": 6,
+          "updatedAt": "2026-10-31T21:18:23+07:00"
+        }
+      },
+      {
+        "label": "หน้าเว็บแสดงตารางใหม่ ไม่มี checkbox ค้าง",
+        "pass": true,
+        "actual": [
+          "MA211",
+          "CS111"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-10",
+    "title": "ลบรายวิชาสุดท้ายจนตารางว่าง",
+    "pass": true,
+    "checks": [
+      {
+        "label": "ระหว่างรอ ปุ่มลบถูกปิด",
+        "pass": true,
+        "actual": {
+          "courses": [
+            "CS180"
+          ],
+          "checked": [],
+          "checkboxesDisabled": [
+            true
+          ],
+          "deleteButtonsDisabled": [
+            true
+          ],
+          "deleteSelected": {
+            "text": "ลบที่เลือก",
+            "disabled": true
+          },
+          "deleteAll": {
+            "disabled": true
+          },
+          "emptyText": false,
+          "alerts": [],
+          "credits": "หน่วยกิต 3 / 22",
+          "summary": "วิชาในตารางเรียน: 1 วิชา (3.0 หน่วยกิต)",
+          "conflictBanner": false,
+          "gridHeaders": true
+        }
+      },
+      {
+        "label": "HTTP 200 entries=[] totalCredits=0 conflicts=[]",
+        "pass": true,
+        "actual": {
+          "academicYear": 2568,
+          "semester": 1,
+          "entries": [],
+          "totalCredits": 0,
+          "maxCredits": 22,
+          "conflicts": [],
+          "updatedAt": "2026-10-31T21:18:30+07:00"
+        }
+      },
+      {
+        "label": "updatedAt ใน response ไม่เป็น null และ updated_at ใน DB เปลี่ยน",
+        "pass": true,
+        "actual": "2026-10-31T14:18:26Z → 2026-10-31T14:18:30Z (response 2026-10-31T21:18:30+07:00)"
+      },
+      {
+        "label": "แถว timetable 1/2568 ยังอยู่ใน DB แต่ไม่มี entry",
+        "pass": true,
+        "actual": [
+          {
+            "timetableId": 10004,
+            "studentId": "6609000000",
+            "term": "1/2568",
+            "updatedAt": "2026-10-31T14:18:30Z",
+            "entryId": null,
+            "course": null
+          }
+        ]
+      },
+      {
+        "label": "UI แสดงตารางว่าง ยังมีหัววัน หน่วยกิต 0 / 22",
+        "pass": true,
+        "actual": {
+          "empty": true,
+          "headers": true,
+          "credits": "หน่วยกิต 0 / 22"
+        }
+      },
+      {
+        "label": "ปุ่ม ลบที่เลือก / ลบทั้งหมด ถูกปิด",
+        "pass": true,
+        "actual": {
+          "deleteSelected": {
+            "text": "ลบที่เลือก",
+            "disabled": true
+          },
+          "deleteAll": {
+            "disabled": true
+          }
+        }
+      },
+      {
+        "label": "ไม่มี error (สถานะกลับเป็น idle)",
+        "pass": true,
+        "actual": []
+      }
+    ]
+  },
+  {
+    "id": "ST-US2-11",
+    "title": "ลบทีละวิชาต่อเนื่อง 2 รายการ",
+    "pass": true,
+    "checks": [
+      {
+        "label": "ส่ง DELETE แยก 2 ครั้ง /entries/{id} ได้ 200 ทั้งคู่",
+        "pass": true,
+        "actual": {
+          "deletes": [
+            "/api/timetable/entries/30125",
+            "/api/timetable/entries/30126"
+          ],
+          "status": [
+            200,
+            200
+          ]
+        }
+      },
+      {
+        "label": "หลังลบ CS180: response และจอเหลือ MA211, CS111 หน่วยกิต 6",
+        "pass": true,
+        "actual": {
+          "response": [
+            "MA211",
+            "CS111"
+          ],
+          "ui": [
+            "MA211",
+            "CS111"
+          ],
+          "credits": "หน่วยกิต 6 / 22"
+        }
+      },
+      {
+        "label": "หลังลบ MA211: response และจอเหลือ CS111 หน่วยกิต 3",
+        "pass": true,
+        "actual": {
+          "response": [
+            "CS111"
+          ],
+          "ui": [
+            "CS111"
+          ],
+          "credits": "หน่วยกิต 3 / 22"
+        }
+      },
+      {
+        "label": "DB เหลือ CS111 เท่านั้น",
+        "pass": true,
+        "actual": [
+          "CS111"
+        ]
+      },
+      {
+        "label": "ไม่มี error และกลับเป็น idle หลังแต่ละคำขอ",
+        "pass": true,
+        "actual": {
+          "alerts1": [],
+          "alerts2": []
+        }
+      }
+    ]
+  }
+]
