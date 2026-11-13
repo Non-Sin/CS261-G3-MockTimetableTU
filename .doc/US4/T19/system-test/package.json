@@ -1,0 +1,14 @@
+{
+  "name": "us4-t19-system-test",
+  "private": true,
+  "type": "module",
+  "description": "System Test ของ US4 ตาม US4-T15: Puppeteer ตรวจหน้าเว็บ + API + DB ของ Logout และ Session หมดอายุ",
+  "scripts": {
+    "test": "node run-system-test.mjs",
+    "test:logout": "node run-system-test.mjs --phase=logout",
+    "test:expiry": "node run-system-test.mjs --phase=expiry"
+  },
+  "devDependencies": {
+    "puppeteer": "^23.11.1"
+  }
+}
