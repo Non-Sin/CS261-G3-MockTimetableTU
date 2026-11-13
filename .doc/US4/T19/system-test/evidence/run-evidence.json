@@ -1,0 +1,1421 @@
+{
+  "results": [
+    {
+      "id": "ST-01",
+      "title": "logout ปกติ → 204, ล้าง state ครบ, กลับหน้า Login, DB ไม่เปลี่ยน",
+      "checks": [
+        {
+          "layer": "UI",
+          "description": "ก่อน logout: Navbar แสดงชื่อ รหัส และตารางเรียน CS180, MA211",
+          "pass": true,
+          "actual": {
+            "navbar": "SJ Somchai Jaidee 6609000001",
+            "courses": [
+              "CS180",
+              "MA211"
+            ]
+          }
+        },
+        {
+          "layer": "API",
+          "description": "POST /api/auth/logout แนบ Authorization: Bearer <token ปัจจุบัน>",
+          "pass": true,
+          "actual": "Bearer eyJraWQiOiIwa"
+        },
+        {
+          "layer": "API",
+          "description": "request ไม่มี body",
+          "pass": true
+        },
+        {
+          "layer": "API",
+          "description": "ตอบ 204 No Content ไม่มี body",
+          "pass": true,
+          "actual": {
+            "status": 204,
+            "body": ""
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดง banner Session หมดอายุ",
+          "pass": true,
+          "actual": null
+        },
+        {
+          "layer": "DB",
+          "description": "users, login_attempt, timetable ของ A ไม่เปลี่ยน",
+          "pass": true,
+          "actual": {
+            "users": [
+              [
+                "6609000001",
+                "2026-11-01T17:25:46Z"
+              ]
+            ],
+            "loginAttempt": [],
+            "timetable": [
+              [
+                "6609000001",
+                "1",
+                "2026-11-01T17:25:44Z",
+                "40039",
+                "CS180"
+              ],
+              [
+                "6609000001",
+                "1",
+                "2026-11-01T17:25:44Z",
+                "40040",
+                "MA211"
+              ],
+              [
+                "6609000001",
+                "2",
+                "2026-10-31T12:32:12Z",
+                "NULL",
+                "NULL"
+              ]
+            ]
+          }
+        },
+        {
+          "layer": "DB",
+          "description": "backend ไม่รัน insert/update/delete ระหว่าง logout",
+          "pass": true,
+          "actual": []
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-02",
+      "title": "กด Back หลัง logout → ไม่แสดงข้อมูลเดิม กลับหน้า Login",
+      "checks": [
+        {
+          "layer": "UI",
+          "description": "กด Back ไปถึงหน้าเมนูหลักที่ต้อง login จริง",
+          "pass": true,
+          "actual": "http://localhost:3000/"
+        },
+        {
+          "layer": "UI",
+          "description": "หน้าเดิมที่คืนจาก bfcache ไม่แสดงชื่อ Somchai Jaidee ในเฟรมที่วาดขึ้นจอ",
+          "pass": true,
+          "actual": {
+            "persisted": true,
+            "atPageshow": true,
+            "at": "http://localhost:3000/",
+            "frame1": false,
+            "frame2": false,
+            "after100ms": false
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดง banner Session หมดอายุ",
+          "pass": true,
+          "actual": null
+        },
+        {
+          "layer": "API",
+          "description": "ไม่มี request ที่แนบ token เดิม",
+          "pass": true,
+          "actual": []
+        }
+      ],
+      "notes": [
+        "กด Back ไปที่ http://localhost:3000/ แล้วจบที่ http://localhost:3000/login · request: []",
+        "เบราว์เซอร์คืนหน้า / จาก bfcache (persisted=true) ชื่อผู้ใช้อยู่ใน DOM: ตอน pageshow=true, เฟรมแรก=false, เฟรมที่สอง=false, หลัง 100ms=false"
+      ],
+      "error": null
+    },
+    {
+      "id": "ST-03",
+      "title": "พิมพ์ URL หน้าเมนูหลักตรงๆ หลัง logout → กลับหน้า Login",
+      "checks": [
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดง banner Session หมดอายุ",
+          "pass": true,
+          "actual": null
+        }
+      ],
+      "notes": [
+        "request หลังเปิด /: []"
+      ],
+      "error": null
+    },
+    {
+      "id": "ST-04",
+      "title": "login ใหม่หลัง logout → token ใหม่ Navbar แสดงชื่อและรหัส",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "ได้ token ใหม่ไม่ซ้ำกับ token ของ ST-01",
+          "pass": true,
+          "actual": "Me4QtgrC0Y"
+        },
+        {
+          "layer": "UI",
+          "description": "Navbar แสดง \"Somchai Jaidee\" และ \"6609000001\"",
+          "pass": true,
+          "actual": "SJ Somchai Jaidee 6609000001"
+        },
+        {
+          "layer": "UI",
+          "description": "ตารางเรียนของ A แสดงครบ CS180, MA211",
+          "pass": true,
+          "actual": [
+            "CS180",
+            "MA211"
+          ]
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-05",
+      "title": "สลับบัญชี A → A2 ในแท็บเดียวกัน ข้อมูลไม่ปนกัน",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "logout A ได้ 204",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "UI",
+          "description": "Navbar แสดง \"Somporn Tuayang\" และ \"6609000000\"",
+          "pass": true,
+          "actual": "ST Somporn Tuayang 6609000000"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มีชื่อหรือรหัสของ A (Somchai Jaidee, 6609000001) บนจอ",
+          "pass": true,
+          "actual": "ST Somporn Tuayang 6609000000"
+        },
+        {
+          "layer": "UI",
+          "description": "รายการวิชาที่เพิ่มแล้วเป็นของ A2 (LAS101) ไม่มี CS180, MA211 ของ A",
+          "pass": true,
+          "actual": [
+            "LAS101"
+          ]
+        },
+        {
+          "layer": "API",
+          "description": "GET /api/users/me และ /api/timetable หลังสลับบัญชีใช้ token ของ A2 ทั้งหมด",
+          "pass": true,
+          "actual": [
+            "/api/users/me DvnAD8d0",
+            "/api/timetable?academicYear=2568&semester=1 DvnAD8d0",
+            "/api/courses?academicYear=2568&semester=1 DvnAD8d0"
+          ]
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-06",
+      "title": "ข้อมูลไม่หายหลัง logout (เพิ่มวิชา → logout → login)",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "เพิ่ม CS111 ผ่านหน้าเว็บ ได้ 201",
+          "pass": true,
+          "actual": 201
+        },
+        {
+          "layer": "DB",
+          "description": "DB มี CS180, MA211, CS111",
+          "pass": true,
+          "actual": [
+            "CS180",
+            "MA211",
+            "CS111"
+          ]
+        },
+        {
+          "layer": "API",
+          "description": "logout ได้ 204",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "DB",
+          "description": "หลัง logout แถวใน users, login_attempt, timetable, timetable_entry เหมือนเดิมทุกค่า",
+          "pass": true,
+          "actual": {
+            "users": [
+              [
+                "6609000001",
+                "2026-11-01T17:26:00Z"
+              ]
+            ],
+            "loginAttempt": [],
+            "timetable": [
+              [
+                "6609000001",
+                "1",
+                "2026-11-01T17:26:00Z",
+                "40042",
+                "CS180"
+              ],
+              [
+                "6609000001",
+                "1",
+                "2026-11-01T17:26:00Z",
+                "40043",
+                "MA211"
+              ],
+              [
+                "6609000001",
+                "1",
+                "2026-11-01T17:26:00Z",
+                "40044",
+                "CS111"
+              ],
+              [
+                "6609000001",
+                "2",
+                "2026-10-31T12:32:12Z",
+                "NULL",
+                "NULL"
+              ]
+            ]
+          }
+        },
+        {
+          "layer": "DB",
+          "description": "backend ไม่รัน insert/update/delete ระหว่าง logout",
+          "pass": true,
+          "actual": []
+        },
+        {
+          "layer": "UI",
+          "description": "login อีกครั้ง ตารางเรียนยังมี CS180, MA211, CS111",
+          "pass": true,
+          "actual": [
+            "CS180",
+            "MA211",
+            "CS111"
+          ]
+        },
+        {
+          "layer": "DB",
+          "description": "entry_id ในตารางเรียนเหมือนเดิม (ไม่ถูกลบหรือสร้างใหม่)",
+          "pass": true,
+          "actual": [
+            [
+              "6609000001",
+              "1",
+              "2026-11-01T17:26:00Z",
+              "40042",
+              "CS180"
+            ],
+            [
+              "6609000001",
+              "1",
+              "2026-11-01T17:26:00Z",
+              "40043",
+              "MA211"
+            ],
+            [
+              "6609000001",
+              "1",
+              "2026-11-01T17:26:00Z",
+              "40044",
+              "CS111"
+            ],
+            [
+              "6609000001",
+              "2",
+              "2026-10-31T12:32:12Z",
+              "NULL",
+              "NULL"
+            ]
+          ]
+        },
+        {
+          "layer": "DB",
+          "description": "แถว users ของ A ยังอยู่",
+          "pass": true,
+          "actual": [
+            [
+              "6609000001",
+              "2026-11-01T17:26:04Z"
+            ]
+          ]
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-07",
+      "title": "ดับเบิลคลิก ออกจากระบบ → กลับหน้า Login ไม่มี error",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "request แรกได้ 204 และถ้ามี request ที่สองได้ 204/401",
+          "pass": true,
+          "actual": [
+            204
+          ]
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดง banner Session หมดอายุ",
+          "pass": true,
+          "actual": null
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มีข้อความ error บนหน้าจอ และไม่มี JavaScript error",
+          "pass": true,
+          "actual": {
+            "alerts": [],
+            "errors": []
+          }
+        }
+      ],
+      "notes": [
+        "POST /api/auth/logout ถูกส่ง 1 ครั้ง: [204]"
+      ],
+      "error": null
+    },
+    {
+      "id": "ST-08",
+      "title": "logout ซ้ำจากอีกแท็บ → แท็บ 2 ล้าง state และกลับหน้า Login",
+      "checks": [
+        {
+          "layer": "UI",
+          "description": "แท็บ 2 แสดงหน้าเมนูหลักของ A",
+          "pass": true,
+          "actual": null
+        },
+        {
+          "layer": "API",
+          "description": "แท็บ 1 logout ได้ 204",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "API",
+          "description": "แท็บ 2 กด logout ส่ง token เดิมได้ 204 (stateless) หรือ 401",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดง banner Session หมดอายุ",
+          "pass": true,
+          "actual": null
+        }
+      ],
+      "notes": [
+        "หลังแท็บ 1 logout แท็บ 2 ยังอยู่ที่ / และยังมี token ของตัวเอง: true",
+        "แท็บ 2 ได้ 204"
+      ],
+      "error": null
+    },
+    {
+      "id": "ST-10",
+      "title": "ใช้ token เดิมหลัง logout (ข้อจำกัดของระบบ stateless)",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "POST /api/auth/logout ได้ 204",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "API",
+          "description": "ช่วงที่ 1: GET /api/users/me ด้วย token เดิมหลัง logout ได้ 200 ข้อมูลของ A (ตามข้อจำกัดที่บันทึกใน US4-T05)",
+          "pass": true,
+          "actual": {
+            "status": 200,
+            "contentType": "application/json",
+            "body": {
+              "studentId": "6609000001",
+              "firstName": "Somchai",
+              "lastName": "Jaidee",
+              "firstNameTh": "สมชาย",
+              "lastNameTh": "ใจดี"
+            },
+            "date": "Sun, 01 Nov 2026 17:26:17 GMT"
+          }
+        }
+      ],
+      "notes": [
+        "ช่วงที่ 2 (หลัง token หมดอายุได้ 401) อยู่ใน Flow 2 ที่ใช้ token อายุสั้น"
+      ],
+      "error": null
+    },
+    {
+      "id": "ST-18a",
+      "title": "อายุ token ตามค่าจริง = 3 ชั่วโมง",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "exp − iat ของ token = 10800 วินาที (3 ชั่วโมง)",
+          "pass": true,
+          "actual": {
+            "exp": 1793564777,
+            "sub": "6609000001",
+            "iat": 1793553977
+          }
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-20",
+      "title": "login 2 เบราว์เซอร์ด้วยบัญชีเดียวกัน logout ที่หนึ่ง อีกที่ยังใช้ได้ (ข้อจำกัด)",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "เบราว์เซอร์ 1 logout ได้ 204",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "API",
+          "description": "เบราว์เซอร์ 2 reload แล้ว GET /api/users/me และ /api/timetable ได้ 200",
+          "pass": true,
+          "actual": [
+            "GET /api/users/me → 200",
+            "GET /api/timetable?academicYear=2568&semester=1 → 200",
+            "GET /api/courses?academicYear=2568&semester=1 → 200"
+          ]
+        },
+        {
+          "layer": "UI",
+          "description": "เบราว์เซอร์ 2 ยังแสดงหน้าเมนูหลักของ A ตามปกติ",
+          "pass": true,
+          "actual": "SJ Somchai Jaidee 6609000001"
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-21",
+      "title": "ปุ่ม ออกจากระบบ อยู่ที่ Navbar ทุกเมนู",
+      "checks": [
+        {
+          "layer": "UI",
+          "description": "ปุ่มบัญชีผู้ใช้ (ที่มีเมนู ออกจากระบบ) อยู่ที่ Navbar มุมขวาบนตำแหน่งเดียวกันทุกเมนู",
+          "pass": true,
+          "actual": {
+            "จัดตารางเรียนจำลอง": "1160,63",
+            "ดูวิชาเสรีแนะนำ": "1160,63",
+            "ค้นหาช่องทางขอโควตา": "1160,63"
+          }
+        },
+        {
+          "layer": "API",
+          "description": "logout จากเมนูดูวิชาเสรีแนะนำ ได้ 204",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดง banner Session หมดอายุ",
+          "pass": true,
+          "actual": null
+        }
+      ],
+      "notes": [
+        "ระบบมีหน้าเดียว (/) ที่สลับเมนูใน header ส่วน /dashboard redirect มาที่ / จึงทดสอบทุกเมนูแทนทุกหน้า"
+      ],
+      "error": null
+    },
+    {
+      "id": "ST-09",
+      "title": "logout ตอน token หมดอายุแล้ว → 401 ล้าง state ไม่แสดง banner",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "POST /api/auth/logout ได้ 401 ProblemDetail",
+          "pass": true,
+          "actual": {
+            "status": 401,
+            "contentType": "application/problem+json;charset=UTF-8",
+            "body": "{\"type\":\"about:blank\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"กรุณาเข้าสู่ระบบก่อนใช้งาน\"}"
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดง banner Session หมดอายุ",
+          "pass": true,
+          "actual": null
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-10",
+      "title": "ใช้ token เดิมหลัง logout: ก่อนหมดอายุ 200, หลังหมดอายุ 401",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "logout ด้วย token อายุสั้นได้ 204",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "API",
+          "description": "ก่อนหมดอายุ GET /api/users/me ด้วย token ที่ logout แล้วได้ 200 (ข้อจำกัด stateless)",
+          "pass": true,
+          "actual": 200
+        },
+        {
+          "layer": "API",
+          "description": "หลังหมดอายุได้ 401",
+          "pass": true,
+          "actual": 401
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-11",
+      "title": "หมดอายุแล้วกดฟังก์ชันที่เรียก API → 401 กลับหน้า Login พร้อม banner",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "GET /api/timetable ด้วย token หมดอายุได้ 401 ProblemDetail",
+          "pass": true,
+          "actual": 401
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "แสดง banner สีเหลือง \"เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง\"",
+          "pass": true,
+          "actual": "เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง"
+        },
+        {
+          "layer": "DB",
+          "description": "DB ของ A ไม่เปลี่ยน",
+          "pass": true,
+          "actual": {
+            "users": [
+              [
+                "6609000001",
+                "2026-11-01T17:27:00Z"
+              ]
+            ],
+            "loginAttempt": [],
+            "timetable": [
+              [
+                "6609000001",
+                "1",
+                "2026-11-01T17:26:46Z",
+                "40047",
+                "CS180"
+              ],
+              [
+                "6609000001",
+                "1",
+                "2026-11-01T17:26:46Z",
+                "40048",
+                "MA211"
+              ],
+              [
+                "6609000001",
+                "2",
+                "2026-10-31T12:32:12Z",
+                "NULL",
+                "NULL"
+              ]
+            ]
+          }
+        },
+        {
+          "layer": "DB",
+          "description": "backend ไม่รัน insert/update/delete",
+          "pass": true,
+          "actual": []
+        }
+      ],
+      "notes": [
+        "request: [\"GET /api/courses?academicYear=2568&semester=2 → 401\",\"GET /api/timetable?academicYear=2568&semester=2 → 401\"]"
+      ],
+      "error": null
+    },
+    {
+      "id": "ST-15",
+      "title": "หมดอายุแล้ว login ใหม่ → สำเร็จ ตารางเรียนเดิมอยู่ครบ",
+      "checks": [
+        {
+          "layer": "UI",
+          "description": "login สำเร็จ Navbar แสดงชื่อและรหัส",
+          "pass": true,
+          "actual": "SJ Somchai Jaidee 6609000001"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี banner Session หมดอายุ และ flag ถูกล้าง",
+          "pass": true,
+          "actual": {
+            "banner": null,
+            "flag": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ตารางเรียนเดิมครบ CS180, MA211",
+          "pass": true,
+          "actual": [
+            "CS180",
+            "MA211"
+          ]
+        },
+        {
+          "layer": "DB",
+          "description": "DB ตรงกับที่หน้าเว็บแสดง",
+          "pass": true,
+          "actual": [
+            "CS180",
+            "MA211"
+          ]
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-13",
+      "title": "banner แสดงเฉพาะตอน Session หมดอายุ",
+      "checks": [
+        {
+          "layer": "UI",
+          "description": "หลัง logout ปกติ (ST-01) ไม่มี banner",
+          "pass": true,
+          "actual": null
+        },
+        {
+          "layer": "UI",
+          "description": "หลังหมดอายุ (ST-11) มี banner ข้อความตามที่กำหนด",
+          "pass": true,
+          "actual": "เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง"
+        },
+        {
+          "layer": "API",
+          "description": "login แล้ว logout ปกติอีกรอบได้ 204",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "UI",
+          "description": "banner หายไป ไม่แสดงบนหน้า Login หลัง logout ปกติ",
+          "pass": true,
+          "actual": null
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-12",
+      "title": "หมดอายุแต่ไม่ทำอะไร → หน้าไม่เปลี่ยนเองจนกว่าจะมี request",
+      "checks": [
+        {
+          "layer": "UI",
+          "description": "ยังอยู่หน้าเมนูหลัก (/) แสดงชื่อและตารางเรียนเดิม ไม่มี banner",
+          "pass": true,
+          "actual": {
+            "path": "/",
+            "navbar": "SJ Somchai Jaidee 6609000001",
+            "banner": null
+          }
+        },
+        {
+          "layer": "API",
+          "description": "ไม่มี request ใดถูกส่งระหว่างที่ปล่อยไว้ (UI ไม่ได้ตั้งตัวจับเวลาจาก token)",
+          "pass": true,
+          "actual": []
+        }
+      ],
+      "notes": [
+        "ปล่อยหน้าไว้โดยไม่แตะ จนเลยเวลาหมดอายุของ token 77 วินาที"
+      ],
+      "error": null
+    },
+    {
+      "id": "ST-14",
+      "title": "หมดอายุกลางการเพิ่มวิชา → 401 ไม่มีวิชาถูกเพิ่ม",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "POST /api/timetable/entries ได้ 401",
+          "pass": true,
+          "actual": {
+            "status": 401,
+            "body": "{\"type\":\"about:blank\",\"title\":\"Unauthorized\",\"status\":401,\"detail\":\"กรุณาเข้าสู่ระบบก่อนใช้งาน\"}"
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "แสดง banner สีเหลือง \"เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง\"",
+          "pass": true,
+          "actual": "เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง"
+        },
+        {
+          "layer": "DB",
+          "description": "จำนวนวิชาใน timetable_entry ยังเป็น 2 ไม่มี CS111 และทุกแถวเหมือนก่อนกด",
+          "pass": true,
+          "actual": [
+            "CS180",
+            "MA211"
+          ]
+        },
+        {
+          "layer": "DB",
+          "description": "backend ไม่รัน insert/update/delete",
+          "pass": true,
+          "actual": []
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-16",
+      "title": "refresh หลังหมดอายุ → 401 แล้วกลับหน้า Login ไม่ค้าง",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "API ที่หน้าเรียกตอน refresh ได้ 401",
+          "pass": true,
+          "actual": [
+            "GET /api/users/me → 401"
+          ]
+        },
+        {
+          "layer": "UI",
+          "description": "ถูกพากลับหน้า Login ภายใน 10 วินาที (ไม่ค้างหน้าว่างหรือโหลดไม่จบ)",
+          "pass": true,
+          "actual": "http://localhost:3000/login"
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somchai Jaidee, 6609000001) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "แสดง banner สีเหลือง \"เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง\"",
+          "pass": true,
+          "actual": "เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง"
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-17",
+      "title": "ทุก API ที่ต้อง Authentication ตอบ 401 เหมือนกันเมื่อ token หมดอายุ",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "GET /api/users/me → 401 ProblemDetail",
+          "pass": true,
+          "actual": {
+            "status": 401,
+            "contentType": "application/problem+json;charset=UTF-8"
+          }
+        },
+        {
+          "layer": "API",
+          "description": "GET /api/timetable?academicYear=2568&semester=1 → 401 ProblemDetail",
+          "pass": true,
+          "actual": {
+            "status": 401,
+            "contentType": "application/problem+json;charset=UTF-8"
+          }
+        },
+        {
+          "layer": "API",
+          "description": "POST /api/timetable/entries → 401 ProblemDetail",
+          "pass": true,
+          "actual": {
+            "status": 401,
+            "contentType": "application/problem+json;charset=UTF-8"
+          }
+        },
+        {
+          "layer": "API",
+          "description": "DELETE /api/timetable/entries?entryIds=40047 → 401 ProblemDetail",
+          "pass": true,
+          "actual": {
+            "status": 401,
+            "contentType": "application/problem+json;charset=UTF-8"
+          }
+        },
+        {
+          "layer": "API",
+          "description": "POST /api/auth/logout → 401 ProblemDetail",
+          "pass": true,
+          "actual": {
+            "status": 401,
+            "contentType": "application/problem+json;charset=UTF-8"
+          }
+        },
+        {
+          "layer": "DB",
+          "description": "DB ของ A ไม่เปลี่ยน (CS180 ไม่ถูกลบ, CS111 ไม่ถูกเพิ่ม)",
+          "pass": true,
+          "actual": {
+            "users": [
+              [
+                "6609000001",
+                "2026-11-01T17:28:35Z"
+              ]
+            ],
+            "loginAttempt": [],
+            "timetable": [
+              [
+                "6609000001",
+                "1",
+                "2026-11-01T17:26:46Z",
+                "40047",
+                "CS180"
+              ],
+              [
+                "6609000001",
+                "1",
+                "2026-11-01T17:26:46Z",
+                "40048",
+                "MA211"
+              ],
+              [
+                "6609000001",
+                "2",
+                "2026-10-31T12:32:12Z",
+                "NULL",
+                "NULL"
+              ]
+            ]
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "หน้าเว็บตอบสนอง 401 เหมือนกันทุกจุด (ST-11 GET timetable, ST-14 POST entries, ST-16 GET users/me)",
+          "pass": true,
+          "actual": [
+            "ST-11",
+            "ST-14",
+            "ST-16"
+          ]
+        }
+      ],
+      "notes": [],
+      "error": null
+    },
+    {
+      "id": "ST-18",
+      "title": "ขอบเขตเวลา: ก่อนหมดอายุ 200 หลังหมดอายุ 401",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "เรียกก่อน exp 5 วินาที ได้ 200",
+          "pass": true,
+          "actual": 200
+        },
+        {
+          "layer": "API",
+          "description": "หลัง exp ได้ 401",
+          "pass": true,
+          "actual": [
+            "exp-5s → 200",
+            "exp+0s → 200",
+            "exp+5s → 200",
+            "exp+10s → 200",
+            "exp+15s → 200",
+            "exp+20s → 200",
+            "exp+25s → 200",
+            "exp+30s → 200",
+            "exp+35s → 200",
+            "exp+40s → 200",
+            "exp+45s → 200",
+            "exp+50s → 200",
+            "exp+55s → 200",
+            "exp+60s → 401"
+          ]
+        },
+        {
+          "layer": "API",
+          "description": "ถูกปฏิเสธไม่เกิน exp + 60 วินาที (clock skew เริ่มต้น) + รอบการวัด 5 วินาที",
+          "pass": true,
+          "actual": 60
+        }
+      ],
+      "notes": [
+        "ลำดับการเรียกหลัง exp: exp-5s → 200, exp+0s → 200, exp+5s → 200, exp+10s → 200, exp+15s → 200, exp+20s → 200, exp+25s → 200, exp+30s → 200, exp+35s → 200, exp+40s → 200, exp+45s → 200, exp+50s → 200, exp+55s → 200, exp+60s → 401",
+        "token ถูกปฏิเสธครั้งแรกที่ exp + 60 วินาที (วัดทุก 5 วินาที)",
+        "backend ยังรับ token หลัง exp อยู่ช่วงหนึ่ง ตรงกับ clock skew 60 วินาทีที่ NimbusJwtDecoder ตั้งไว้เป็นค่าเริ่มต้น อายุจริงจึงเป็น 3 ชั่วโมง + ไม่เกิน 60 วินาที"
+      ],
+      "error": null
+    },
+    {
+      "id": "ST-19",
+      "title": "วงจรเต็ม (บัญชี A2): login → เพิ่ม/ลบวิชา → logout → login → หมดอายุ → ใช้งานต่อ",
+      "checks": [
+        {
+          "layer": "API",
+          "description": "เพิ่ม CS111 ผ่านหน้าเว็บได้ 201",
+          "pass": true,
+          "actual": 201
+        },
+        {
+          "layer": "API",
+          "description": "ลบ CS180 ผ่านหน้าเว็บได้ 200",
+          "pass": true,
+          "actual": 200
+        },
+        {
+          "layer": "API",
+          "description": "logout ได้ 204",
+          "pass": true,
+          "actual": 204
+        },
+        {
+          "layer": "UI",
+          "description": "login ใหม่ ตารางเรียนเป็น MA211, CS111 ตามที่ทำล่าสุด",
+          "pass": true,
+          "actual": [
+            "MA211",
+            "CS111"
+          ]
+        },
+        {
+          "layer": "API",
+          "description": "หลังหมดอายุ ใช้งานต่อได้ 401",
+          "pass": true,
+          "actual": 401
+        },
+        {
+          "layer": "UI",
+          "description": "อยู่หน้า /login",
+          "pass": true,
+          "actual": "/login"
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่มี token ใน sessionStorage และ localStorage",
+          "pass": true,
+          "actual": {
+            "session": null,
+            "local": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "ไม่แสดงข้อมูลผู้ใช้เดิม (Somporn Tuayang, 6609000000) และตารางเรียน",
+          "pass": true,
+          "actual": {
+            "navbar": null,
+            "courses": null
+          }
+        },
+        {
+          "layer": "UI",
+          "description": "แสดง banner สีเหลือง \"เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง\"",
+          "pass": true,
+          "actual": "เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง"
+        },
+        {
+          "layer": "DB",
+          "description": "ตารางเรียนใน DB ยังเป็น MA211, CS111 ตามที่ทำล่าสุด",
+          "pass": true,
+          "actual": [
+            "MA211",
+            "CS111"
+          ]
+        }
+      ],
+      "notes": [],
+      "error": null
+    }
+  ],
+  "evidence": {
+    "ST-01": {
+      "api": [
+        {
+          "at": "2026-11-01T17:25:49.103Z",
+          "method": "POST",
+          "path": "/api/auth/logout",
+          "status": 204,
+          "authorization": "Bearer <JWT …taKUxfyQ>",
+          "requestBody": null
+        }
+      ],
+      "db": {
+        "users": [
+          [
+            "6609000001",
+            "2026-11-01T17:25:46Z"
+          ]
+        ],
+        "loginAttempt": [],
+        "timetable": [
+          [
+            "6609000001",
+            "1",
+            "2026-11-01T17:25:44Z",
+            "40039",
+            "CS180"
+          ],
+          [
+            "6609000001",
+            "1",
+            "2026-11-01T17:25:44Z",
+            "40040",
+            "MA211"
+          ],
+          [
+            "6609000001",
+            "2",
+            "2026-10-31T12:32:12Z",
+            "NULL",
+            "NULL"
+          ]
+        ]
+      }
+    },
+    "ST-02": {
+      "backUrl": "http://localhost:3000/",
+      "bf": {
+        "persisted": true,
+        "atPageshow": true,
+        "at": "http://localhost:3000/",
+        "frame1": false,
+        "frame2": false,
+        "after100ms": false
+      },
+      "nav": "navigate"
+    },
+    "ST-03": {},
+    "ST-04": {},
+    "ST-05": {},
+    "ST-06": {},
+    "ST-07": {},
+    "ST-08": {},
+    "ST-10": {},
+    "ST-18a": {},
+    "ST-20": {},
+    "ST-21": {},
+    "PREP": {},
+    "ST-09": {},
+    "ST-11": {},
+    "ST-15": {},
+    "ST-13": {},
+    "ST-12": {},
+    "ST-14": {},
+    "ST-16": {},
+    "ST-17": {
+      "GET /api/users/me": {
+        "status": 401,
+        "contentType": "application/problem+json;charset=UTF-8",
+        "body": {
+          "type": "about:blank",
+          "title": "Unauthorized",
+          "status": 401,
+          "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+        },
+        "date": "Sun, 01 Nov 2026 17:28:44 GMT"
+      },
+      "GET /api/timetable?academicYear=2568&semester=1": {
+        "status": 401,
+        "contentType": "application/problem+json;charset=UTF-8",
+        "body": {
+          "type": "about:blank",
+          "title": "Unauthorized",
+          "status": 401,
+          "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+        },
+        "date": "Sun, 01 Nov 2026 17:28:44 GMT"
+      },
+      "POST /api/timetable/entries": {
+        "status": 401,
+        "contentType": "application/problem+json;charset=UTF-8",
+        "body": {
+          "type": "about:blank",
+          "title": "Unauthorized",
+          "status": 401,
+          "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+        },
+        "date": "Sun, 01 Nov 2026 17:28:44 GMT"
+      },
+      "DELETE /api/timetable/entries?entryIds=40047": {
+        "status": 401,
+        "contentType": "application/problem+json;charset=UTF-8",
+        "body": {
+          "type": "about:blank",
+          "title": "Unauthorized",
+          "status": 401,
+          "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+        },
+        "date": "Sun, 01 Nov 2026 17:28:44 GMT"
+      },
+      "POST /api/auth/logout": {
+        "status": 401,
+        "contentType": "application/problem+json;charset=UTF-8",
+        "body": {
+          "type": "about:blank",
+          "title": "Unauthorized",
+          "status": 401,
+          "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+        },
+        "date": "Sun, 01 Nov 2026 17:28:44 GMT"
+      }
+    },
+    "ST-18": {},
+    "ST-19": {}
+  }
+}
