@@ -23,6 +23,7 @@ US3: Login เข้าสู่ระบบด้วย user name และ pas
 | รหัสผ่านถูกแต่เป็นนักศึกษาต่างสาขา (`department != "ภาควิชาวิทยาการคอมพิวเตอร์"`) → ล้าง `login_attempt` (ไม่ถูก Rollback) แล้วปฏิเสธโดยไม่บันทึกลงตาราง `users` | `403 Forbidden` (`code: "NOT_CS_STUDENT"`) | ST-08 |
 | รหัสผ่านถูกแต่เป็นนักศึกษา CS ภาคพิเศษ (หลักที่ 5–6 ของรหัสนักศึกษาเป็น `65`) → ล้าง `login_attempt` (ไม่ถูก Rollback) แล้วปฏิเสธโดยไม่บันทึกลงตาราง `users` | `403 Forbidden` (`code: "NOT_CS_STUDENT"`) | ST-09 |
 | ไม่ส่ง `username` หรือ `password` (`@NotBlank`) หรือเรียก `GET /api/users/me` โดยไม่มี JWT / JWT ไม่ถูกต้อง | `400 Bad Request` (พร้อม `errors`) และ `401 Unauthorized` (จาก `JwtAuthenticationFilter`) | ST-10 |
+| TU Login API ใช้งานไม่ได้ (Application-Key ผิด, timeout, 5xx) → ส่งต่อ exception โดยไม่นับ attempt | `503 Service Unavailable` (`code: "TU_API_UNAVAILABLE"`) และไม่มีแถวใน `login_attempt` | ST-11 |
 
 ---
 
@@ -57,11 +58,12 @@ US3: Login เข้าสู่ระบบด้วย user name และ pas
 | `6609000003` | สมศักดิ์ พักก่อน / somsak pakkon | ภาควิชาวิทยาการคอมพิวเตอร์ / ภาคปกติ | `พักการศึกษา` (Inactive) | ST-07 (บัญชีไม่ Active → `403 ACCOUNT_INACTIVE`) |
 | `6609000002` | สมหญิง รักเรียน / somying rakrian | ภาควิชาคณิตศาสตร์และสถิติ / ภาคปกติ | `ปกติ` (Active) | ST-08 (นักศึกษาต่างสาขา → `403 NOT_CS_STUDENT`, TC2) |
 | `6609650001` | สมปอง พิเศษ / sompong piset | ภาควิชาวิทยาการคอมพิวเตอร์ / ภาคพิเศษ (หลักที่ 5–6 เป็น `65`) | `ปกติ` (Active) | ST-09 (นักศึกษา CS ภาคพิเศษ → `403 NOT_CS_STUDENT`, TC2) |
+| `6609000099` | - (ไม่มีข้อมูล stub คืน 503 ทุกครั้ง) | - | - | ST-11 (TU Login API ใช้งานไม่ได้ → `503 TU_API_UNAVAILABLE`) |
 
 ### คำสั่งล้างข้อมูลใน DB ก่อนเริ่มชุดทดสอบ
 
 ```bash
-docker exec sqlserver bash -c '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -d appdb -Q "DELETE FROM login_attempt; DELETE FROM users WHERE student_id IN (N'"'"'6609000001'"'"', N'"'"'6609000002'"'"', N'"'"'6609000003'"'"', N'"'"'6609000004'"'"', N'"'"'6609650001'"'"');"'
+docker exec sqlserver bash -c '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -d appdb -Q "DELETE FROM login_attempt; DELETE FROM users WHERE student_id IN (N'"'"'6609000001'"'"', N'"'"'6609000002'"'"', N'"'"'6609000003'"'"', N'"'"'6609000004'"'"', N'"'"'6609650001'"'"', N'"'"'6609000099'"'"');"'
 ```
 
 ### คำสั่งตรวจสอบข้อมูลใน DB (ใช้ตรวจผลในแต่ละ Test Case)
@@ -248,7 +250,7 @@ ORDER BY username;
 2. ตรวจสอบหน้าเว็บ, API Response และตาราง `users` / `login_attempt` ใน DB
 
 **Expected Result:**
-- **หน้าเว็บ:** ไม่อนุญาตให้เข้าสู่ระบบ และแสดงข้อความแจ้งเตือนว่าบัญชีไม่อยู่ในสถานะใช้งานปกติ
+- **หน้าเว็บ:** ไม่อนุญาตให้เข้าสู่ระบบ ยังอยู่ที่หน้า `/login` และแสดงข้อความเดียวกับกรอกรหัสผิด **"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง"** (ใช้หน้าจอเดียวกับ `INVALID_CREDENTIALS` ทุกประการ ตามข้อสรุป US3-T13 หัวข้อ 4.1 ข้อ 1)
 - **API:** ตอบ `403 Forbidden` เป็น `ProblemDetail` ที่มี `"code": "ACCOUNT_INACTIVE"`
 - **DB:**
   - **ตาราง `users`:** รหัส `6609000003` **ต้องไม่ถูกบันทึก**ลงในตาราง `users` (`0` แถว)
@@ -328,6 +330,31 @@ ORDER BY username;
 
 ---
 
+### [ST-11] TU Login API ใช้งานไม่ได้ ระบบตอบ `503 TU_API_UNAVAILABLE` โดยไม่นับเป็นการกรอกรหัสผิด
+
+**Related CoS:** - (เส้นทาง TU API ใช้งานไม่ได้ใน Sequence Diagram)
+
+**เส้นทางใน Sequence Diagram:**
+- ส่งครบ → `isLocked` = `false` → `TuApiClient.verifyCredentials` โยน `BusinessRuleException 503 TU_API_UNAVAILABLE` (Application-Key ผิด, timeout หรือ 5xx) → `AuthService` ส่งต่อ exception **โดยไม่เรียก `loginFailed`** (ไม่นับ attempt) → `503 ProblemDetail`
+
+**Preconditions:**
+- รันด้วย profile `stub-tu` (`StubTuApiClient` โยน 503 ทุกครั้งเมื่อ `username = "6609000099"`)
+- ตาราง `login_attempt` และ `users` ไม่มีแถวของ `6609000099`
+
+**Test Steps:**
+1. ที่หน้า `/login` กรอกชื่อผู้ใช้งาน `6609000099` และรหัสผ่านใดก็ได้ (เช่น `Passw0rd!`) แล้วกด **"เข้าสู่ระบบ"**
+2. ตรวจสอบหน้าเว็บ, API Response และตาราง `login_attempt` / `users` ใน DB
+3. กดส่งซ้ำอีก 4 ครั้ง (รวม **5 ครั้ง**) แล้วตรวจ API Response และ DB อีกครั้ง
+
+**Expected Result:**
+- **หน้าเว็บ:** ยังอยู่ที่หน้าเข้าสู่ระบบ แสดงข้อความ **"ไม่สามารถเชื่อมต่อระบบของมหาวิทยาลัยได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง"** (ไม่ใช่ข้อความรหัสผิด) และค่าที่กรอกยังอยู่ในช่องให้กดลองใหม่ได้
+- **API:** ทั้ง 5 ครั้งตอบ `503 Service Unavailable` เป็น `ProblemDetail` ที่มี `"code": "TU_API_UNAVAILABLE"` (ครั้งที่ 5 **ต้องไม่**เป็น `429 ACCOUNT_LOCKED`)
+- **DB:**
+  - **ตาราง `login_attempt`:** ไม่มีแถวของ `6609000099` (`0` แถว — ยืนยันว่าไม่นับ attempt เมื่อระบบมหาวิทยาลัยล่ม)
+  - **ตาราง `users`:** ไม่มีแถวของ `6609000099` (`0` แถว)
+
+---
+
 ## สรุปความครอบคลุม (Traceability)
 
 | Test Case | เรื่องที่ทดสอบตาม Sequence Diagram | CoS (US3-T16) |
@@ -342,6 +369,7 @@ ORDER BY username;
 | ST-08 | นักศึกษาต่างสาขา ("สมหญิง รักเรียน" `6609000002`) → ล้าง `login_attempt` (ไม่ Rollback) แล้วปฏิเสธด้วย `403 NOT_CS_STUDENT` โดยไม่บันทึกลงตาราง `users` | TC2 |
 | ST-09 | นักศึกษา CS ภาคพิเศษ หลักที่ 5–6 เป็น `65` ("สมปอง พิเศษ" `6609650001`) → ล้าง `login_attempt` (ไม่ Rollback) แล้วปฏิเสธด้วย `403 NOT_CS_STUDENT` โดยไม่บันทึกลงตาราง `users` | TC2 |
 | ST-10 | ไม่ส่ง `username`/`password` → `400 Bad Request` และเรียก `/api/users/me` ไม่มี/ผิด Token → `401 Unauthorized` | - (Validation & JWT Filter) |
+| ST-11 | TU Login API ใช้งานไม่ได้ (`6609000099`) → `503 TU_API_UNAVAILABLE` ไม่นับ attempt แม้ส่งครบ 5 ครั้ง | - (TU API ใช้งานไม่ได้) |
 
 ---
 
@@ -359,6 +387,7 @@ ORDER BY username;
 | ST-08 | | | | |
 | ST-09 | | | | |
 | ST-10 | | | | |
+| ST-11 | | | | |
 
 ---
 
