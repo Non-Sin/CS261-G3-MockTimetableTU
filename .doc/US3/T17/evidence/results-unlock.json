@@ -1,0 +1,12 @@
+[
+  {
+    "id": "IT-16",
+    "pass": true,
+    "actual": "ครั้งที่ 5 → 429 retryAfterSeconds 30 ตัวนับเริ่ม \"00 นาที : 29 วินาที\" · ตัวนับถึง 0 → UI \"ปลดการระงับการเข้าสู่ระบบแล้ว\" · login รหัสถูก → 200 URL /",
+    "shots": [
+      "it16-1-locked-short.png",
+      "it16-2-unlocked.png",
+      "it16-3-login-after-unlock.png"
+    ]
+  }
+]

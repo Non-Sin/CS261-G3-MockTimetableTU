@@ -1,0 +1,211 @@
+[
+  {
+    "id": "IT-01",
+    "pass": true,
+    "actual": "ส่ง POST /api/auth/login {username:\"6609000001\", password:(ตรงที่กรอก true)} → 200 token ยาว 207 ตัว · URL / · เมนูที่ถูกเลือก \"จัดตารางเรียนจำลอง\"",
+    "shots": [
+      "it01-02-after-login.png"
+    ]
+  },
+  {
+    "id": "IT-02",
+    "pass": false,
+    "actual": "GET /api/users/me Authorization = Bearer <token จาก IT-01>: true → 200 {\"studentId\":\"6609000001\",\"firstName\":\"Somchai\",\"lastName\":\"Jaidee\",\"firstNameTh\":\"สมชาย\",\"lastNameTh\":\"ใจดี\"} · Navbar แสดง \"SJ Somchai Jaidee 6609000001\" · token ใน sessionStorage มี (ไม่เห็น users/me)",
+    "shots": [
+      "it01-02-after-login.png"
+    ]
+  },
+  {
+    "id": "IT-03",
+    "pass": true,
+    "actual": "บัญชี F รหัสใหม่ → 200 · URL /",
+    "shots": [
+      "it03-new-password.png"
+    ]
+  },
+  {
+    "id": "IT-04",
+    "pass": true,
+    "actual": "บัญชี F รหัสเดิม → 401 INVALID_CREDENTIALS · UI \"เข้าสู่ระบบไม่สำเร็จ\n\nชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง\" · token ไม่มี",
+    "shots": [
+      "it04-old-password.png"
+    ]
+  },
+  {
+    "id": "IT-05",
+    "pass": true,
+    "actual": "→ 401 INVALID_CREDENTIALS (ProblemDetail มี title, status, detail, instance) · UI \"เข้าสู่ระบบไม่สำเร็จ\n\nชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง\" · ขอบแดง 2/2 ช่อง · ช่องรหัสผ่านยังมีค่า true · token ไม่มี · เรียก users/me 0 ครั้ง",
+    "shots": [
+      "it05-wrong-password.png"
+    ]
+  },
+  {
+    "id": "IT-06",
+    "pass": true,
+    "actual": "Username ไม่มีในระบบ → 401 INVALID_CREDENTIALS detail \"ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง\" (เหมือน IT-05: true) · UI เหมือน IT-05: true",
+    "shots": [
+      "it06-unknown-user.png"
+    ]
+  },
+  {
+    "id": "IT-07",
+    "pass": true,
+    "actual": "4 ครั้ง → 401, 401, 401, 401 · กล่องรหัสผิดแสดงทุกครั้ง true · failed_attempts ใน DB = 4",
+    "shots": [
+      "it07-four-wrong.png"
+    ]
+  },
+  {
+    "id": "IT-08",
+    "pass": true,
+    "actual": "→ 403 NOT_CS_STUDENT · UI หัวข้อ \"ไม่สามารถเข้าใช้งานระบบได้\" · token ไม่มี · เรียก users/me 0 ครั้ง",
+    "shots": [
+      "it08-not-cs.png"
+    ]
+  },
+  {
+    "id": "IT-09",
+    "pass": true,
+    "actual": "→ 403 NOT_CS_STUDENT · UI หัวข้อ \"ไม่สามารถเข้าใช้งานระบบได้\" · token ไม่มี · เรียก users/me 0 ครั้ง",
+    "shots": [
+      "it09-not-cs.png"
+    ]
+  },
+  {
+    "id": "IT-10",
+    "pass": true,
+    "actual": "กลับมาฟอร์ม ช่อง username \"\" password \"\" · login ใหม่ด้วยบัญชี A → 200 URL /",
+    "shots": [
+      "it10-back-to-login.png"
+    ]
+  },
+  {
+    "id": "IT-11",
+    "pass": true,
+    "actual": "→ 403 ACCOUNT_INACTIVE · ไม่มี token ใน response",
+    "shots": [
+      "it11-inactive.png"
+    ]
+  },
+  {
+    "id": "IT-12",
+    "pass": true,
+    "actual": "UI \"เข้าสู่ระบบไม่สำเร็จ\n\nชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง\" · ขอบแดง 2/2 · หน้า Access Denied ไม่แสดง · token ไม่มี · users/me 0 ครั้ง",
+    "shots": [
+      "it11-inactive.png"
+    ]
+  },
+  {
+    "id": "IT-13",
+    "pass": true,
+    "actual": "→ 403 ACCOUNT_INACTIVE · UI \"เข้าสู่ระบบไม่สำเร็จ\n\nชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง\" · ขอบแดง 2/2 · หน้า Access Denied ไม่แสดง · token ไม่มี · users/me 0 ครั้ง",
+    "shots": [
+      "it13-inactive.png"
+    ]
+  },
+  {
+    "id": "IT-14",
+    "pass": true,
+    "actual": "ครั้งที่ 1–5 → 401, 401, 401, 401, 429 · ครั้งที่ 5 ACCOUNT_LOCKED retryAfterSeconds 900 · UI \"ระงับการเข้าสู่ระบบชั่วคราว\" ตัวนับ \"14 นาที : 59 วินาที\"",
+    "shots": [
+      "it14-locked.png"
+    ]
+  },
+  {
+    "id": "IT-15",
+    "pass": true,
+    "actual": "รหัสถูกระหว่างถูกระงับ → 429 ACCOUNT_LOCKED retryAfterSeconds 893 · ตัวนับ \"14 นาที : 52 วินาที\"",
+    "shots": [
+      "it15-locked-correct-password.png"
+    ]
+  },
+  {
+    "id": "IT-18",
+    "pass": true,
+    "actual": "ระหว่าง D ถูกระงับ login A2 → 200 URL /",
+    "shots": [
+      "it18-other-user.png"
+    ]
+  },
+  {
+    "id": "IT-17",
+    "pass": true,
+    "actual": "ผิด 4 ครั้ง → 401, 401, 401, 401 · รหัสถูก → 200  (failed_attempts หลังนั้น = 0) · ผิดอีก 4 ครั้ง → 401, 401, 401, 401",
+    "shots": [
+      "it17-reset-count.png"
+    ]
+  },
+  {
+    "id": "IT-27",
+    "pass": true,
+    "actual": "ผิด 4 ครั้ง → 401, 401, 401, 401 · รหัสถูก → 403 ACCOUNT_INACTIVE (failed_attempts หลังนั้น = 0) · ผิดอีก 4 ครั้ง → 401, 401, 401, 401",
+    "shots": [
+      "it27-reset-count.png"
+    ]
+  },
+  {
+    "id": "IT-20",
+    "pass": true,
+    "actual": "ยิงตรง username ว่าง → 400 errors {\"username\":\"must not be blank\"} · ยิงบัญชี E (ถ้ายิง TU จะได้ 503) password ว่าง → 400 แสดงว่าไม่ยิง TU · failed_attempts ของ E = 0 · ผ่าน UI ได้ 400 UI แสดง \"เข้าสู่ระบบไม่สำเร็จ\n\nเกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง\" ไม่ crash",
+    "shots": [
+      "it20-blank-username.png"
+    ]
+  },
+  {
+    "id": "IT-21",
+    "pass": true,
+    "actual": "→ 503 TU_API_UNAVAILABLE · UI \"เข้าสู่ระบบไม่สำเร็จ\n\nไม่สามารถเชื่อมต่อระบบของมหาวิทยาลัยได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง\" (ไม่ใช่ข้อความรหัสผิด) · failed_attempts ของ E = 0",
+    "shots": [
+      "it21-tu-unavailable.png"
+    ]
+  },
+  {
+    "id": "IT-22",
+    "pass": true,
+    "actual": "ACCOUNT_LOCKED: 429 ACCOUNT_LOCKED detail ถูกเปลี่ยน → UI ยังแสดงหน้าถูก · INVALID_CREDENTIALS: 401 INVALID_CREDENTIALS detail ถูกเปลี่ยน → UI ยังแสดงหน้าถูก · ACCOUNT_INACTIVE: 403 ACCOUNT_INACTIVE detail ถูกเปลี่ยน → UI ยังแสดงหน้าถูก · NOT_CS_STUDENT: 403 NOT_CS_STUDENT detail ถูกเปลี่ยน → UI ยังแสดงหน้าถูก",
+    "shots": [
+      "it22-account_locked.png",
+      "it22-invalid_credentials.png",
+      "it22-account_inactive.png",
+      "it22-not_cs_student.png"
+    ]
+  },
+  {
+    "id": "IT-23",
+    "pass": true,
+    "actual": "ไม่มี token: users/me → ไม่เรียก · กลับหน้า /login · token ถูกล้าง · banner เซสชันหมดอายุ ไม่แสดง · token ปลอม: users/me → 401 · กลับหน้า /login · token ถูกล้าง · banner เซสชันหมดอายุ แสดง · token ถูกแก้ลายเซ็น: users/me → 401 · กลับหน้า /login · token ถูกล้าง · banner เซสชันหมดอายุ แสดง",
+    "shots": [
+      "it23-none.png",
+      "it23-fake.png",
+      "it23-tamper.png"
+    ]
+  },
+  {
+    "id": "IT-24",
+    "pass": true,
+    "actual": "Navbar หลัง login A \"SJ Somchai Jaidee 6609000001\" · logout แล้ว login A2 Navbar \"ST Somporn Tuayang 6609000000\" (ไม่เห็น users/me รอบสอง)",
+    "shots": [
+      "it24-switch-account.png"
+    ]
+  },
+  {
+    "id": "IT-25",
+    "pass": true,
+    "actual": "ปิด backend แล้วกด login → 500 · UI \"เข้าสู่ระบบไม่สำเร็จ\n\nเกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง\" · ปุ่มกดได้ true",
+    "shots": [
+      "it25-backend-down.png"
+    ]
+  },
+  {
+    "id": "IT-26",
+    "pass": true,
+    "actual": "preflight OPTIONS จาก Origin http://localhost:3000 → 200 Access-Control-Allow-Origin \"http://localhost:3000\" · หน้าเว็บใน Docker เรียกผ่าน rewrite ของ Next.js (same origin) ทุก request: true · console มี CORS error 0 ครั้ง",
+    "shots": []
+  },
+  {
+    "id": "IT-19",
+    "pass": true,
+    "actual": "ตรวจ login request 48 รายการ: ทุกรายการ POST, Content-Type application/json, body มีแค่ username/password, URL ไม่มี query string · ไม่ตรง 0 รายการ",
+    "shots": []
+  }
+]
