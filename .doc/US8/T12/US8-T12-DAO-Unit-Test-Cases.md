@@ -21,7 +21,7 @@
   - การเรียง `plans` ตาม `planType` (`SPECIAL_PROJECT` ก่อน `CO_OP`) ซึ่ง T06 ให้ `StudyPlanService` เรียงใน Java ไม่ได้เรียงใน SQL เคสในเอกสารนี้จึงตรวจแค่ลำดับที่ query คืน
   - การเลือก section, ตรวจเวลาชน, ตรวจวิชาซ้ำ และหน่วยกิตเกิน 22 ใน `PlanScheduler` (ไม่ใช้ DB)
   - error `MINOR_NOT_ALLOWED`, `MINOR_PLAN_MISMATCH`, 404 และ `dryRun` ใน `ApplyPlanService`
-  - rollback ของ `ApplyPlanService.applyPlan` ทั้ง transaction เมื่อเรียกผ่าน API ซึ่งอยู่ใน US8-T14 (PR #86) เคส IT-16
+  - rollback ของ `ApplyPlanService.applyPlan` ทั้ง transaction เมื่อเรียกผ่าน API ซึ่งอยู่ใน [US8-T14](../T14/US8-T14-design-it-api-dao.md) เคส IT-API-DAO-US8-16
 
 ระบบไม่ตรวจสอบวิชาที่นักศึกษาเรียนผ่านแล้ว นักศึกษาลบวิชาออกจากตารางเองได้ (ตามข้อตกลงของทีมเรื่อง CoS ของ US8) จึงไม่มี query และเคสเรื่องวิชาที่เรียนผ่านแล้ว
 
@@ -80,7 +80,9 @@
 - `CUR_A` = `"หลักสูตรทดสอบ A"`, `CUR_B` = `"หลักสูตรทดสอบ B"`
 - `OLD` = `2000-01-01T00:00:00+07:00` ใช้ตั้ง `updated_at` ของตารางเดิม เพื่อตรวจว่า `touch()` เปลี่ยนค่าหรือไม่
 
-ข้อมูลชุดนี้ใช้รหัสวิชา แผน และวิชาโทชุดเดียวกับ US8-T14 (PR #86) เท่าที่ DAO ต้องใช้ และเพิ่ม `T8F01` ในวิชาโท MN-1 (ชั้นปี 4 ภาค 1) กับแผนว่าง P-EMPTY เพื่อทดสอบการโหลดวิชาโทข้ามภาคและแผนที่ไม่มีวิชา
+**หมายเหตุ:** รายวิชา `T8...` และแผน P-... ในเอกสารนี้เป็นข้อมูลทดสอบที่สร้างขึ้นสำหรับ DAO test เท่านั้น ไม่ใช่วิชาหรือแผนจริงในเล่มหลักสูตร (แผนและวิชาจริงดูได้จาก [sheet ข้อมูลของทีม](https://docs.google.com/spreadsheets/d/1OGlBEta-Qrl1A0p4MWngh4PlCRBNDEyHinQqgSsRZ6k/edit?usp=sharing)) ส่วนชื่อวิชาโทใช้ชื่อวิชาโทที่มีจริงของหลักสูตร (วิทยาการข้อมูล, ปัญญาประดิษฐ์, การออกแบบและพัฒนาผลิตภัณฑ์ดิจิทัล, เดฟออปส์) แต่รายวิชาในวิชาโทเป็นข้อมูลทดสอบ
+
+ข้อมูลชุดนี้ใช้รหัสวิชา แผน และวิชาโทชุดเดียวกับ [US8-T14](../T14/US8-T14-design-it-api-dao.md) เท่าที่ DAO ต้องใช้ และเพิ่ม `T8F01` ในวิชาโท MN-1 (ชั้นปี 4 ภาค 1) กับแผนว่าง P-EMPTY เพื่อทดสอบการโหลดวิชาโทข้ามภาคและแผนที่ไม่มีวิชา
 
 ### 1. ตาราง `course` และ `section` / `schedule_slot` (ภาค 1/2568 ยกเว้นที่ระบุ)
 
@@ -124,7 +126,7 @@
 
 | ตัวแปร | `curriculum_name` | `minor_name` | `sort_order` | วิชา (`study_year`/`semester`, `sort_order`) | ลำดับ insert ของวิชา |
 | --- | --- | --- | --- | --- | --- |
-| MN-OTHER | `CUR_B` | `"ความมั่นคงปลอดภัยไซเบอร์"` | 3 | T8N01 (3/1, 1) | T8N01 |
+| MN-OTHER | `CUR_B` | `"เดฟออปส์"` | 3 | T8N01 (3/1, 1) | T8N01 |
 | MN-1 | `CUR_A` | `"วิทยาการข้อมูล"` | 1 | T8N01 (3/1, 1), T8N02 (3/1, 2), T8M05 (3/1, 3), T8F01 (4/1, 1) | T8F01, T8M05, T8N01, T8N02 |
 | MN-2 | `CUR_A` | `"ปัญญาประดิษฐ์"` | 2 | T8N01 (4/2, 1) | T8N01 |
 
@@ -526,8 +528,8 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 - **Related:** ER Constraint · **Test method:** `insertMinor_duplicateNameOrOrder_throwsConstraintViolation` (`@ParameterizedTest` 2 ค่า) และ `insertMinor_sameOrderInOtherCurriculum_succeeds`
 - **Test Steps:**
   1. insert `study_minor (CS, CUR_A, "วิทยาการข้อมูล", 9)` ชื่อซ้ำกับ MN-1
-  2. insert `study_minor (CS, CUR_A, "วิศวกรรมซอฟต์แวร์", 1)` `sort_order` ซ้ำกับ MN-1
-  3. (เทสแยก) insert `study_minor (CS, CUR_B, "วิศวกรรมซอฟต์แวร์", 1)`
+  2. insert `study_minor (CS, CUR_A, "การออกแบบและพัฒนาผลิตภัณฑ์ดิจิทัล", 1)` `sort_order` ซ้ำกับ MN-1
+  3. (เทสแยก) insert `study_minor (CS, CUR_B, "การออกแบบและพัฒนาผลิตภัณฑ์ดิจิทัล", 1)`
 - **Expected Result:**
   - ข้อ 1 throw ด้วย `uq_study_minor` · ข้อ 2 throw ด้วย `uq_study_minor_order`
   - ข้อ 3 insert ได้ (ลำดับปุ่มแยกตามหลักสูตร)
@@ -580,7 +582,7 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 
 ## Traceability Matrix
 
-คอลัมน์ CoS ใช้เลข Conditions of Satisfaction ของการ์ด US8 หลังทีมตัด TC2 และ TC5 เดิมออก (1 = เพิ่มวิชาที่จำเป็นต้องลงทะเบียนตามแผน, 2 = ไม่เพิ่มวิชาที่มีในตารางซ้ำ, 3 = เวลาชน) แบบเดียวกับ US8-T14 (PR #86) และ US8-T16 (PR #85) ส่วน "T04" คือกรณีที่การ์ด US8-T04 ให้ครอบคลุมเพิ่ม และ "T05" คือกรณีจาก US8-T05 ที่ไม่ได้อยู่ใน CoS
+คอลัมน์ CoS ใช้เลข Conditions of Satisfaction ของการ์ด US8 หลังทีมตัด TC2 และ TC5 เดิมออก (1 = เพิ่มวิชาที่จำเป็นต้องลงทะเบียนตามแผน, 2 = ไม่เพิ่มวิชาที่มีในตารางซ้ำ, 3 = เวลาชน) แบบเดียวกับ [US8-T14](../T14/US8-T14-design-it-api-dao.md) และ [US8-T16](../T16/US8-T16-uat-test-cases.md) ส่วน "T04" คือกรณีที่การ์ด US8-T04 ให้ครอบคลุมเพิ่ม และ "T05" คือกรณีจาก US8-T05 ที่ไม่ได้อยู่ใน CoS
 
 | CoS / ข้อกำหนดของ US8 | บทบาทของชั้น DAO ที่ต้องรองรับ | TC ID ที่ครอบคลุม |
 | --- | --- | --- |
@@ -619,8 +621,8 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 - [Sequence Diagram ดูแผนการเรียน](../T06/US8-T06-Sequence-Diagram-StudyPlans.md) (US8-T06)
 - [DTO & API Spec](../T05/US8-DTO-API-Spec.md) (US8-T05)
 - [API Class Diagram](../T05/US8-API-Class-Diagram.md) (US8-T05)
-- Integration Test Cases ระหว่าง API กับ DAO (US8-T14 · PR #86)
-- UAT Test Cases (US8-T16 · PR #85)
+- [Integration Test Cases ระหว่าง API กับ DAO](../T14/US8-T14-design-it-api-dao.md) (US8-T14)
+- [UAT Test Cases](../T16/US8-T16-uat-test-cases.md) (US8-T16)
 - [US1-T06 DAO Class Diagram](../../US1/T06/US1-T06-DAO-Class-Diagram.md)
 - [US1-T12 Design Unit Test Cases ส่วน DAO](../../US1/T12/US1-T12%20Design%20Unit%20Test%20Cases%20ส่วน%20DAO.md)
 - [US2-T12 Design Unit Test Cases ส่วน DAO](../../US2/T12/US2-T12-DAO-Unit-Test-Cases.md)
