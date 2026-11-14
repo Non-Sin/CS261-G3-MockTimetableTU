@@ -77,7 +77,7 @@ Nov 14, 2026 · @Non
 
 ## ส่วนที่ต่างจากเอกสารออกแบบ
 
-**1. แก้ `ck_study_plan_plan_type` ตามข้อเสนอของ T12** SQL ใน [T06 ER Diagram](../T06/US8-T06-ER-Diagram.md) ยอมให้ชั้นปี 3–4 มี `plan_type = NULL` เพราะ `NULL IN (...)` ได้ UNKNOWN ซึ่ง CHECK ของ SQL Server ถือว่าผ่าน migration จึงเพิ่ม `plan_type IS NOT NULL` ตามหัวข้อ "สิ่งที่ต้องแก้ใน T06 / T09" ของ T12 UT-DAO-US8-23 ค่า (3, `NULL`) และ (4, `NULL`) จึงผ่าน **SQL ใน T06 ER Diagram ยังเป็นฉบับเดิม ควรอัปเดตให้ตรงกับ migration**
+**1. แก้ `ck_study_plan_plan_type` ตามข้อเสนอของ T12** SQL ใน [T06 ER Diagram](../T06/US8-T06-ER-Diagram.md) ยอมให้ชั้นปี 3–4 มี `plan_type = NULL` เพราะ `NULL IN (...)` ได้ UNKNOWN ซึ่ง CHECK ของ SQL Server ถือว่าผ่าน migration จึงเพิ่ม `plan_type IS NOT NULL` ตามหัวข้อ "สิ่งที่ต้องแก้ใน T06 / T09" ของ T12 UT-DAO-US8-23 ค่า (3, `NULL`) และ (4, `NULL`) จึงผ่าน SQL ใน T06 ER Diagram อัปเดตตาม migration แล้ว
 
 **2. ตัดคอลัมน์ของ collection ออกจาก `order by` ใน JPQL** JPQL ใน [T06 DAO Class Diagram](../T06/US8-T06-DAO-Class-Diagram.md) ใส่ `pc.sortOrder` และ `mc.studyYear, mc.semester, mc.sortOrder` ไว้ใน `order by` แต่เมื่อ `join fetch` collection ที่มี `@OrderBy` Hibernate ต่อ `@OrderBy` ท้าย `order by` ให้เอง SQL จึงมีคอลัมน์ซ้ำ และ SQL Server ปฏิเสธด้วย `A column has been specified more than once in the order by list` (ครั้งที่ 3 ในประวัติการรัน) จึงเหลือไว้แค่ส่วนของ root ลำดับที่ได้เหมือน T06 ทุกข้อ ซึ่ง UT-DAO-US8-01, 07, 09, 13 ยืนยันแล้ว
 
@@ -88,7 +88,7 @@ Nov 14, 2026 · @Non
 | `StudyMinorRepository.findByDepartmentAndTerm` | `order by m.sortOrder, m.minorId, mc.studyYear, mc.semester, mc.sortOrder` | `order by m.sortOrder, m.minorId` | `... sort_order, minor_id, study_year, semester, sort_order` |
 | `StudyMinorRepository.findWithCoursesById` | `order by mc.studyYear, mc.semester, mc.sortOrder` | ไม่มี `order by` | `... study_year, semester, sort_order` |
 
-ถ้าภายหลังลบ `@OrderBy` ออกจาก entity ต้องใส่คอลัมน์เหล่านี้กลับเข้าไปใน JPQL ไม่อย่างนั้นวิชาจะไม่เรียง (เขียนเตือนไว้ใน Javadoc ของ repository ทั้งสองตัวแล้ว)
+ถ้าภายหลังลบ `@OrderBy` ออกจาก entity ต้องใส่คอลัมน์เหล่านี้กลับเข้าไปใน JPQL ไม่อย่างนั้นวิชาจะไม่เรียง (เขียนเตือนไว้ใน Javadoc ของ repository ทั้งสองตัว และใน T06 DAO Class Diagram ที่อัปเดต JPQL ตามโค้ดแล้ว)
 
 **3. ข้อมูลตั้งต้นของ `ApplyPlanSaveRollbackTest` ใช้ `JdbcTemplate`** T12 ให้เตรียมข้อมูลใน `transactionTemplate.executeWithoutResult(...)` ซึ่งทำตามแล้ว แต่ข้างในใช้ `INSERT ... OUTPUT INSERTED` ผ่าน `JdbcTemplate` แทน entity เพราะคลาสนี้ปิด transaction ของ `@DataJpaTest` ไว้และไม่มี `TestEntityManager` ที่ใช้ได้นอก transaction ข้อมูลตรงกับที่ T12 กำหนด (`T8R01`, `T8R02`, TT-R ที่มี `updated_at = OLD`) และ `@AfterEach` ลบตามลำดับที่ T12 กำหนด นอกจากนี้ `@BeforeEach` เรียก cleanup ก่อน เพื่อกันข้อมูลค้างถ้ารอบก่อนหยุดกลางทาง
 
@@ -113,5 +113,4 @@ Nov 14, 2026 · @Non
 ## สิ่งที่ต้องทำต่อ
 
 - กรอกคอลัมน์ Actual Result / Status และ "สรุปผลการทดสอบ" ในเอกสาร US8-T12 ตามผลนี้ (อยู่บน branch ของ T12)
-- อัปเดต SQL ของ `ck_study_plan_plan_type` และ JPQL ใน T06 ให้ตรงกับโค้ด (ส่วนที่ต่างข้อ 1 และ 2)
 - Seed แผนการเรียนและวิชาโทจริงใน `db/seed` สำหรับ UAT (US8-T16) ยังไม่ได้ทำ

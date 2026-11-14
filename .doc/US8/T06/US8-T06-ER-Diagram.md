@@ -105,6 +105,8 @@ erDiagram
 
 SQL ชุดนี้เป็นฉบับที่ใช้สร้าง Flyway migration แทนข้อเสนอในหัวข้อ "ข้อมูล preset" ของ US8-T05 ต่างจากข้อเสนอเดิม 3 ข้อ คือเพิ่ม `uq_study_plan_course_order`, `uq_study_minor_order` และ `uq_study_minor_course_order` (ช่วง `study_year` 1–4 ของ `study_plan` บังคับผ่าน `ck_study_plan_plan_type` แล้ว จึงไม่ต้องมี CHECK แยก)
 
+**`ck_study_plan_plan_type` ต้องมี `plan_type IS NOT NULL`** ในเงื่อนไขของปี 3–4 เพราะ `NULL IN ('SPECIAL_PROJECT', 'CO_OP')` ได้ผล UNKNOWN และ CHECK ของ SQL Server ถือว่า UNKNOWN ผ่าน ถ้าไม่ใส่ แผนปี 3–4 ที่ลืมระบุ `plan_type` จะ insert ได้ (พบใน US8-T12 และยืนยันด้วย UT-DAO-US8-23 ใน US8-T09)
+
 ```sql
 CREATE TABLE study_plan (
     plan_id         BIGINT IDENTITY(1,1) NOT NULL,
@@ -118,7 +120,7 @@ CREATE TABLE study_plan (
     CONSTRAINT ck_study_plan_semester CHECK (semester IN (1, 2)),
     CONSTRAINT ck_study_plan_plan_type CHECK (
         (study_year IN (1, 2) AND plan_type IS NULL)
-        OR (study_year IN (3, 4) AND plan_type IN ('SPECIAL_PROJECT', 'CO_OP'))
+        OR (study_year IN (3, 4) AND plan_type IS NOT NULL AND plan_type IN ('SPECIAL_PROJECT', 'CO_OP'))
     )
 );
 

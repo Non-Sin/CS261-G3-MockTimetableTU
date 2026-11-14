@@ -180,7 +180,7 @@ classDiagram
         join fetch pc.course
         where p.department = :department
           and p.studyYear = :studyYear and p.semester = :semester
-        order by p.curriculumName, p.planId, pc.sortOrder""")
+        order by p.curriculumName, p.planId""")
 List<StudyPlan> findByDepartmentAndStudyYearAndSemester(@Param("department") String department,
                                                         @Param("studyYear") int studyYear,
                                                         @Param("semester") int semester);
@@ -189,10 +189,11 @@ List<StudyPlan> findByDepartmentAndStudyYearAndSemester(@Param("department") Str
         select p from StudyPlan p
         join fetch p.courses pc
         join fetch pc.course
-        where p.planId = :planId
-        order by pc.sortOrder""")
+        where p.planId = :planId""")
 Optional<StudyPlan> findWithCoursesById(@Param("planId") Long planId);
 ```
+
+- **ลำดับวิชาในแผนมาจาก `@OrderBy("sortOrder")` ของ `StudyPlan.courses`** เมื่อ `join fetch` collection ที่มี `@OrderBy` Hibernate ต่อ `sort_order` ท้าย `order by` ของ SQL ให้เอง (`... order by curriculum_name, plan_id, sort_order`) ห้ามเขียน `pc.sortOrder` ใน JPQL ซ้ำ เพราะ SQL Server ปฏิเสธคอลัมน์ซ้ำใน `order by` (`A column has been specified more than once in the order by list`) ถ้าภายหลังลบ `@OrderBy` ออกจาก entity ต้องเพิ่ม `pc.sortOrder` กลับเข้า JPQL (พบตอนรัน UT-DAO-US8-01 – 18 ใน US8-T09)
 
 - fetch collection เดียว (`courses`) จึงไม่เกิด `MultipleBagFetchException` และ Hibernate 6+ ตัดแถวซ้ำของ `StudyPlan` ให้เอง
 - ใช้ `join fetch` (inner join) เพราะ ER กำหนดว่าแผนมีวิชาอย่างน้อย 1 วิชา (`1..*`) แผนที่ไม่มีวิชาจะไม่ถูกคืน ซึ่งถือว่าเป็น seed ผิด
@@ -210,7 +211,7 @@ Optional<StudyPlan> findWithCoursesById(@Param("planId") Long planId);
         where m.department = :department
           and exists (select 1 from StudyMinorCourse x
                       where x.minor = m and x.studyYear = :studyYear and x.semester = :semester)
-        order by m.sortOrder, m.minorId, mc.studyYear, mc.semester, mc.sortOrder""")
+        order by m.sortOrder, m.minorId""")
 List<StudyMinor> findByDepartmentAndTerm(@Param("department") String department,
                                          @Param("studyYear") int studyYear,
                                          @Param("semester") int semester);
@@ -219,8 +220,7 @@ List<StudyMinor> findByDepartmentAndTerm(@Param("department") String department,
         select m from StudyMinor m
         join fetch m.courses mc
         join fetch mc.course
-        where m.minorId = :minorId
-        order by mc.studyYear, mc.semester, mc.sortOrder""")
+        where m.minorId = :minorId""")
 Optional<StudyMinor> findWithCoursesById(@Param("minorId") Long minorId);
 ```
 
@@ -229,6 +229,7 @@ Optional<StudyMinor> findWithCoursesById(@Param("minorId") Long minorId);
 - query ไม่กรอง `curriculumName` UI แสดงเฉพาะวิชาโทที่ `curriculumName` ตรงกับ preset ที่เลือกตาม Spec
 - `findWithCoursesById` ใช้ใน `ApplyPlanService.loadMinor` แล้ว `loadCandidates` เรียก `minor.coursesOf(plan.studyYear, plan.semester)` วิชาโทที่ไม่มีวิชาในภาคของ preset จะไม่เพิ่มวิชาใด (ไม่ใช่ error)
 - fetch collection เดียวเช่นเดียวกับ `StudyPlanRepository`
+- **ลำดับวิชาในวิชาโทมาจาก `@OrderBy("studyYear, semester, sortOrder")` ของ `StudyMinor.courses`** แบบเดียวกับ `StudyPlanRepository` Hibernate ต่อ `study_year, semester, sort_order` ท้าย `order by` ให้เอง JPQL จึงเรียงแค่ `m.sortOrder, m.minorId`
 
 ## เอกสารที่เกี่ยวข้อง
 
