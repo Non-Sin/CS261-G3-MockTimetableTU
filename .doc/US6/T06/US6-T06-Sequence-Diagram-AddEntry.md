@@ -4,6 +4,8 @@
 
 ## เงื่อนไขก่อน POST
 
+เมื่อเปิด modal ให้เลือก Sec แรกที่ `selectable && !inTimetable` อัตโนมัติตามลำดับ `semester` แล้ว `sectionNo` แม้มีหลายตัวเลือก ตาม [Sequence รายละเอียด](./US6-T06-Sequence-Diagram-Detail.md) ผู้ใช้เปลี่ยน Sec ที่เลือกได้ก่อนกดเพิ่ม
+
 UI ต้องเลือก Sec ที่ `selectable: true` และวิชานี้ยังไม่มี Sec ใดที่ `inTimetable: true` ก่อนส่ง กันกดซ้ำขณะกำลังส่ง หาก modal เปิดค้างแล้วเปลี่ยนปี/ภาคตาราง ต้องโหลดรายละเอียดใหม่และตรวจ selection อีกครั้ง ไม่ใช้ selectable จากตารางก่อนหน้า
 
 US1 **อ่านปี/ภาคจาก section** และไม่ได้รับ currentSemester เพื่อปฏิเสธอีกภาค หาก UI ส่ง Sec อีกภาคไป US1 อาจสร้างตารางอีกภาคได้ ไม่ใช่ 409 ดังนั้นกรณี PY250 อีกภาคต้องกันที่ UI ตาม T05 `conflictWith` ไม่ว่างยังเลือกและส่ง POST ได้ เวลาชนไม่ใช่ข้อห้ามเพิ่ม
@@ -21,7 +23,7 @@ sequenceDiagram
     participant O as ScheduleOverlap
     participant DB as Database
 
-    Student->>UI: เลือก Sec แล้วกด + เพิ่มลงตาราง
+    Student->>UI: ตรวจหรือเปลี่ยน Sec ที่เลือกไว้<br/>แล้วกด + เพิ่มลงตาราง
     UI->>UI: ตรวจ selectable, วิชายังไม่อยู่ในตาราง, กันกดซ้ำ
     UI->>C: POST /api/timetable/entries<br/>{sectionId} + Bearer token
     Note over UI,C: 401 จาก security<br/>ก่อนถึง Controller<br/>body ผิด @Valid = 400<br/>ก่อนเข้า method

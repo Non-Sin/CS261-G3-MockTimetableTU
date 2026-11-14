@@ -2,6 +2,8 @@
 
 `GET /api/electives/{courseCode}?academicYear=2568&currentSemester=1` ตาม [US6-T05 รุ่น 8213f9a](https://github.com/Non-Sin/CS261-G3-MockTimetableTU/blob/8213f9acded350f8837eefc6a1b96564c82a297d/.doc/US6/T05/US6-DTO%20%26%20API%20Spec.md) คืนรายละเอียด **ทุก Sec ในปีนั้น** แม้บาง Sec ไม่ผ่านตัวกรองหน้ารายการหรืออยู่อีกภาค ดูกรณี FR205 และ PY250 ใน Prototype ของ T05
 
+กติกาเลือก Sec เริ่มต้นปรับตาม [รีวิว PR #92](https://github.com/Non-Sin/CS261-G3-MockTimetableTU/pull/92): เลือก Sec แรกที่เลือกได้เสมอจากลำดับ `semester` แล้ว `sectionNo` รวมกรณีมีหลาย Sec แทนเงื่อนไขว่าต้องเหลือตัวเลือกเดียวใน T05 รุ่นที่อ้างอิงข้างต้น
+
 ```mermaid
 sequenceDiagram
     actor Student as นักศึกษา
@@ -71,6 +73,13 @@ sequenceDiagram
             S->>S: offeredSemesters จาก Sec ทั้งปี<br/>ประกอบ summary + description + sections
             S-->>C: ElectiveDetailResponse
             C-->>UI: 200 รายละเอียด
+            UI->>UI: หา Sec แรกที่ selectable และไม่ inTimetable<br/>ตามลำดับ semester แล้ว sectionNo
+            alt มี Sec ที่เลือกได้
+                UI->>UI: เลือก Sec แรกอัตโนมัติ แม้มีหลายตัวเลือก
+            else ไม่มี Sec ที่เลือกได้
+                UI->>UI: ไม่เลือก Sec และ disable ปุ่มเพิ่ม
+            end
+            Note over UI: ถ้าวิชานี้มี Sec ใดอยู่ในตารางแล้ว<br/>ปุ่มเพิ่มทั้งวิชายังคง disabled
             UI-->>Student: ชื่อ หน่วยกิต bullet รีวิว Sec และป้าย/คำเตือน
         end
     end
@@ -96,7 +105,8 @@ sequenceDiagram
 
 ## ปุ่มเพิ่มและ error
 
-- ถ้ามี Sec ที่ `selectable && !inTimetable` เพียงตัวเดียว ให้ UI เลือกอัตโนมัติ; หากมีหลายตัวต้องตรวจว่ามี Sec ที่เลือกอยู่และยังเลือกได้ก่อนกดเพิ่ม
+- เมื่อโหลดรายละเอียดสำเร็จ ให้ UI เลือก Sec แรกที่ `selectable && !inTimetable` อัตโนมัติตามลำดับ `semester` แล้ว `sectionNo` แม้มีหลายตัวเลือก ผู้ใช้เปลี่ยน Sec ที่เลือกได้ก่อนกดเพิ่ม
+- หากไม่มี Sec ที่เลือกได้ ให้ไม่มี selection และ disable ปุ่มเพิ่ม; หากมี Sec ใดของวิชานี้ `inTimetable: true` ปุ่มเพิ่มทั้งวิชายัง disabled ตามกฎป้องกันวิชาซ้ำ
 - UI ปิด modal/retry ได้เมื่อ GET ล้มเหลว; รายละเอียดไม่มีสิทธิ์เข้ารายการได้ 404 ไม่โหลดตารางผู้ใช้ต่อ
 - วิชาที่ไม่มี review ไม่เข้ารายการและ detail ได้ 404 ตาม eligibility; fallback “ยังไม่มีรายละเอียดวิชา” ของ UI เป็นการรับมือข้อมูลผิดพลาด ไม่ใช่ผลสำเร็จปกติที่ seed ควรให้
 - GET ไม่เขียน `timetable` หรือ metadata แม้นักศึกษายังไม่มีตาราง

@@ -147,7 +147,7 @@ query root `ElectiveInfo` แบบ `SELECT DISTINCT info` พร้อม `JOIN
 
 ```sql
 -- JPQL (ไม่ใช่ SQL migration)
-select distinct s from Section s
+select s from Section s
 join fetch s.course c
 left join fetch s.slots
 where c.courseCode in :courseCodes and s.academicYear = :academicYear
@@ -155,6 +155,8 @@ order by c.courseCode, s.semester, s.sectionNo
 ```
 
 ใช้ `LEFT JOIN` เพื่อรักษา section ไม่มีคาบไว้ ตัวกรองวัน/เวลา/ภาค/ไม่ชนทำใน service บนชุด section นี้ ไม่ใช้ method เดิมที่บังคับหนึ่งภาค เพราะรายละเอียดต้องแสดง Sec ของทั้งปี และ `offeredSemesters` ต้องไม่เปลี่ยนตามตัวกรอง
+
+ใช้ `select s` ให้สอดคล้องกับ query ใน `SectionRepository` ของ US1 และให้ Hibernate 6+ จัดการ root entity ซ้ำจาก collection fetch join ไม่บังคับ SQL `SELECT DISTINCT` ใน query นี้ ตามข้อเสนอแนะรีวิว PR #92 ยังคงเรียง `semester` แล้ว `sectionNo` ภายในแต่ละวิชาเพื่อใช้เลือก Sec เริ่มต้น
 
 ### 4. รายละเอียดโหลดรีวิวใน read-only transaction
 
