@@ -14,9 +14,10 @@ CREATE TABLE study_plan (
     CONSTRAINT uq_study_plan UNIQUE (department, curriculum_name, study_year, semester, plan_type),
     CONSTRAINT ck_study_plan_semester CHECK (semester IN (1, 2)),
     -- บังคับช่วง study_year 1–4 ไปด้วย
+    -- ต้องมี plan_type IS NOT NULL เพราะ NULL IN (...) ได้ UNKNOWN ซึ่ง CHECK ถือว่าผ่าน (US8-T12 "สิ่งที่ต้องแก้ใน T06 / T09")
     CONSTRAINT ck_study_plan_plan_type CHECK (
         (study_year IN (1, 2) AND plan_type IS NULL)
-        OR (study_year IN (3, 4) AND plan_type IN ('SPECIAL_PROJECT', 'CO_OP'))
+        OR (study_year IN (3, 4) AND plan_type IS NOT NULL AND plan_type IN ('SPECIAL_PROJECT', 'CO_OP'))
     )
 );
 
