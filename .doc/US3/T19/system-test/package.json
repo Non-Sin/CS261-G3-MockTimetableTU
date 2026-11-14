@@ -1,0 +1,15 @@
+{
+  "name": "us3-t19-system-test",
+  "private": true,
+  "type": "module",
+  "description": "System Test ของ US3 ตาม US3-T15: Puppeteer ตรวจหน้าเว็บ + API + DB และ newman รัน Postman collection",
+  "scripts": {
+    "test:ui": "node run-system-test.mjs",
+    "test:api": "newman run ../US3-T19-system-test.postman_collection.json",
+    "reset-db": "node run-system-test.mjs --reset-only"
+  },
+  "devDependencies": {
+    "newman": "^6.2.3",
+    "puppeteer": "^25.16.0"
+  }
+}

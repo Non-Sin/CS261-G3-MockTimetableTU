@@ -1,0 +1,12 @@
+{
+  "name": "us4-t20-uat",
+  "private": true,
+  "type": "module",
+  "description": "US4-T20 รัน UAT ตาม US4-T16 ด้วย puppeteer",
+  "scripts": {
+    "uat": "node run-uat.mjs"
+  },
+  "dependencies": {
+    "puppeteer": "23.11.1"
+  }
+}
