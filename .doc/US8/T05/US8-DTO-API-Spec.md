@@ -40,20 +40,21 @@ Nov 3, 2026 · @Non
 
 ```json
 {
-  "department": "วิทยาการคอมพิวเตอร์",
+  "department": "ภาควิชาวิทยาการคอมพิวเตอร์",
   "studyYear": 2,
   "semester": 1,
   "plans": [
     {
-      "planId": 12,
+      "planId": 3,
       "curriculumName": "หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชาวิทยาการคอมพิวเตอร์ (ฉบับปรับปรุง พ.ศ. 2566)",
       "studyYear": 2,
       "semester": 1,
       "planType": null,
-      "totalCredits": 21,
+      "totalCredits": 18,
       "courses": [
-        { "courseCode": "CS211", "courseName": "DATA STRUCTURES AND ALGORITHMS", "category": "MAJOR", "credits": 3 },
-        { "courseCode": "CS261", "courseName": "SOFTWARE ENGINEERING", "category": "MAJOR", "credits": 3 }
+        { "courseCode": "CS221", "courseName": "Introduction to Computer System and Organization", "category": "MAJOR", "credits": 3 },
+        { "courseCode": "CS213", "courseName": "Data Structures", "category": "MAJOR", "credits": 3 },
+        { "courseCode": "EL295", "courseName": "Academic English and Study Skills 1", "category": "GENERAL_EDUCATION", "credits": 3 }
       ]
     }
   ],
@@ -61,7 +62,8 @@ Nov 3, 2026 · @Non
 }
 ```
 
-- ไม่พบแผน → `200` กับ `plans: []` ไม่ใช่ error UI แสดง "ยังไม่มีแผนการเรียนสำหรับชั้นปีนี้"
+- `department` คือ `users.department` ตามที่ TU API ส่งมา (`ภาควิชาวิทยาการคอมพิวเตอร์`) ค่าใน seed ต้องสะกดตรงกัน
+- ไม่พบแผน → `200` กับ `plans: []` ไม่ใช่ error UI แสดง "ยังไม่มีแผนการเรียนสำหรับชั้นปีนี้" เช่น ชั้นปีที่ 4 ภาค 2 ที่มีแต่วิชาเลือกเสรี
 - backend ไม่คำนวณชั้นปี ใช้ค่า `studyYear` ที่ส่งมาตรง ๆ และตอบกลับใน response ให้ UI แสดง "แผนการเรียนชั้นปีที่ 2" ส่วนปุ่ม "ชั้นปี" ไม่มีค่าเริ่มต้น นักศึกษาต้องเลือกก่อนจึงจะเรียก endpoint นี้
 - `courses` เป็นข้อมูลของ preset เท่านั้น ยังไม่บอกว่าภาคนี้เปิดสอนหรือไม่ ผลจริงดูจาก `apply-plan` แบบ `dryRun`
 
@@ -69,20 +71,36 @@ Nov 3, 2026 · @Non
 
 ```json
 {
-  "department": "วิทยาการคอมพิวเตอร์",
+  "department": "ภาควิชาวิทยาการคอมพิวเตอร์",
   "studyYear": 3,
   "semester": 1,
   "plans": [
-    { "planId": 21, "curriculumName": "หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชาวิทยาการคอมพิวเตอร์ (ฉบับปรับปรุง พ.ศ. 2566)", "studyYear": 3, "semester": 1, "planType": "SPECIAL_PROJECT", "totalCredits": 15, "courses": [ ... ] },
-    { "planId": 22, "curriculumName": "หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชาวิทยาการคอมพิวเตอร์ (ฉบับปรับปรุง พ.ศ. 2566)", "studyYear": 3, "semester": 1, "planType": "CO_OP", "totalCredits": 15, "courses": [ ... ] }
+    { "planId": 6, "curriculumName": "หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชาวิทยาการคอมพิวเตอร์ (ฉบับปรับปรุง พ.ศ. 2566)", "studyYear": 3, "semester": 1, "planType": "SPECIAL_PROJECT", "totalCredits": 15, "courses": [ ... ] },
+    { "planId": 5, "curriculumName": "หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชาวิทยาการคอมพิวเตอร์ (ฉบับปรับปรุง พ.ศ. 2566)", "studyYear": 3, "semester": 1, "planType": "CO_OP", "totalCredits": 12, "courses": [ ... ] }
   ],
   "minors": [
     {
-      "minorId": 3,
+      "minorId": 1,
+      "planType": "SPECIAL_PROJECT",
       "curriculumName": "หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชาวิทยาการคอมพิวเตอร์ (ฉบับปรับปรุง พ.ศ. 2566)",
       "minorName": "วิทยาการข้อมูล",
       "totalCredits": 6,
-      "courses": [ { "courseCode": "...", "courseName": "...", "category": "MAJOR", "credits": 3 } ]
+      "courses": [
+        { "courseCode": "CS345", "courseName": "Practical Machine Learning", "category": "MINOR", "credits": 3 },
+        { "courseCode": "CS346", "courseName": "Big Data Applications and Analytics", "category": "MINOR", "credits": 3 }
+      ]
+    },
+    {
+      "minorId": 1,
+      "planType": "CO_OP",
+      "curriculumName": "หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชาวิทยาการคอมพิวเตอร์ (ฉบับปรับปรุง พ.ศ. 2566)",
+      "minorName": "วิทยาการข้อมูล",
+      "totalCredits": 9,
+      "courses": [
+        { "courseCode": "CS440", "courseName": "Selected Topics in Data Science", "category": "MINOR", "credits": 3 },
+        { "courseCode": "CS345", "courseName": "Practical Machine Learning", "category": "MINOR", "credits": 3 },
+        { "courseCode": "CS346", "courseName": "Big Data Applications and Analytics", "category": "MINOR", "credits": 3 }
+      ]
     }
   ]
 }
@@ -95,20 +113,22 @@ Nov 3, 2026 · @Non
 - ไม่ต้องแก้ `apply-plan` เพราะ `planId` บอกแผนอยู่แล้ว
 - วิชาสหกิจศึกษาที่ section ไม่มีคาบเรียน (ไม่มี `schedules`) ไม่ชนกับวิชาใด จึงถูกเพิ่มได้ตามปกติ ถ้าภาคนั้นไม่มี section เลยได้ `NO_SECTION_AVAILABLE` เหมือนวิชาอื่น
 
-**วิชาโท (`minors`):** อยู่ระดับบนของ response ไม่ได้อยู่ใน preset เพราะเลือกได้อิสระจากแผน (หัวข้อพิเศษ/สหกิจ)
+**วิชาโท (`minors`):** อยู่ระดับบนของ response ไม่ได้อยู่ใน preset เพราะเลือกได้อิสระจากแผน (หัวข้อพิเศษ/สหกิจ) แต่**วิชาของวิชาโทขึ้นกับแผน** เล่มหลักสูตรวางวิชาโทบางวิชาของแผนสหกิจไว้คนละภาคกับแผนหัวข้อพิเศษ (เช่น CS440 แผนหัวข้อพิเศษเรียนปี 4/1 แต่แผนสหกิจเรียนปี 3/1 เพราะปี 4/1 ออกสหกิจ)
 
+- **1 รายการ = 1 วิชาโท × 1 แผน** แต่ละรายการมี `planType` (`SPECIAL_PROJECT` / `CO_OP`) และ `courses` ของแผนนั้น วิชาโทเดียวกันจึงมีได้ 2 รายการที่ `minorId` เดียวกัน UI กรอง `minors` ตาม `planType` ของแผนที่เลือก แบบเดียวกับ `plans` (เพิ่มใน US8-T09 ตาม `study_minor_course.plan_type`)
+- วิชาโทที่ไม่มีวิชาในภาคนี้ของแผนใด ไม่มีรายการของแผนนั้น เช่น ชั้นปีที่ 4 ภาค 1 แผนสหกิจไม่มีวิชาโท จึงมีแต่รายการ `SPECIAL_PROJECT`
 - **เฉพาะชั้นปีที่ 3–4:** `studyYear` 1–2 ได้ `minors: []` เสมอ (DB บังคับให้วิชาของวิชาโทอยู่ปี 3–4 เท่านั้น) UI แสดงกลุ่มปุ่ม "เลือกวิชาโท" เฉพาะเมื่อเลือกชั้นปีที่ 3–4 และเปลี่ยนไปปี 1–2 ให้ล้างวิชาโทที่เลือกกลับเป็น "ไม่เรียนวิชาโท"
-- `minors` มีเฉพาะวิชาโทของ `department` นักศึกษาที่**มีวิชาใน `studyYear` + `semester` นี้** เรียงตาม `sortOrder` ไม่มีเลย → `minors: []` และ UI ซ่อนกลุ่มปุ่ม "เลือกวิชาโท"
-- `courses` / `totalCredits` ของวิชาโท คือเฉพาะวิชาของภาคที่ขอ ไม่ใช่ทั้งวิชาโท
+- `minors` มีเฉพาะวิชาโทของ `department` นักศึกษาที่**มีวิชาใน `studyYear` + `semester` นี้ของแผนนั้น** เรียงตาม `sortOrder` ของวิชาโท แล้วตาม `planType` (`SPECIAL_PROJECT` → `CO_OP`) ไม่มีรายการของแผนที่เลือก → UI ซ่อนกลุ่มปุ่ม "เลือกวิชาโท"
+- `courses` / `totalCredits` ของวิชาโท คือเฉพาะวิชาของภาคที่ขอของแผนนั้น ไม่ใช่ทั้งวิชาโท
 - ถ้ามีหลายหลักสูตร UI แสดงเฉพาะวิชาโทที่ `curriculumName` ตรงกับ preset ที่เลือก
 - UI มีปุ่ม "ไม่เรียนวิชาโท" เป็นตัวเลือกแรกและเป็นค่าเริ่มต้น (ไม่ได้มาจาก API) เลือกได้ 1 อย่าง
-- เปลี่ยนภาคเรียนแล้ววิชาโทที่เลือกยังอยู่ (UI จำ `minorId`) ถ้าภาคใหม่ไม่มีวิชาโทนั้นใน `minors` ให้กลับเป็น "ไม่เรียนวิชาโท"
+- เปลี่ยนภาคเรียนหรือแผนแล้ววิชาโทที่เลือกยังอยู่ (UI จำ `minorId`) ถ้าภาคหรือแผนใหม่ไม่มีรายการของวิชาโทนั้นใน `minors` ให้กลับเป็น "ไม่เรียนวิชาโท"
 - หัวรายการวิชาแสดงเช่น "วิชาแนะนำสำหรับ: ชั้นปีที่ 3 ภาคเรียนที่ 1 (แผนทำหัวข้อพิเศษ · วิชาโทวิทยาการข้อมูล)"
 
 ### 2. POST /api/timetable/apply-plan — จัดตารางตามแผน
 
 ```json
-{ "planId": 21, "minorId": 3, "academicYear": 2568, "dryRun": true }
+{ "planId": 8, "minorId": 1, "academicYear": 2568, "dryRun": true }
 ```
 
 | Field | ชนิด | บังคับ | หมายเหตุ |
@@ -118,49 +138,51 @@ Nov 3, 2026 · @Non
 | `academicYear` | int (พ.ศ.) | ใช่ | ปีการศึกษาของตารางที่จะลง |
 | `dryRun` | boolean | ไม่ (default `false`) | `true` = คำนวณผลแต่ไม่บันทึก |
 
-ภาคเรียนอ่านจาก `semester` ของ preset จึงไม่ต้องส่งมา (แนวเดียวกับ US1 ที่อ่านภาคจาก section) วิชาโทใช้วิชาของ `studyYear` + `semester` ของ preset ตอบ `200` เป็น `ApplyPlanResponse` ทั้งสองโหมด แม้ `added` จะว่างก็ไม่ใช่ error
+ภาคเรียนอ่านจาก `semester` ของ preset จึงไม่ต้องส่งมา (แนวเดียวกับ US1 ที่อ่านภาคจาก section) วิชาโทใช้วิชาของ `planType` + `studyYear` + `semester` ของ preset (ไม่ต้องส่ง `planType` เพราะ `planId` บอกอยู่แล้ว) ตอบ `200` เป็น `ApplyPlanResponse` ทั้งสองโหมด แม้ `added` จะว่างก็ไม่ใช่ error
 
 ```json
 {
-  "planId": 21,
-  "minorId": 3,
+  "planId": 8,
+  "minorId": 1,
   "dryRun": true,
   "added": [
     {
-      "courseCode": "CS211",
-      "courseName": "DATA STRUCTURES AND ALGORITHMS",
+      "courseCode": "CS372",
+      "courseName": "Machine Learning",
       "category": "MAJOR",
       "credits": 3,
       "source": "PLAN",
       "sectionId": 401,
-      "sectionNo": "010001"
+      "sectionNo": "040001"
     }
   ],
   "skipped": [
     {
-      "courseCode": "CS284",
-      "courseName": "INTRODUCTION TO SOFTWARE ENGINEERING",
-      "category": "MAJOR",
+      "courseCode": "CS246",
+      "courseName": "Data Visualization",
+      "category": "MINOR",
       "credits": 3,
       "source": "MINOR",
       "reason": "TIME_CONFLICT",
-      "conflictWith": ["CS211"],
-      "message": "CS284 ทุกกลุ่มเรียนเวลาชนกับ CS211"
+      "conflictWith": ["CS332", "CS314"],
+      "message": "CS246 ทุกกลุ่มเรียนเวลาชนกับ CS332, CS314"
     },
     {
-      "courseCode": "TU100",
-      "courseName": "CIVIC EDUCATION",
-      "category": "GENERAL_EDUCATION",
+      "courseCode": "CS305",
+      "courseName": "Social and Professional Ethics",
+      "category": "MAJOR",
       "credits": 3,
       "source": "PLAN",
       "reason": "COURSE_ALREADY_IN_TIMETABLE",
-      "existingSectionNo": "780002",
-      "message": "TU100 อยู่ในตารางแล้ว (Sec 780002)"
+      "existingSectionNo": "090001",
+      "message": "CS305 อยู่ในตารางแล้ว (Sec 090001)"
     }
   ],
   "timetable": null
 }
 ```
+
+ตัวอย่างข้างบนคือแผนหัวข้อพิเศษ ชั้นปีที่ 3 ภาค 2 + วิชาโทวิทยาการข้อมูล ตาม seed (CS246 พ./ศ. 09:30–11:00 ชนกับ CS332 พ. 08:00–11:00 และ CS314 ศ. 08:00–11:00) ตัด `added` / `skipped` ให้สั้น
 
 - `source` บอกว่าวิชามาจากแผนหลัก (`PLAN`) หรือวิชาโท (`MINOR`) UI ใช้แสดงป้าย "วิชาโท" · `minorId` ใน response เป็น `null` เมื่อไม่เลือกวิชาโท
 - วิชาที่อยู่ทั้งในแผนหลักและวิชาโท นับเป็นวิชาเดียว `source: "PLAN"`
@@ -175,7 +197,7 @@ Nov 3, 2026 · @Non
 
 ### ขั้นที่ 1 — กรองก่อนค้นหา
 
-1. โหลด preset (ไม่พบ → 404) วิชาโทถ้าส่ง `minorId` (preset เป็นชั้นปีที่ 1–2 → 400 `MINOR_NOT_ALLOWED`, ไม่พบ → 404, คนละ `department`/`curriculumName` กับ preset → 400 `MINOR_PLAN_MISMATCH`) และ entry ที่มีอยู่ของ `(studentId, academicYear, plan.semester)` รวมวิชาของแผน (`PLAN`) กับวิชาโทของ `plan.studyYear` + `plan.semester` (`MINOR`) ตัดวิชาโทที่ซ้ำกับแผนออก
+1. โหลด preset (ไม่พบ → 404) วิชาโทถ้าส่ง `minorId` (preset เป็นชั้นปีที่ 1–2 → 400 `MINOR_NOT_ALLOWED`, ไม่พบ → 404, คนละ `department`/`curriculumName` กับ preset → 400 `MINOR_PLAN_MISMATCH`) และ entry ที่มีอยู่ของ `(studentId, academicYear, plan.semester)` รวมวิชาของแผน (`PLAN`) กับวิชาโทของ `plan.planType` + `plan.studyYear` + `plan.semester` (`MINOR`) ตัดวิชาโทที่ซ้ำกับแผนออก
 2. วิชาที่ตัดออกก่อนค้นหา ใส่ `skipped` ทันที:
 
 | `reason` | เกิดเมื่อ | field เพิ่ม |
@@ -188,7 +210,7 @@ Nov 3, 2026 · @Non
 
 ### ขั้นที่ 2 — ค้นหา
 
-- **ลำดับการวาง:** วิชาที่มีกลุ่มเวลาน้อยที่สุดวางก่อน เท่ากันให้เรียงตามลำดับในแผน (`PLAN` → `MINOR` แล้ว `MAJOR` → `GENERAL_EDUCATION` → `FREE_ELECTIVE` แล้วตาม `sortOrder`) วิชาที่มีทางเลือกน้อยจะตัดกิ่งได้เร็ว ลำดับนี้มีผลแค่กับความเร็ว ไม่มีผลกับคำตอบ
+- **ลำดับการวาง:** วิชาที่มีกลุ่มเวลาน้อยที่สุดวางก่อน เท่ากันให้เรียงตามลำดับในแผน (`PLAN` → `MINOR` แล้วตามหมวดวิชา `MAJOR` → `MINOR` → `GENERAL_EDUCATION` → `FREE_ELECTIVE` แล้วตาม `sortOrder` · หมวด `MINOR` ของ `course.category` คนละอย่างกับ `source: MINOR`) วิชาที่มีทางเลือกน้อยจะตัดกิ่งได้เร็ว ลำดับนี้มีผลแค่กับความเร็ว ไม่มีผลกับคำตอบ
 - **แต่ละวิชามีทางเลือก** = ทุกกลุ่มเวลาที่ไม่ชนกับวิชาที่วางไปแล้ว และไม่ทำให้หน่วยกิตรวมเกิน `maxCredits` + "ข้ามวิชานี้" (ลองเป็นทางเลือกสุดท้าย)
 - **ตัดกิ่งเมื่อชน:** กลุ่มเวลาที่ชนกับวิชาที่วางแล้วไม่ถูกลอง วิชาที่เหลือในกิ่งนั้นจึงไม่ถูกลองต่อ
 - **Branch and bound:** ก่อนลงกิ่งใด ถ้าคะแนนสูงสุดที่เป็นไปได้ (วิชาที่วางแล้ว + วิชาที่ยังเหลือทั้งหมด) ไม่ชนะคำตอบที่ดีที่สุดตอนนี้ ให้ตัดกิ่งนั้นทิ้ง
@@ -218,7 +240,7 @@ Nov 3, 2026 · @Non
 | `CREDIT_LIMIT_EXCEEDED` | มีกลุ่มเวลาที่ไม่ชนกับตารางสุดท้าย แต่เพิ่มแล้วหน่วยกิตเกิน `maxCredits` (code เดียวกับ US1) | `currentCredits`, `maxCredits` |
 | `TIME_CONFLICT` | ทุกกลุ่มเวลาชนกับวิชาในตารางสุดท้าย | `conflictWith` |
 
-`conflictWith` คือรหัสวิชาในตารางสุดท้ายที่ชนกับ section ใด ๆ ของวิชานี้ (ไม่ซ้ำ เรียงตามลำดับที่อยู่ในตาราง) UI ใช้แสดง "ชนกับ CS211, MA211"
+`conflictWith` คือรหัสวิชาในตารางสุดท้ายที่ชนกับ section ใด ๆ ของวิชานี้ (ไม่ซ้ำ เรียงตามลำดับที่อยู่ในตาราง) UI ใช้แสดง "ชนกับ CS332, CS314"
 
 เงื่อนไขเวลาชนใช้สูตรเดียวกับ US1: วันเดียวกันและ `a.startTime < b.endTime && b.startTime < a.endTime` คาบต่อกันพอดีไม่นับ ควรแยก method ตรวจคาบชนใน `TimetableService` ออกมาให้ US1 และ US8 ใช้ร่วมกัน ฝั่ง backend แยกอัลกอริทึมเป็น class `PlanScheduler` ที่ไม่ยุ่งกับ DB (รับวิชา/section/ตารางเดิม คืน `added`/`skipped`) เพื่อให้ unit test ได้โดยไม่ต้องมี DB
 
@@ -237,65 +259,22 @@ Nov 3, 2026 · @Non
 
 ไม่ห้าม apply preset ของสาขาอื่น เพราะเป็นตารางจำลอง และ backend ไม่ได้ตรวจสาขาใน `POST /api/timetable/entries` อยู่แล้ว
 
-## ข้อมูล preset (ข้อเสนอสำหรับ US8-T06 ER Diagram)
+## ข้อมูล preset
 
-```sql
-CREATE TABLE study_plan (
-    plan_id         BIGINT IDENTITY(1,1) NOT NULL,
-    department      NVARCHAR(100) NOT NULL,   -- ตรงกับ users.department
-    curriculum_name NVARCHAR(200) NOT NULL,
-    study_year      INT           NOT NULL,   -- ชั้นปีที่ 1–4
-    semester        INT           NOT NULL,
-    plan_type       NVARCHAR(20)  NULL,       -- SPECIAL_PROJECT / CO_OP เฉพาะชั้นปีที่ 3–4
-    CONSTRAINT pk_study_plan PRIMARY KEY (plan_id),
-    CONSTRAINT uq_study_plan UNIQUE (department, curriculum_name, study_year, semester, plan_type),
-    CONSTRAINT ck_study_plan_semester CHECK (semester IN (1, 2)),
-    CONSTRAINT ck_study_plan_plan_type CHECK (
-        (study_year IN (1, 2) AND plan_type IS NULL)
-        OR (study_year IN (3, 4) AND plan_type IN ('SPECIAL_PROJECT', 'CO_OP'))
-    )
-);
+โครงสร้างตารางฉบับที่ใช้จริงอยู่ใน [US8-T06 ER Diagram](../T06/US8-T06-ER-Diagram.md) และ migration `V20261114_1707__create_study_plan_tables.sql` (ข้อเสนอเดิมในหัวข้อนี้ถูกแทนที่แล้ว) สรุปส่วนที่ API ต้องรู้
 
-CREATE TABLE study_plan_course (
-    plan_id     BIGINT       NOT NULL,
-    course_code NVARCHAR(10) NOT NULL,
-    sort_order  INT          NOT NULL,
-    CONSTRAINT pk_study_plan_course PRIMARY KEY (plan_id, course_code),
-    CONSTRAINT fk_study_plan_course_plan FOREIGN KEY (plan_id) REFERENCES study_plan (plan_id) ON DELETE CASCADE,
-    CONSTRAINT fk_study_plan_course_course FOREIGN KEY (course_code) REFERENCES course (course_code)
-);
-```
+| ตาราง | สาระสำคัญ |
+| --- | --- |
+| `study_plan` | 1 แถวต่อหลักสูตร + ชั้นปี + ภาค (+ `plan_type` ของปี 3–4) · `ck_study_plan_plan_type` บังคับให้ปี 1–2 เป็น `NULL` และปี 3–4 ต้องเป็น `SPECIAL_PROJECT` หรือ `CO_OP` (มี `plan_type IS NOT NULL` เพราะ CHECK ของ SQL Server ถือว่า UNKNOWN ผ่าน) |
+| `study_plan_course` | วิชาในแผน + `sort_order` |
+| `study_minor` | 1 แถวต่อ 1 วิชาโท ไม่ผูกกับแผน |
+| `study_minor_course` | วิชาในวิชาโท + `plan_type` + `study_year` / `semester` / `sort_order` · PK (`minor_id`, `course_code`, `plan_type`) วิชาเดียวกันอยู่คนละภาคได้ตามแผน (เพิ่มใน US8-T09) |
 
-```sql
-CREATE TABLE study_minor (
-    minor_id        BIGINT IDENTITY(1,1) NOT NULL,
-    department      NVARCHAR(100) NOT NULL,
-    curriculum_name NVARCHAR(200) NOT NULL,
-    minor_name      NVARCHAR(100) NOT NULL,   -- เช่น วิทยาการข้อมูล, ปัญญาประดิษฐ์
-    sort_order      INT           NOT NULL,
-    CONSTRAINT pk_study_minor PRIMARY KEY (minor_id),
-    CONSTRAINT uq_study_minor UNIQUE (department, curriculum_name, minor_name)
-);
+`GET /api/study-plans` ดึงวิชาโทที่มีวิชาตรง `studyYear` + `semester` ของแผนใดแผนหนึ่ง แล้วแยกเป็นรายการตาม `planType` ส่วน `apply-plan` ใช้วิชาโทของ `planType` ของ preset
 
-CREATE TABLE study_minor_course (
-    minor_id    BIGINT       NOT NULL,
-    course_code NVARCHAR(10) NOT NULL,
-    study_year  INT          NOT NULL,        -- วิชาโทแนะนำให้เรียนชั้นปี/ภาคไหน (3–4 เท่านั้น)
-    semester    INT          NOT NULL,
-    sort_order  INT          NOT NULL,
-    CONSTRAINT pk_study_minor_course PRIMARY KEY (minor_id, course_code),
-    CONSTRAINT fk_study_minor_course_minor FOREIGN KEY (minor_id) REFERENCES study_minor (minor_id) ON DELETE CASCADE,
-    CONSTRAINT fk_study_minor_course_course FOREIGN KEY (course_code) REFERENCES course (course_code),
-    CONSTRAINT ck_study_minor_course_semester CHECK (semester IN (1, 2)),
-    CONSTRAINT ck_study_minor_course_year CHECK (study_year IN (3, 4))
-);
-```
+entity เก็บ `planType` เป็น `@Enumerated(EnumType.STRING)` · `uq_study_plan` ของ SQL Server นับ `NULL` เป็นค่าเดียวกัน ปี 1–2 จึงมีได้ 1 preset ต่อหลักสูตร/ภาค
 
-วิชาโทเก็บ 1 แถวต่อ 1 วิชาโท ส่วนรายวิชาแยกชั้นปี/ภาคไว้ที่ `study_minor_course` (ไม่ผูกกับ `plan_type`) `GET /api/study-plans` ดึงวิชาโทที่มีวิชาตรง `studyYear` + `semester`
-
-`ck_study_plan_plan_type` บังคับให้ปี 1–2 ไม่มีแผน และปี 3–4 ต้องระบุแผนเสมอ ส่วน `uq_study_plan` ของ SQL Server นับ `NULL` เป็นค่าเดียวกัน ปี 1–2 จึงมีได้ 1 preset ต่อหลักสูตร/ภาคตามเดิม entity เก็บ `planType` เป็น `@Enumerated(EnumType.STRING)`
-
-preset อ้างอิง `course_code` ไม่ใช่ `section_id` เพราะ section เปลี่ยนทุกภาค ส่วนวิชาเลือกเสรี/วิชาเลือกที่แผนไม่ได้ระบุรหัส ไม่ใส่ใน preset (นักศึกษาเพิ่มเองผ่าน US1)
+preset อ้างอิง `course_code` ไม่ใช่ `section_id` เพราะ section เปลี่ยนทุกภาค ส่วนวิชาเลือกเสรี/วิชาเลือกที่แผนไม่ได้ระบุรหัส ไม่ใส่ใน preset (นักศึกษาเพิ่มเองผ่าน US1) ข้อมูลจริง seed ใน `db/seed/V20261114_2100__seed_study_plans.sql` (US8-T09) จากตารางเรียนตามแผน (Excel) และเล่มหลักสูตร 2566 วิชาที่เป็นวิชาโทอย่างเดียวมีหมวด `MINOR` (เพิ่มใน `CourseCategory` ของ US1)
 
 ## TypeScript types (frontend)
 
@@ -325,9 +304,10 @@ export type StudyPlan = {
 
 export type StudyMinor = {
   minorId: number;
+  planType: PlanType;          // 1 รายการต่อ 1 วิชาโท × 1 แผน UI กรองตามแผนที่เลือก
   curriculumName: string;
   minorName: string;
-  totalCredits: number;        // เฉพาะวิชาของภาคที่ขอ
+  totalCredits: number;        // เฉพาะวิชาของภาคที่ขอของแผนนั้น
   courses: StudyPlanCourse[];
 };
 
@@ -384,6 +364,8 @@ export type ApplyPlanResponse = {
 - `studyYear=3` ได้ 2 preset `planType` เป็น `SPECIAL_PROJECT` แล้ว `CO_OP` ตามลำดับ, `studyYear=2` ได้ `planType: null`
 - apply preset `CO_OP` ได้วิชาของแผนสหกิจ ไม่มีวิชาของแผนหัวข้อพิเศษปน, วิชาที่ section ไม่มีคาบเรียนอยู่ใน `added` ไม่ถูกนับว่าชน
 - `GET` ได้ `minors` เฉพาะวิชาโทที่มีวิชาในชั้นปี/ภาคที่ขอ, ไม่มี → `minors: []`, `studyYear=1` และ `2` ได้ `minors: []` เสมอ
+- `GET studyYear=3&semester=1` ได้วิชาโทเดียวกัน 2 รายการ (`SPECIAL_PROJECT` / `CO_OP`) ที่ `courses` ต่างกัน (เช่น CS440 อยู่เฉพาะรายการ `CO_OP`), `studyYear=4&semester=1` มีเฉพาะรายการ `SPECIAL_PROJECT`
+- apply preset `CO_OP` ปี 3/1 + วิชาโทวิทยาการข้อมูล → ได้ CS440 ด้วย, apply preset `SPECIAL_PROJECT` ปี 3/1 + วิชาโทเดียวกัน → ไม่มี CS440
 - ไม่ส่ง `minorId` → ผลเหมือนก่อนมีวิชาโท และ `minorId: null`
 - ส่ง `minorId` → วิชาโทอยู่ใน `added` พร้อม `source: "MINOR"`
 - วิชาโทชนกับวิชาแผนหลักทุก section → วิชาแผนหลักถูกเพิ่ม วิชาโทเป็น `TIME_CONFLICT` (แม้วิชาโทจะมีหน่วยกิตมากกว่า)

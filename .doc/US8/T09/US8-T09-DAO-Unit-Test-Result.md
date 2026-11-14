@@ -4,7 +4,7 @@ Nov 14, 2026 · @Non
 
 ## สรุปผล
 
-รัน unit test 30 กรณีตามเอกสาร [US8-T12 Design Unit Test Cases ส่วน DAO](../T12/US8-T12-DAO-Unit-Test-Cases.md) (branch `docs/US8-T12-design-unit-test-dao` commit `7cf987a` ยังไม่ merge เข้า `main`) กับโค้ด DAO ของ US8-T09 **ผ่านครบ 30/30** และกรณีที่เพิ่มใน T09 หลังเพิ่ม `plan_type` ในวิชาโท (UT-DAO-US8-31 – 33) ผ่าน 3/3 รวม **33/33** (53 invocation รวม `@ParameterizedTest`) `./mvnw clean test` ทั้งโปรเจกต์ผ่าน 251/252 ตัวที่ไม่ผ่านคือ `BackendApplicationTests` ซึ่งต่อฐานข้อมูล `appdb` ของ docker compose ในเครื่อง ไม่ใช่ DAO test (ดูประวัติการรันครั้งที่ 7)
+รัน unit test 30 กรณีตามเอกสาร [US8-T12 Design Unit Test Cases ส่วน DAO](../T12/US8-T12-DAO-Unit-Test-Cases.md) (branch `docs/US8-T12-design-unit-test-dao` commit `7cf987a` ยังไม่ merge เข้า `main`) กับโค้ด DAO ของ US8-T09 **ผ่านครบ 30/30** และกรณีที่เพิ่มใน T09 หลังเพิ่ม `plan_type` ในวิชาโท (UT-DAO-US8-31 – 33) ผ่าน 3/3 รวม **33/33** (53 invocation รวม `@ParameterizedTest`) `./mvnw clean test` ทั้งโปรเจกต์ผ่าน 252/252 (ครั้งที่ 8 หลังล้าง migration เก่าออกจาก `appdb` ในเครื่อง)
 
 | ส่วน | Repository / Entity | Test case | Test class | ผ่าน |
 | --- | --- | --- | --- | --- |
@@ -126,6 +126,7 @@ Nov 14, 2026 · @Non
 | 5 | **PASS 248/248** | `./mvnw clean test` ทั้งโปรเจกต์ ไม่ได้แก้โค้ดระหว่างครั้งที่ 4 กับ 5 ข้อมูลที่ `ApplyPlanSaveRollbackTest` commit ไม่ทำให้ test class อื่นล้ม |
 | 6 | **PASS 33/33** (+ `SchemaConstraintTest`, `CourseRepositoryTest`) | หลังเพิ่ม `plan_type` ในวิชาโท, หมวด `MINOR` และ UT-DAO-US8-31 – 33 |
 | 7 | 251/252 | `./mvnw clean test` ทั้งโปรเจกต์ DAO test ทุกตัวผ่าน `BackendApplicationTests` ล้มด้วย `Migration checksum mismatch for migration version 20261114.1707` เพราะครั้งที่ 5 ไป apply migration ฉบับก่อนเพิ่ม `plan_type` ลง `appdb` ของ docker compose ในเครื่อง (test นี้ต่อ DB จริงของเครื่อง ไม่ใช้ Testcontainers) ต้องล้างตาราง US8 / แถวใน `flyway_schema_history` ของ DB ในเครื่องก่อน ไม่ใช่ปัญหาของโค้ด |
+| 8 | **PASS 252/252** | ลบตาราง US8 ทั้ง 4 ตาราง (ว่างอยู่) และแถว `20261114.1707` ใน `flyway_schema_history` ของ `appdb` แล้ว `BackendApplicationTests` apply `V20261114_1707`, `V20261114_1900` และ seed `V20261114_2100` สำเร็จ จากนั้น `./mvnw clean test` ทั้งโปรเจกต์ผ่าน |
 
 ## Seed แผนการเรียน (`db/seed/V20261114_2100__seed_study_plans.sql`)
 
@@ -153,6 +154,28 @@ Nov 14, 2026 · @Non
 ## สิ่งที่ต้องทำต่อ
 
 - กรอกคอลัมน์ Actual Result / Status และ "สรุปผลการทดสอบ" ในเอกสาร US8-T12 และเพิ่ม UT-DAO-US8-31 – 33 กับ `plan_type` ใน fixture (อยู่บน branch ของ T12)
-- T05 (API) ต้องตัดสินว่า `minors` ใน `GET /api/study-plans` ส่งวิชาของแต่ละแผนอย่างไร เพราะวิชาโทเดียวกันมีวิชาต่างกันตาม `planType`
-- อัปเดตค่าที่คาดในเอกสาร / Postman ของ US1 ที่อ้าง seed เดิม (รายวิชา 2568/1 มี 9 วิชา, 2568/2 มีแค่ CS111 และ CS223, เวลา ST216, ชื่อ CS223) และ UAT ของ US8-T16 ที่อ้างว่า CS223 เปิดเฉพาะภาค 2
-- ล้าง migration US8 ออกจาก `appdb` ในเครื่องแล้วรัน `BackendApplicationTests` ใหม่
+
+### ผลรัน Postman ของ US1 กับ seed ใหม่ (2026-11-14)
+
+rebuild container `backend` (`docker compose up -d --build backend`) ให้มีหมวด `MINOR` แล้วรันด้วย `npx -y newman@6` บัญชี `6609000001` (stub-tu)
+
+| Collection | ผล | หมายเหตุ |
+| --- | --- | --- |
+| US1-T17 | **ผ่าน 24/24 assertion** (26 request) | รวม "200 ได้ 37 วิชาของ 2568/1" |
+| US1-T08 | ผ่าน 30/32 | รันจากสำเนาที่เติม Bearer token ระดับ collection (collection นี้ทำก่อนมี login ของ US3) assertion ที่อิง seed ผ่านทุกข้อ (37 วิชา, `q=cs1`, `q=CS`, GE, 2568/2, ไม่มี CS217) ข้อที่ไม่ผ่าน 2 ข้อคือ `updatedAt` ต้องเป็น `null` ใน 00 Precondition และ 24 (ตาราง 2568/2) เพราะบัญชีนี้เคยมีตารางทั้งสองภาคแล้ว collection ออกแบบไว้สำหรับนักศึกษาที่ยังไม่เคยมีตาราง ไม่เกี่ยวกับ seed |
+
+ก่อนรัน ตาราง 2568/1 ของ `6609000001` มี CS180 820001 และ MA211 020001 ซึ่ง T17 ลบออกตอน setup หลังรันเพิ่มคืนแล้ว ข้อมูลของบัญชีอื่นไม่ถูกแตะ
+
+## เอกสารที่อัปเดตตาม seed และ `plan_type` ของวิชาโท
+
+ค่าที่คาดทั้งหมดได้จากการเรียก `CourseRepository.search` / `SectionRepository` จริงบน Testcontainers ที่รัน `db/migration` + `db/seed` (test ชั่วคราว ลบทิ้งแล้ว) ไม่ได้คำนวณด้วยมือ
+
+| เอกสาร | ที่เปลี่ยน |
+| --- | --- |
+| US8-T05 DTO & API Spec, DTO / API Class Diagram | `minors` เป็น 1 รายการต่อ 1 วิชาโท × 1 แผน (เพิ่ม `planType`) UI กรองตามแผน · `apply-plan` ใช้วิชาโทของ `planType` ของ preset (request ไม่เปลี่ยน) · `department` ตัวอย่างเป็น `ภาควิชาวิทยาการคอมพิวเตอร์` · ตัวอย่างใช้ข้อมูลจาก seed จริง · หมวด `MINOR` ในลำดับการวาง · หัวข้อ SQL ชี้ไป T06 |
+| US8-T16 UAT | เปลี่ยน "แผนทดสอบ" เป็นแผนจริงจาก seed (ปี 2/1, ปี 3/1 ทั้งสองแผน, ปี 3/2) เขียน UAT-01 – 06 ใหม่ และเพิ่ม UAT-07 (วิชาโทชนกับวิชาของแผน) |
+| US1-T08 / US1-T17 Postman collection | รายวิชา 2568/1 = 37 วิชา, `q=cs1` = 5 วิชา, `q=CS` = 24 วิชา, GE 2568/1 = 9 วิชา, 2568/2 = 27 วิชา, ตรวจว่าไม่มี CS217 (แทน CS223 ที่ตอนนี้เปิด 2568/1) |
+| US1-T13 IT, US1-T15 ST, US1-T16 UAT | ชุดข้อมูลรายวิชา 37 วิชา, CS217 แทน CS223 ใน IT-01, เวลา ST216 อ./พฤ. 13:30–15:00 |
+| US1-T05 Spec, US1-T06 ER / DAO Class Diagram | `CourseCategory` เพิ่ม `MINOR` |
+
+ไม่ได้แก้เอกสารผลการรันในอดีต (US1-T08 / T17 / T18 / T19 / T20 Test Result, newman log, evidence) เพราะเป็นบันทึกของการรันครั้งนั้น และ US8-T14 ที่ยังระบุว่าตัวอย่าง `department` ใน T05 ผิด (ข้อ 1 ในตารางข้อสังเกต) ซึ่งตอนนี้แก้แล้ว

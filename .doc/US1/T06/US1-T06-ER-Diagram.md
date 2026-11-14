@@ -12,7 +12,7 @@ erDiagram
     COURSE {
         NVARCHAR(10) course_code PK
         NVARCHAR(200) course_name
-        NVARCHAR(20) category "MAJOR, GENERAL_EDUCATION, FREE_ELECTIVE"
+        NVARCHAR(20) category "MAJOR, GENERAL_EDUCATION, FREE_ELECTIVE, MINOR (US8-T09)"
         int credits
     }
     SECTION {
