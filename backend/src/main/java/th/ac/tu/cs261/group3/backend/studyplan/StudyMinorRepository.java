@@ -20,9 +20,10 @@ import java.util.Optional;
 public interface StudyMinorRepository extends JpaRepository<StudyMinor, Long> {
 
     /**
-     * วิชาโทของสาขาที่มีวิชาอย่างน้อย 1 วิชาในชั้นปี + ภาคนั้น (GET /api/study-plans)
+     * วิชาโทของสาขาที่มีวิชาอย่างน้อย 1 วิชาในชั้นปี + ภาคนั้นของแผนใดแผนหนึ่ง (GET /api/study-plans)
      * ปี 1–2 ได้ list ว่างเสมอเพราะ {@code ck_study_minor_course_year}
-     * ไม่กรอง curriculumName ให้ UI แสดงเฉพาะวิชาโทที่ตรงกับ preset ที่เลือก
+     * ไม่กรอง curriculumName และ planType ให้ service แยกวิชาด้วย
+     * {@link StudyMinor#coursesOf(PlanType, int, int)} และ UI แสดงเฉพาะวิชาโทที่ตรงกับ preset ที่เลือก
      */
     @Query("""
             select m from StudyMinor m

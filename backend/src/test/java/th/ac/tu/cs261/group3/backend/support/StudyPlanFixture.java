@@ -196,16 +196,24 @@ public final class StudyPlanFixture {
         return ((Number) id).longValue();
     }
 
+    /** วิชาโทใน T12 เป็นของแผนหัวข้อพิเศษทั้งหมด (T12 ออกแบบก่อนเพิ่ม plan_type ใน study_minor_course) */
     private void minorCourse(long minorId, String courseCode, int studyYear, int semester, int sortOrder) {
+        insertMinorCourse(em, minorId, courseCode, "SPECIAL_PROJECT", studyYear, semester, sortOrder);
+    }
+
+    /** insert {@code study_minor_course} 1 แถว ใช้ทั้งใน fixture และ test ที่เพิ่มแถวของแผนสหกิจ */
+    public static void insertMinorCourse(TestEntityManager em, long minorId, String courseCode, String planType,
+                                         int studyYear, int semester, int sortOrder) {
         em.getEntityManager()
                 .createNativeQuery("""
-                        INSERT INTO study_minor_course (minor_id, course_code, study_year, semester, sort_order)
-                        VALUES (?1, ?2, ?3, ?4, ?5)""")
+                        INSERT INTO study_minor_course (minor_id, course_code, plan_type, study_year, semester, sort_order)
+                        VALUES (?1, ?2, ?3, ?4, ?5, ?6)""")
                 .setParameter(1, minorId)
                 .setParameter(2, courseCode)
-                .setParameter(3, studyYear)
-                .setParameter(4, semester)
-                .setParameter(5, sortOrder)
+                .setParameter(3, planType)
+                .setParameter(4, studyYear)
+                .setParameter(5, semester)
+                .setParameter(6, sortOrder)
                 .executeUpdate();
     }
 

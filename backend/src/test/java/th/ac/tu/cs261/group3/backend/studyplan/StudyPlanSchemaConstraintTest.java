@@ -115,21 +115,36 @@ class StudyPlanSchemaConstraintTest {
         assertEquals(1, count("SELECT COUNT(*) FROM study_minor WHERE curriculum_name = ?1 AND sort_order = 1", CUR_B));
     }
 
-    /** UT-DAO-US8-29 (ทุกค่าใส่ใน MN-1) */
-    @ParameterizedTest(name = "{0}: ({1}, {2}/{3}, {4})")
+    /**
+     * UT-DAO-US8-29 (ทุกค่าใส่ใน MN-1 แผนหัวข้อพิเศษ ตามแถวของ fixture)
+     * และ UT-DAO-US8-33 (เพิ่มใน T09): plan_type นอก SPECIAL_PROJECT / CO_OP
+     */
+    @ParameterizedTest(name = "{0}: ({1}, {2}, {3}/{4}, {5})")
     @CsvSource({
-            "ck_study_minor_course_year,     T8G01, 2, 1, 9",
-            "ck_study_minor_course_year,     T8G01, 5, 1, 9",
-            "ck_study_minor_course_semester, T8G01, 3, 3, 9",
-            "pk_study_minor_course,          T8N01, 4, 2, 9",
-            "uq_study_minor_course_order,    T8G01, 3, 1, 1",
-            "fk_study_minor_course_course,   ZZ999, 3, 1, 9"})
-    void insertMinorCourse_invalidRow_throwsConstraintViolation(String constraint, String courseCode,
+            "ck_study_minor_course_year,      T8G01, SPECIAL_PROJECT, 2, 1, 9",
+            "ck_study_minor_course_year,      T8G01, SPECIAL_PROJECT, 5, 1, 9",
+            "ck_study_minor_course_semester,  T8G01, SPECIAL_PROJECT, 3, 3, 9",
+            "pk_study_minor_course,           T8N01, SPECIAL_PROJECT, 4, 2, 9",
+            "uq_study_minor_course_order,     T8G01, SPECIAL_PROJECT, 3, 1, 1",
+            "fk_study_minor_course_course,    ZZ999, SPECIAL_PROJECT, 3, 1, 9",
+            "ck_study_minor_course_plan_type, T8G01, MINOR,           3, 1, 9"})
+    void insertMinorCourse_invalidRow_throwsConstraintViolation(String constraint, String courseCode, String planType,
                                                                 int studyYear, int semester, int sortOrder) {
         assertViolates(constraint, () -> execute("""
-                        INSERT INTO study_minor_course (minor_id, course_code, study_year, semester, sort_order)
-                        VALUES (?1, ?2, ?3, ?4, ?5)""",
-                fixture.mn1, courseCode, studyYear, semester, sortOrder));
+                        INSERT INTO study_minor_course (minor_id, course_code, plan_type, study_year, semester, sort_order)
+                        VALUES (?1, ?2, ?3, ?4, ?5, ?6)""",
+                fixture.mn1, courseCode, planType, studyYear, semester, sortOrder));
+    }
+
+    /** UT-DAO-US8-33 (เพิ่มใน T09) วิชาเดียวกันใน MN-1 อยู่ได้อีกแถวถ้าเป็นแผนสหกิจ และ sort_order แยกตามแผน */
+    @Test
+    void insertMinorCourse_sameCourseOtherPlanType_succeeds() {
+        execute("""
+                INSERT INTO study_minor_course (minor_id, course_code, plan_type, study_year, semester, sort_order)
+                VALUES (?1, 'T8N01', 'CO_OP', 3, 1, 1)""", fixture.mn1);
+
+        assertEquals(2, count("SELECT COUNT(*) FROM study_minor_course WHERE minor_id = ?1 AND course_code = 'T8N01'",
+                fixture.mn1));
     }
 
     /** UT-DAO-US8-30 */

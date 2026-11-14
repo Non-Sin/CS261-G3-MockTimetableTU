@@ -99,12 +99,52 @@ class StudyMinorRepositoryTest {
         StudyMinor mn1 = repository.findWithCoursesById(fixture.mn1).orElseThrow();
         em.clear(); // ให้ MN-1 เป็น detached ถ้า coursesOf ต้อง query เพิ่มจะได้ LazyInitializationException
 
-        List<Course> term31 = mn1.coursesOf(3, 1);
-        assertEquals(List.of("T8N01", "T8N02", "T8M05"), term31.stream().map(Course::getCourseCode).toList());
+        List<Course> term31 = mn1.coursesOf(PlanType.SPECIAL_PROJECT, 3, 1);
+        assertEquals(List.of("T8N01", "T8N02", "T8M05"), codes(term31));
         assertEquals(10, term31.stream().mapToInt(Course::getCredits).sum());
 
-        assertEquals(List.of("T8F01"), mn1.coursesOf(4, 1).stream().map(Course::getCourseCode).toList());
-        assertTrue(mn1.coursesOf(3, 2).isEmpty());
+        assertEquals(List.of("T8F01"), codes(mn1.coursesOf(PlanType.SPECIAL_PROJECT, 4, 1)));
+        assertTrue(mn1.coursesOf(PlanType.SPECIAL_PROJECT, 3, 2).isEmpty());
+    }
+
+    /**
+     * UT-DAO-US8-31 (เพิ่มใน T09 หลังเพิ่ม plan_type ใน study_minor_course)
+     * วิชาเดียวกันอยู่ต่างภาคได้ตามแผน เช่น CS440 หัวข้อพิเศษเรียนปี 4/1 สหกิจเรียนปี 3/1
+     */
+    @Test
+    void coursesOf_coopPlan_returnsOnlyCoursesOfThatPlan() {
+        insertMinorCourse(em, fixture.mn1, "T8F01", "CO_OP", 3, 1, 1);
+        em.flush();
+        em.clear();
+
+        StudyMinor mn1 = repository.findWithCoursesById(fixture.mn1).orElseThrow();
+        em.clear();
+
+        assertEquals(5, mn1.getCourses().size(), "T8F01 มี 2 แถว (แผนละ 1 แถว)");
+        assertEquals(List.of("T8F01"), codes(mn1.coursesOf(PlanType.CO_OP, 3, 1)));
+        assertTrue(mn1.coursesOf(PlanType.CO_OP, 4, 1).isEmpty());
+        assertEquals(List.of("T8N01", "T8N02", "T8M05"), codes(mn1.coursesOf(PlanType.SPECIAL_PROJECT, 3, 1)),
+                "แถวของแผนสหกิจไม่ปนกับแผนหัวข้อพิเศษ");
+        assertEquals(List.of("T8F01"), codes(mn1.coursesOf(PlanType.SPECIAL_PROJECT, 4, 1)));
+    }
+
+    /** UT-DAO-US8-32 (เพิ่มใน T09) วิชาโทที่มีวิชาในภาคนั้นเฉพาะแผนสหกิจก็ต้องถูกคืน */
+    @Test
+    void findByDepartmentAndTerm_courseOnlyInCoopPlan_returnsMinor() {
+        assertTrue(repository.findByDepartmentAndTerm(CS, 3, 2).isEmpty());
+
+        insertMinorCourse(em, fixture.mn2, "T8N02", "CO_OP", 3, 2, 1);
+        em.flush();
+        em.clear();
+
+        List<StudyMinor> minors = repository.findByDepartmentAndTerm(CS, 3, 2);
+        assertEquals(List.of(fixture.mn2), minorIds(minors));
+        assertEquals(List.of("T8N02"), codes(minors.get(0).coursesOf(PlanType.CO_OP, 3, 2)));
+        assertTrue(minors.get(0).coursesOf(PlanType.SPECIAL_PROJECT, 3, 2).isEmpty());
+    }
+
+    private static List<String> codes(List<Course> courses) {
+        return courses.stream().map(Course::getCourseCode).toList();
     }
 
     /** ตรวจก่อนแตะ field เพราะ getter ของ lazy proxy จะทำให้โหลดเอง */

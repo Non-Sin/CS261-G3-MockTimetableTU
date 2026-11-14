@@ -97,7 +97,7 @@ class PlanSectionLookupTest {
         List<String> codes = new ArrayList<>(planCodes(fixture.pConflict));
         codes.addAll(planCodes(fixture.pCoop));
         StudyMinor mn1 = minorRepository.findWithCoursesById(fixture.mn1).orElseThrow();
-        mn1.coursesOf(3, 1).stream().map(Course::getCourseCode).forEach(codes::add);
+        mn1.coursesOf(PlanType.SPECIAL_PROJECT, 3, 1).stream().map(Course::getCourseCode).forEach(codes::add);
         em.clear();
         return codes;
     }

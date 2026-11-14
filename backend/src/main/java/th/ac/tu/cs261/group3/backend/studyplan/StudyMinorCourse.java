@@ -7,7 +7,10 @@ import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 import th.ac.tu.cs261.group3.backend.course.Course;
 
-/** วิชา 1 วิชาในวิชาโท พร้อมชั้นปี/ภาคที่แนะนำให้เรียน (ปี 3–4 เท่านั้น) */
+/**
+ * วิชา 1 วิชาในวิชาโท พร้อมชั้นปี/ภาคที่แนะนำให้เรียน (ปี 3–4 เท่านั้น) ของแผนหนึ่ง
+ * วิชาเดียวกันมีได้ 1 แถวต่อแผน ({@code plan_type} อยู่ใน PK)
+ */
 @Entity
 @Immutable
 @Table(name = "study_minor_course")
@@ -37,7 +40,12 @@ public class StudyMinorCourse {
     @Column(nullable = false)
     private int semester;
 
-    /** ลำดับในภาคนั้น (unique ต่อ minor + ชั้นปี + ภาค) */
+    /** ลำดับในภาคนั้น (unique ต่อ minor + แผน + ชั้นปี + ภาค) */
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
+
+    /** แผนที่แถวนี้ใช้ (ค่าอยู่ใน {@link #id}) */
+    public PlanType getPlanType() {
+        return id.getPlanType();
+    }
 }

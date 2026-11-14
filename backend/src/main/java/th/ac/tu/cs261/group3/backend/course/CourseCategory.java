@@ -12,5 +12,7 @@ public enum CourseCategory {
     /** ศึกษาทั่วไป */
     GENERAL_EDUCATION,
     /** เลือกเสรี */
-    FREE_ELECTIVE
+    FREE_ELECTIVE,
+    /** วิชาโท (เพิ่มใน US8-T09 migration V20261114_1900) */
+    MINOR
 }

@@ -49,12 +49,15 @@ public class StudyMinor {
     private List<StudyMinorCourse> courses = new ArrayList<>();
 
     /**
-     * วิชาของภาคที่ระบุ เรียงตาม {@code sortOrder} กรองใน Java จาก {@link #courses} ที่ fetch มาครบแล้ว
+     * วิชาของแผนและภาคที่ระบุ เรียงตาม {@code sortOrder} กรองใน Java จาก {@link #courses} ที่ fetch มาครบแล้ว
      * ต้องเรียกหลัง query ที่ {@code join fetch} courses (open-in-view ปิดอยู่)
+     *
+     * @param planType แผนของ preset ที่ใช้คู่กัน (วิชาโทของปี 3–4 เท่านั้น จึงไม่เป็น null)
      */
-    public List<Course> coursesOf(int studyYear, int semester) {
+    public List<Course> coursesOf(PlanType planType, int studyYear, int semester) {
         return courses.stream()
-                .filter(mc -> mc.getStudyYear() == studyYear && mc.getSemester() == semester)
+                .filter(mc -> mc.getPlanType() == planType
+                        && mc.getStudyYear() == studyYear && mc.getSemester() == semester)
                 .map(StudyMinorCourse::getCourse)
                 .toList();
     }

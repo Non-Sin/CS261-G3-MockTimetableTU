@@ -42,16 +42,20 @@ CREATE TABLE study_minor (
     CONSTRAINT uq_study_minor_order UNIQUE (department, curriculum_name, sort_order)
 );
 
+-- วิชาโทเดียวกันเรียนคนละชั้นปี/ภาคตามแผน เช่น CS440 แผนหัวข้อพิเศษเรียนปี 4/1 แต่แผนสหกิจเรียนปี 3/1
+-- (ปี 4/1 ออกสหกิจ) จึงเก็บ plan_type ไว้ทุกแถว 1 วิชาอยู่ได้ 1 ภาคต่อแผน
 CREATE TABLE study_minor_course (
     minor_id    BIGINT       NOT NULL,
     course_code NVARCHAR(10) NOT NULL,
+    plan_type   NVARCHAR(20) NOT NULL,        -- SPECIAL_PROJECT / CO_OP ตรงกับ study_plan.plan_type
     study_year  INT          NOT NULL,        -- วิชาโทแนะนำให้เรียนชั้นปี/ภาคไหน (3–4 เท่านั้น)
     semester    INT          NOT NULL,
-    sort_order  INT          NOT NULL,        -- ลำดับในภาคนั้น
-    CONSTRAINT pk_study_minor_course PRIMARY KEY (minor_id, course_code),
-    CONSTRAINT uq_study_minor_course_order UNIQUE (minor_id, study_year, semester, sort_order),
+    sort_order  INT          NOT NULL,        -- ลำดับในภาคนั้นของแผนนั้น
+    CONSTRAINT pk_study_minor_course PRIMARY KEY (minor_id, course_code, plan_type),
+    CONSTRAINT uq_study_minor_course_order UNIQUE (minor_id, plan_type, study_year, semester, sort_order),
     CONSTRAINT fk_study_minor_course_minor FOREIGN KEY (minor_id) REFERENCES study_minor (minor_id) ON DELETE CASCADE,
     CONSTRAINT fk_study_minor_course_course FOREIGN KEY (course_code) REFERENCES course (course_code),
+    CONSTRAINT ck_study_minor_course_plan_type CHECK (plan_type IN ('SPECIAL_PROJECT', 'CO_OP')),
     CONSTRAINT ck_study_minor_course_semester CHECK (semester IN (1, 2)),
     CONSTRAINT ck_study_minor_course_year CHECK (study_year IN (3, 4))
 );
