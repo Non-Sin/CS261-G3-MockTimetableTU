@@ -56,7 +56,7 @@ classDiagram
     }
 
     class Course {
-        <<US1 Entity + US7 field>>
+        <<US1 Entity>>
     }
     class CourseQuotaInfo {
         <<US7 Entity>>

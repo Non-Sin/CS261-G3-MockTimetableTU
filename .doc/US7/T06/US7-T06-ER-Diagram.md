@@ -1,6 +1,6 @@
 # US7-T06 — ER Diagram (DB)
 
-โครงสร้างฐานข้อมูลสำหรับฟีเจอร์ค้นหาช่องทางการขอโควตา (US7) ต่อยอดจากตาราง `course`, `section`, `timetable`, `timetable_entry` ของ US1 โดยเพิ่มคอลัมน์ `course_name_th` ใน `course` และเพิ่มตารางใหม่ 5 ตาราง (`course_quota_info`, `quota_condition`, `quota_round`, `quota_channel`, `quota_contact`) ด้วย **Flyway migration ไฟล์ใหม่** (ห้ามแก้ไข migration เดิมของ US1/US3 ที่ merge แล้ว)
+โครงสร้างฐานข้อมูลสำหรับฟีเจอร์ค้นหาช่องทางการขอโควตา (US7) ต่อยอดจากตาราง `course`, `section`, `timetable`, `timetable_entry` ของ US1 (และอ้างอิงชื่อวิชาภาษาไทยจาก `elective_info.course_name_th` ของ US6-T06 เพื่อไม่เก็บซ้ำสองที่) โดยเพิ่มตารางใหม่ 5 ตาราง (`course_quota_info`, `quota_condition`, `quota_round`, `quota_channel`, `quota_contact`) ด้วย **Flyway migration ไฟล์ใหม่** (ห้ามแก้ไข migration เดิมของ US1/US3 ที่ merge แล้ว)
 
 ```mermaid
 erDiagram
@@ -18,7 +18,6 @@ erDiagram
     COURSE {
         NVARCHAR(10) course_code PK "US1 มีอยู่แล้ว"
         NVARCHAR(200) course_name "US1 มีอยู่แล้ว"
-        NVARCHAR(200) course_name_th "US7 เพิ่ม (NULL ได้)"
         NVARCHAR(20) category "MAJOR, GENERAL_EDUCATION, FREE_ELECTIVE"
         int credits
     }
@@ -60,7 +59,8 @@ erDiagram
         NVARCHAR(100) label "NULL ได้ · เช่น รหัส 65-66"
         date start_date "NULL ได้เมื่อเป็นกำหนดส่งวันเดียว"
         date end_date "ISO ค.ศ."
-        time end_time "NULL ได้ · เช่น 15:00"
+        time start_time "NULL ได้ · เช่น 09:00"
+        time end_time "NULL ได้ · เช่น 15:00, 16:00"
     }
     QUOTA_CHANNEL {
         bigint channel_id PK "US7 ใหม่"
@@ -100,9 +100,9 @@ erDiagram
   - ไม่มีแถวใน `course_quota_info` → `NO_DATA`
   - มีแถวและ `quota_required = 0` → `NOT_REQUIRED`
   - มีแถวและ `quota_required = 1` → `REQUIRED`
-- **เพิ่ม `course_name_th` ใน `course` ด้วย migration ไฟล์ใหม่:** รองรับการแสดงชื่อวิชาภาษาไทยและการค้นหาด้วยคำภาษาไทย (เช่น `แคลคูลัส` → `MA211`, `ดาราศาสตร์เบื้องต้น` → `PC280`) โดยไม่แก้ไข `V20261014_1940__create_timetable_tables.sql` ที่ merge แล้ว
+- **ใช้ชื่อวิชาภาษาไทยจาก `elective_info.course_name_th` (US6-T06) แทนการเพิ่มลง `course`:** เพื่อไม่ให้เก็บชื่อวิชาภาษาไทยซ้ำสองที่ ตาราง `course` จึงคงโครงสร้างเดิมของ US1 ไว้ทั้งหมด
 - **ผูก `quota_round` กับ `(course_code, academic_year, semester)`:** ช่วงเวลายื่นคำร้องเปลี่ยนทุกภาคเรียน (เช่น ในข้อมูลจริงภาค 2/2569 ของ `EL105`, `MA211`, `AN347`, `IS313`) ส่วนเงื่อนไข ช่องทาง และช่องทางติดต่อไม่เปลี่ยนบ่อยจึงผูกกับ `course_code` ใน `course_quota_info`
-- **`quota_round.label` และ `start_date`:** รองรับทั้งรอบปกติที่มีช่วงวันที่ (`EL105` รอบที่ 1: 5–9 ต.ค. 69), กำหนดส่งวันเดียวพร้อมเวลา (`MA211` `start_date = NULL`, `end_date = 2026-10-20`, `end_time = 15:00`), และรอบที่แบ่งตามรหัสนักศึกษา (`AN347` 4 รอบ ใช้ `label` เก็บ `"รหัส 65-66"`, `"รหัส 67"`, `"รหัส 68"`, `"รหัส 69"`)
+- **`quota_round.label`, `start_date`, `start_time` และ `end_time`:** รองรับทั้งรอบปกติที่มีช่วงวันที่ (`EL105` รอบที่ 1: 5–9 ต.ค. 69), กำหนดส่งวันเดียวพร้อมเวลาปิดรับ (`MA211` `start_date = NULL`, `end_date = 2026-10-20`, `start_time = NULL`, `end_time = 15:00`), และรอบที่แบ่งตามรหัสนักศึกษาพร้อมช่วงเวลา (`AN347` 4 รอบ ใช้ `label` เก็บ `"รหัส 65-66"`, `"รหัส 67"`, `"รหัส 68"`, `"รหัส 69"` และระบุ `start_time = 09:00`, `end_time = 16:00`)
 - **`quota_contact.url` เป็น `NULL` ได้:** รองรับช่องทางติดต่อที่ไม่ใช่ลิงก์เว็บ เช่น `PC280` ที่ติดต่อผ่าน `MS Teams wchumpon@tu.ac.th` (ใส่ใน `label` โดย `url IS NULL`)
 
 ---
@@ -113,7 +113,6 @@ erDiagram
 
 | ตาราง | Constraint | เหตุผล |
 | --- | --- | --- |
-| `course` | `ALTER TABLE course ADD course_name_th NVARCHAR(200) NULL` | เพิ่มชื่อวิชาภาษาไทยโดยไม่กระทบข้อมูลเดิมของ US1 |
 | `course_quota_info` | `PK (course_code)`, `FK (course_code) -> course` | 1 วิชามีข้อมูลโควตาหลักได้ 1 แถว |
 | `quota_condition` | `FK (course_code) -> course_quota_info ON DELETE CASCADE`, `FK (related_course_code) -> course`, `UQ (course_code, sort_order)` | ลำดับเงื่อนไขคงที่และอ้างรหัสวิชาที่มีอยู่จริง (เช่น `EL395` → `EL295`) |
 | `quota_round` | `FK (course_code) -> course_quota_info ON DELETE CASCADE`, `UQ (course_code, academic_year, semester, round_no)`, `CHECK (semester IN (1, 2))`, `CHECK (start_date IS NULL OR end_date >= start_date)` | รอบไม่ซ้ำในภาคเดียวกัน และวันสิ้นสุดต้องไม่ก่อนวันเริ่มต้น |
