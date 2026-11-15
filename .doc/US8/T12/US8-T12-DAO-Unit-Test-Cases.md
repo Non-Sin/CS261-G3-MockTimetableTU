@@ -1,8 +1,8 @@
-# US8-T12 Design Unit Test Cases ส่วน DAO: จัดตารางเรียนตามแผนการเรียน
+﻿# US8-T12 Design Unit Test Cases ส่วน DAO: จัดตารางเรียนตามแผนการเรียน
 
 ## ขอบเขตการทดสอบ
 
-ออกแบบ Unit Test ชั้น DAO จำนวน 30 เคส สำหรับ repository และ entity ที่ US8 เพิ่ม (`StudyPlanRepository`, `StudyMinorRepository`, `StudyMinor.coursesOf`) และ repository เดิมของ US1 ที่ `ApplyPlanService` ใช้ในแบบใหม่ (หา section ของวิชาในแผน และบันทึกหลายวิชาในครั้งเดียว) ตามที่ออกแบบไว้ใน [US8-T06 DAO Class Diagram](../T06/US8-T06-DAO-Class-Diagram.md) และ [US8-T06 ER Diagram](../T06/US8-T06-ER-Diagram.md) เพื่อใช้เป็นข้อกำหนดในการเขียนโค้ดและชุดทดสอบใน US8-T09
+ออกแบบ Unit Test ชั้น DAO จำนวน 33 เคส (30 เคสเดิม + 3 เคสใหม่เพิ่มใน T09) สำหรับ repository และ entity ที่ US8 เพิ่ม (`StudyPlanRepository`, `StudyMinorRepository`, `StudyMinor.coursesOf`) และ repository เดิมของ US1 ที่ `ApplyPlanService` ใช้ในแบบใหม่ (หา section ของวิชาในแผน และบันทึกหลายวิชาในครั้งเดียว) ตามที่ออกแบบไว้ใน [US8-T06 DAO Class Diagram](../T06/US8-T06-DAO-Class-Diagram.md) และ [US8-T06 ER Diagram](../T06/US8-T06-ER-Diagram.md) เพื่อใช้เป็นข้อกำหนดในการเขียนโค้ดและชุดทดสอบใน US8-T09
 
 - **User Story:** US8 จัดตารางเรียนจำลองตามแผนในเล่มหลักสูตร
 - **Branch:** `docs/US8-T12-design-unit-test-dao`
@@ -11,17 +11,18 @@
 | ส่วน | Repository / Entity | Method | TC ID |
 | --- | --- | --- | --- |
 | 1 | `StudyPlanRepository` (ใหม่) | `findByDepartmentAndStudyYearAndSemester(department, studyYear, semester)`, `findWithCoursesById(planId)` | UT-DAO-US8-01 – 08 |
-| 2 | `StudyMinorRepository` (ใหม่) และ `StudyMinor` | `findByDepartmentAndTerm(department, studyYear, semester)`, `findWithCoursesById(minorId)`, `StudyMinor.coursesOf(studyYear, semester)` | UT-DAO-US8-09 – 15 |
+| 2 | `StudyMinorRepository` (ใหม่) และ `StudyMinor` | `findByDepartmentAndTerm(department, studyYear, semester)`, `findWithCoursesById(minorId)`, `StudyMinor.coursesOf(studyYear, semester)` + พร้อม `plan_type` | UT-DAO-US8-09 – 15, 31 – 32 |
 | 3 | `SectionRepository` (US1) | `findByCourseCodesAndTerm(courseCodes, academicYear, semester)` กับรหัสวิชาของแผนและวิชาโท | UT-DAO-US8-16 – 18 |
 | 4 | `TimetableRepository`, `TimetableEntryRepository` (US1) | `save(timetable)` + `saveAll(entries)` ตามขั้น `saveAdded` และการ rollback เมื่อผิดพลาด | UT-DAO-US8-19 – 22 |
-| 5 | Schema (Flyway) | constraint ของ `study_plan`, `study_plan_course`, `study_minor`, `study_minor_course` | UT-DAO-US8-23 – 30 |
+| 5 | Schema (Flyway) | constraint ของ `study_plan`, `study_plan_course`, `study_minor`, `study_minor_course` | UT-DAO-US8-23 – 30, 33 |
+| 6 | `StudyMinor` + `plan_type` (เพิ่มใน T09) | `StudyMinor.coursesOf(planType, studyYear, semester)` และ constraint ใหม่ | UT-DAO-US8-31 – 33 |
 
 - **ประเภท:** Unit test ชั้น DAO ทดสอบกับฐานข้อมูล SQL Server จริงผ่าน Testcontainers ไม่ใช้ mock
 - **ไม่อยู่ในขอบเขต (ทดสอบในชั้น Service / Controller แทน):**
   - การเรียง `plans` ตาม `planType` (`SPECIAL_PROJECT` ก่อน `CO_OP`) ซึ่ง T06 ให้ `StudyPlanService` เรียงใน Java ไม่ได้เรียงใน SQL เคสในเอกสารนี้จึงตรวจแค่ลำดับที่ query คืน
   - การเลือก section, ตรวจเวลาชน, ตรวจวิชาซ้ำ และหน่วยกิตเกิน 22 ใน `PlanScheduler` (ไม่ใช้ DB)
   - error `MINOR_NOT_ALLOWED`, `MINOR_PLAN_MISMATCH`, 404 และ `dryRun` ใน `ApplyPlanService`
-  - rollback ของ `ApplyPlanService.applyPlan` ทั้ง transaction เมื่อเรียกผ่าน API ซึ่งอยู่ใน [US8-T14](../T14/US8-T14-design-it-api-dao.md) เคส IT-API-DAO-US8-16
+  - rollback ของ `ApplyPlanService.applyPlan` ทั้ง transaction เมื่อเรียกผ่าน API ซึ่งอยู่ใน US8-T14 (PR #86) เคส IT-16
 
 ระบบไม่ตรวจสอบวิชาที่นักศึกษาเรียนผ่านแล้ว นักศึกษาลบวิชาออกจากตารางเองได้ (ตามข้อตกลงของทีมเรื่อง CoS ของ US8) จึงไม่มี query และเคสเรื่องวิชาที่เรียนผ่านแล้ว
 
@@ -53,13 +54,13 @@
 
 | คลาส | เคส | หมายเหตุ |
 | --- | --- | --- |
-| `support/StudyPlanFixture` | ข้อมูลตั้งต้น | แบบเดียวกับ `DaoFixture` ของ US1 แต่ใช้ข้อมูลของ US8 เท่านั้น |
+| `support/StudyPlanFixture` | ข้อมูลตั้งต้น | แบบเดียวกับ `DaoFixture` ของ US1 แต่ใช้ข้อมูลของ US8 เท่านั้น แถววิชาโททั้งหมดเป็น `SPECIAL_PROJECT` |
 | `StudyPlanRepositoryTest` | 01 – 08 | |
-| `StudyMinorRepositoryTest` | 09 – 15 | |
+| `StudyMinorRepositoryTest` | 09 – 15, 31 – 32 | เพิ่ม T09 หลังแก้ไข schema ด้วย `plan_type` |
 | `PlanSectionLookupTest` | 16 – 18 | ไม่เพิ่มลงใน `SectionRepositoryTest` ของ US1 |
 | `ApplyPlanSaveRepositoryTest` | 19 – 20 | |
 | `ApplyPlanSaveRollbackTest` | 21 – 22 | `@Transactional(propagation = Propagation.NOT_SUPPORTED)` ระดับคลาส |
-| `StudyPlanSchemaConstraintTest` | 23 – 30 | ไม่เพิ่มลงใน `SchemaConstraintTest` เดิม |
+| `StudyPlanSchemaConstraintTest` | 23 – 30, 33 | ไม่เพิ่มลงใน `SchemaConstraintTest` เดิม; เพิ่ม T09 ค่าที่ 7 และ success case |
 
 **หลักการเตรียมข้อมูลและตรวจสอบผลในแต่ละเคส:**
 
@@ -80,9 +81,7 @@
 - `CUR_A` = `"หลักสูตรทดสอบ A"`, `CUR_B` = `"หลักสูตรทดสอบ B"`
 - `OLD` = `2000-01-01T00:00:00+07:00` ใช้ตั้ง `updated_at` ของตารางเดิม เพื่อตรวจว่า `touch()` เปลี่ยนค่าหรือไม่
 
-**หมายเหตุ:** รายวิชา `T8...` และแผน P-... ในเอกสารนี้เป็นข้อมูลทดสอบที่สร้างขึ้นสำหรับ DAO test เท่านั้น ไม่ใช่วิชาหรือแผนจริงในเล่มหลักสูตร (แผนและวิชาจริงดูได้จาก [sheet ข้อมูลของทีม](https://docs.google.com/spreadsheets/d/1OGlBEta-Qrl1A0p4MWngh4PlCRBNDEyHinQqgSsRZ6k/edit?usp=sharing)) ส่วนชื่อวิชาโทใช้ชื่อวิชาโทที่มีจริงของหลักสูตร (วิทยาการข้อมูล, ปัญญาประดิษฐ์, การออกแบบและพัฒนาผลิตภัณฑ์ดิจิทัล, เดฟออปส์) แต่รายวิชาในวิชาโทเป็นข้อมูลทดสอบ
-
-ข้อมูลชุดนี้ใช้รหัสวิชา แผน และวิชาโทชุดเดียวกับ [US8-T14](../T14/US8-T14-design-it-api-dao.md) เท่าที่ DAO ต้องใช้ และเพิ่ม `T8F01` ในวิชาโท MN-1 (ชั้นปี 4 ภาค 1) กับแผนว่าง P-EMPTY เพื่อทดสอบการโหลดวิชาโทข้ามภาคและแผนที่ไม่มีวิชา
+ข้อมูลชุดนี้ใช้รหัสวิชา แผน และวิชาโทชุดเดียวกับ US8-T14 (PR #86) เท่าที่ DAO ต้องใช้ และเพิ่ม `T8F01` ในวิชาโท MN-1 (ชั้นปี 4 ภาค 1) กับแผนว่าง P-EMPTY เพื่อทดสอบการโหลดวิชาโทข้ามภาคและแผนที่ไม่มีวิชา
 
 ### 1. ตาราง `course` และ `section` / `schedule_slot` (ภาค 1/2568 ยกเว้นที่ระบุ)
 
@@ -126,7 +125,7 @@
 
 | ตัวแปร | `curriculum_name` | `minor_name` | `sort_order` | วิชา (`study_year`/`semester`, `sort_order`) | ลำดับ insert ของวิชา |
 | --- | --- | --- | --- | --- | --- |
-| MN-OTHER | `CUR_B` | `"เดฟออปส์"` | 3 | T8N01 (3/1, 1) | T8N01 |
+| MN-OTHER | `CUR_B` | `"ความมั่นคงปลอดภัยไซเบอร์"` | 3 | T8N01 (3/1, 1) | T8N01 |
 | MN-1 | `CUR_A` | `"วิทยาการข้อมูล"` | 1 | T8N01 (3/1, 1), T8N02 (3/1, 2), T8M05 (3/1, 3), T8F01 (4/1, 1) | T8F01, T8M05, T8N01, T8N02 |
 | MN-2 | `CUR_A` | `"ปัญญาประดิษฐ์"` | 2 | T8N01 (4/2, 1) | T8N01 |
 
@@ -151,14 +150,14 @@
 
 | TC ID | สถานการณ์ | Input | Expected Result | Actual Result | Status |
 | --- | --- | --- | --- | --- | --- |
-| UT-DAO-US8-01 | อ่านแผนของชั้นปีและภาคที่มี 2 หลักสูตร | `findByDepartmentAndStudyYearAndSemester(CS, 2, 1)` | คืน `[P-BASIC, P-SECOND]` เรียงตาม `curriculumName` (ไม่ใช่ `planId`); แผนละ 1 object ไม่ซ้ำจากการ join; วิชาของ P-BASIC เรียง `T8M01, T8M02, T8M04, T8G02` |  | ยังไม่รัน |
-| UT-DAO-US8-02 | กรองตามภาคเรียน | `(CS, 2, 2)` | คืน `[P-SEM2]` เท่านั้น |  | ยังไม่รัน |
-| UT-DAO-US8-03 | ชั้นปีที่ 3 มี 2 แผน (หัวข้อพิเศษ / สหกิจ) | `(CS, 3, 1)` | คืนทั้ง 2 แผน `[P-COOP, P-CONFLICT]` ตาม `planId` (DAO ไม่เรียงตาม `planType`); `planType` อ่านเป็น enum `CO_OP` และ `SPECIAL_PROJECT` |  | ยังไม่รัน |
-| UT-DAO-US8-04 | ชั้นปีหรือภาคที่ไม่มีแผน | `(CS, 4, 1)`, `(CS, 4, 2)`, `(CS, 1, 1)` | คืน list ว่างทุกครั้ง ไม่ throw |  | ยังไม่รัน |
-| UT-DAO-US8-05 | `department` สะกดไม่ตรงกับ seed | `(CS_TYPO, 2, 1)` | คืน list ว่าง |  | ยังไม่รัน |
-| UT-DAO-US8-06 | แผนที่ไม่มีวิชา (seed ผิด) | `(CS, 1, 2)` และ `findWithCoursesById(P-EMPTY)` | คืน list ว่าง และ `Optional.empty()` (inner `join fetch` ตาม ER `1..*`) |  | ยังไม่รัน |
-| UT-DAO-US8-07 | อ่านแผนตาม id พร้อมวิชาเพื่อจัดตาราง | `findWithCoursesById(P-BASIC)` | คืนแผนพร้อม 4 วิชาเรียงตาม `sortOrder`; `course` โหลดมาแล้ว อ่าน `courseCode`, `category`, `credits` ได้ |  | ยังไม่รัน |
-| UT-DAO-US8-08 | id ของแผนที่ไม่มีอยู่ | `findWithCoursesById(-1L)` | คืน `Optional.empty()` ไม่ throw |  | ยังไม่รัน |
+| UT-DAO-US8-01 | อ่านแผนของชั้นปีและภาคที่มี 2 หลักสูตร | `findByDepartmentAndStudyYearAndSemester(CS, 2, 1)` | คืน `[P-BASIC, P-SECOND]` เรียงตาม `curriculumName` (ไม่ใช่ `planId`); แผนละ 1 object ไม่ซ้ำจากการ join; วิชาของ P-BASIC เรียง `T8M01, T8M02, T8M04, T8G02` | PASS | PASS |
+| UT-DAO-US8-02 | กรองตามภาคเรียน | `(CS, 2, 2)` | คืน `[P-SEM2]` เท่านั้น | PASS | PASS |
+| UT-DAO-US8-03 | ชั้นปีที่ 3 มี 2 แผน (หัวข้อพิเศษ / สหกิจ) | `(CS, 3, 1)` | คืนทั้ง 2 แผน `[P-COOP, P-CONFLICT]` ตาม `planId` (DAO ไม่เรียงตาม `planType`); `planType` อ่านเป็น enum `CO_OP` และ `SPECIAL_PROJECT` | PASS | PASS |
+| UT-DAO-US8-04 | ชั้นปีหรือภาคที่ไม่มีแผน | `(CS, 4, 1)`, `(CS, 4, 2)`, `(CS, 1, 1)` | คืน list ว่างทุกครั้ง ไม่ throw | PASS | PASS |
+| UT-DAO-US8-05 | `department` สะกดไม่ตรงกับ seed | `(CS_TYPO, 2, 1)` | คืน list ว่าง | PASS | PASS |
+| UT-DAO-US8-06 | แผนที่ไม่มีวิชา (seed ผิด) | `(CS, 1, 2)` และ `findWithCoursesById(P-EMPTY)` | คืน list ว่าง และ `Optional.empty()` (inner `join fetch` ตาม ER `1..*`) | PASS | PASS |
+| UT-DAO-US8-07 | อ่านแผนตาม id พร้อมวิชาเพื่อจัดตาราง | `findWithCoursesById(P-BASIC)` | คืนแผนพร้อม 4 วิชาเรียงตาม `sortOrder`; `course` โหลดมาแล้ว อ่าน `courseCode`, `category`, `credits` ได้ | PASS | PASS |
+| UT-DAO-US8-08 | id ของแผนที่ไม่มีอยู่ | `findWithCoursesById(-1L)` | คืน `Optional.empty()` ไม่ throw | PASS | PASS |
 
 ### รายละเอียดขั้นตอนการทดสอบ (UT-DAO-US8-01 ถึง 08)
 
@@ -245,13 +244,13 @@
 
 | TC ID | สถานการณ์ | Input | Expected Result | Actual Result | Status |
 | --- | --- | --- | --- | --- | --- |
-| UT-DAO-US8-09 | อ่านวิชาโทของภาคที่มีวิชา | `findByDepartmentAndTerm(CS, 3, 1)` | คืน `[MN-1, MN-OTHER]` เรียงตาม `sortOrder`; MN-2 ไม่อยู่; MN-1 โหลดวิชาครบทุกภาค 4 วิชา เรียง `T8N01, T8N02, T8M05, T8F01` |  | ยังไม่รัน |
-| UT-DAO-US8-10 | กรองตามชั้นปีและภาคของวิชาในวิชาโท | `(CS, 4, 1)`, `(CS, 4, 2)` | `(4, 1)` คืน `[MN-1]` · `(4, 2)` คืน `[MN-2]` |  | ยังไม่รัน |
-| UT-DAO-US8-11 | ภาคที่ไม่มีวิชาโท และชั้นปี 1–2 | `(CS, 3, 2)`, `(CS, 1, 1)`, `(CS, 2, 1)` | คืน list ว่างทุกครั้ง |  | ยังไม่รัน |
-| UT-DAO-US8-12 | `department` สะกดไม่ตรงกับ seed | `(CS_TYPO, 3, 1)` | คืน list ว่าง |  | ยังไม่รัน |
-| UT-DAO-US8-13 | อ่านวิชาโทตาม id พร้อมวิชาทุกภาค | `findWithCoursesById(MN-1)` | คืน MN-1 พร้อม 4 วิชาเรียง `studyYear, semester, sortOrder` |  | ยังไม่รัน |
-| UT-DAO-US8-14 | id ของวิชาโทที่ไม่มีอยู่ | `findWithCoursesById(-1L)` | คืน `Optional.empty()` |  | ยังไม่รัน |
-| UT-DAO-US8-15 | เลือกวิชาของวิชาโทเฉพาะภาคของแผน | `MN-1.coursesOf(3, 1)`, `(4, 1)`, `(3, 2)` | `[T8N01, T8N02, T8M05]` · `[T8F01]` · `[]` |  | ยังไม่รัน |
+| UT-DAO-US8-09 | อ่านวิชาโทของภาคที่มีวิชา | `findByDepartmentAndTerm(CS, 3, 1)` | คืน `[MN-1, MN-OTHER]` เรียงตาม `sortOrder`; MN-2 ไม่อยู่; MN-1 โหลดวิชาครบทุกภาค 4 วิชา เรียง `T8N01, T8N02, T8M05, T8F01` | PASS | PASS |
+| UT-DAO-US8-10 | กรองตามชั้นปีและภาคของวิชาในวิชาโท | `(CS, 4, 1)`, `(CS, 4, 2)` | `(4, 1)` คืน `[MN-1]` · `(4, 2)` คืน `[MN-2]` | PASS | PASS |
+| UT-DAO-US8-11 | ภาคที่ไม่มีวิชาโท และชั้นปี 1–2 | `(CS, 3, 2)`, `(CS, 1, 1)`, `(CS, 2, 1)` | คืน list ว่างทุกครั้ง | PASS | PASS |
+| UT-DAO-US8-12 | `department` สะกดไม่ตรงกับ seed | `(CS_TYPO, 3, 1)` | คืน list ว่าง | PASS | PASS |
+| UT-DAO-US8-13 | อ่านวิชาโทตาม id พร้อมวิชาทุกภาค | `findWithCoursesById(MN-1)` | คืน MN-1 พร้อม 4 วิชาเรียง `studyYear, semester, sortOrder` | PASS | PASS |
+| UT-DAO-US8-14 | id ของวิชาโทที่ไม่มีอยู่ | `findWithCoursesById(-1L)` | คืน `Optional.empty()` | PASS | PASS |
+| UT-DAO-US8-15 | เลือกวิชาของวิชาโทเฉพาะภาคของแผน | `MN-1.coursesOf(3, 1)`, `(4, 1)`, `(3, 2)` | `[T8N01, T8N02, T8M05]` · `[T8F01]` · `[]` | PASS | PASS |
 
 ### รายละเอียดขั้นตอนการทดสอบ (UT-DAO-US8-09 ถึง 15)
 
@@ -328,9 +327,9 @@
 
 | TC ID | สถานการณ์ | Input | Expected Result | Actual Result | Status |
 | --- | --- | --- | --- | --- | --- |
-| UT-DAO-US8-16 | หา section ของทุกวิชาในแผน | รหัสวิชาของ P-BASIC, 2568, 1 | คืน 6 section เรียง `courseCode` แล้ว `sectionNo`: T8G02 (780001, 780002, 780003), T8M01, T8M02, T8M04 พร้อม `course` และ `slots` |  | ยังไม่รัน |
-| UT-DAO-US8-17 | แผนที่มีวิชาไม่เปิดในภาค วิชาไม่มีคาบ และรหัสซ้ำกับวิชาโท | รหัสของ P-CONFLICT + P-COOP + `MN-1.coursesOf(3, 1)`, 2568, 1 | คืน 6 section: T8C01 (`slots` ว่าง), T8G01, T8M03, T8M05 (ครั้งเดียว), T8N01, T8N02; ไม่มี T8X01 |  | ยังไม่รัน |
-| UT-DAO-US8-18 | ภาคหรือปีการศึกษาที่ไม่มี section | รหัสชุดเดียวกับ 17, (2568, 2) และ (2569, 1) | (2568, 2) คืน `[T8X01 010001]` · (2569, 1) คืน list ว่าง |  | ยังไม่รัน |
+| UT-DAO-US8-16 | หา section ของทุกวิชาในแผน | รหัสวิชาของ P-BASIC, 2568, 1 | คืน 6 section เรียง `courseCode` แล้ว `sectionNo`: T8G02 (780001, 780002, 780003), T8M01, T8M02, T8M04 พร้อม `course` และ `slots` | PASS | PASS |
+| UT-DAO-US8-17 | แผนที่มีวิชาไม่เปิดในภาค วิชาไม่มีคาบ และรหัสซ้ำกับวิชาโท | รหัสของ P-CONFLICT + P-COOP + `MN-1.coursesOf(3, 1)`, 2568, 1 | คืน 6 section: T8C01 (`slots` ว่าง), T8G01, T8M03, T8M05 (ครั้งเดียว), T8N01, T8N02; ไม่มี T8X01 | PASS | PASS |
+| UT-DAO-US8-18 | ภาคหรือปีการศึกษาที่ไม่มี section | รหัสชุดเดียวกับ 17, (2568, 2) และ (2569, 1) | (2568, 2) คืน `[T8X01 010001]` · (2569, 1) คืน list ว่าง | PASS | PASS |
 
 ### รายละเอียดขั้นตอนการทดสอบ (UT-DAO-US8-16 ถึง 18)
 
@@ -389,10 +388,10 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 
 | TC ID | สถานการณ์ | Input | Expected Result | Actual Result | Status |
 | --- | --- | --- | --- | --- | --- |
-| UT-DAO-US8-19 | ยังไม่มีตารางของภาค สร้างตารางใหม่และบันทึกหลายวิชา | `"6609000801"`, 2568/1, section ของ T8M01, T8M02, T8M04, T8G02 780001 | ได้ตารางใหม่ 1 แถวที่มี `timetableId`; `findByTimetableId` คืน 4 entry ตรงตาม section; `updatedAt` ไม่เป็น `null` |  | ยังไม่รัน |
-| UT-DAO-US8-20 | มีตารางเดิมอยู่แล้ว เพิ่มวิชาของแผนต่อท้าย | TT-OLD + section ของ T8M01, T8M04 | ไม่สร้างตารางใหม่; TT-OLD มี 3 entry (E-OLD + 2); `updatedAt` เปลี่ยนจาก `OLD` |  | ยังไม่รัน |
-| UT-DAO-US8-21 | บันทึกหลายวิชาลงตารางเดิม แต่มี 1 วิชาผิด constraint | TT-R + `saveAll([T8R01, T8R02])` (T8R02 มีอยู่แล้ว) | throw `DataIntegrityViolationException`; หลัง rollback TT-R ยังมี 1 entry (T8R02), ไม่มี entry ของ T8R01, `updated_at` ยังเป็น `OLD` |  | ยังไม่รัน |
-| UT-DAO-US8-22 | สร้างตารางใหม่แล้วบันทึกหลายวิชา แต่ batch มี section ซ้ำ | `"6609000801"`, 2568/1, `saveAll([T8R01, T8R01])` | throw `DataIntegrityViolationException`; หลัง rollback ไม่มีตารางของ `"6609000801"` ภาค 1/2568 และจำนวนแถว `timetable_entry` ทั้งหมดเท่าเดิม (1) |  | ยังไม่รัน |
+| UT-DAO-US8-19 | ยังไม่มีตารางของภาค สร้างตารางใหม่และบันทึกหลายวิชา | `"6609000801"`, 2568/1, section ของ T8M01, T8M02, T8M04, T8G02 780001 | ได้ตารางใหม่ 1 แถวที่มี `timetableId`; `findByTimetableId` คืน 4 entry ตรงตาม section; `updatedAt` ไม่เป็น `null` | PASS | PASS |
+| UT-DAO-US8-20 | มีตารางเดิมอยู่แล้ว เพิ่มวิชาของแผนต่อท้าย | TT-OLD + section ของ T8M01, T8M04 | ไม่สร้างตารางใหม่; TT-OLD มี 3 entry (E-OLD + 2); `updatedAt` เปลี่ยนจาก `OLD` | PASS | PASS |
+| UT-DAO-US8-21 | บันทึกหลายวิชาลงตารางเดิม แต่มี 1 วิชาผิด constraint | TT-R + `saveAll([T8R01, T8R02])` (T8R02 มีอยู่แล้ว) | throw `DataIntegrityViolationException`; หลัง rollback TT-R ยังมี 1 entry (T8R02), ไม่มี entry ของ T8R01, `updated_at` ยังเป็น `OLD` | PASS | PASS |
+| UT-DAO-US8-22 | สร้างตารางใหม่แล้วบันทึกหลายวิชา แต่ batch มี section ซ้ำ | `"6609000801"`, 2568/1, `saveAll([T8R01, T8R01])` | throw `DataIntegrityViolationException`; หลัง rollback ไม่มีตารางของ `"6609000801"` ภาค 1/2568 และจำนวนแถว `timetable_entry` ทั้งหมดเท่าเดิม (1) | PASS | PASS |
 
 ### รายละเอียดขั้นตอนการทดสอบ (UT-DAO-US8-19 ถึง 22)
 
@@ -452,14 +451,14 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 
 | TC ID | สถานการณ์ | Input | Expected Result | Actual Result | Status |
 | --- | --- | --- | --- | --- | --- |
-| UT-DAO-US8-23 | ชั้นปีกับ `plan_type` ไม่สอดคล้องกัน | `@ParameterizedTest` 7 ค่า (ดูรายละเอียด) | ทุกค่าถูกปฏิเสธด้วย `ck_study_plan_plan_type` |  | ยังไม่รัน |
-| UT-DAO-US8-24 | ภาคเรียนนอก 1, 2 | `study_plan.semester` = 3 และ 0 | ถูกปฏิเสธด้วย `ck_study_plan_semester` |  | ยังไม่รัน |
-| UT-DAO-US8-25 | แผนซ้ำในหลักสูตร ชั้นปี ภาค (รวมกรณี `plan_type` เป็น `NULL`) | ซ้ำกับ P-BASIC และซ้ำกับ P-COOP | ถูกปฏิเสธด้วย `uq_study_plan`; ปี 4 ภาค 1 `CO_OP` ใหม่ insert ได้ |  | ยังไม่รัน |
-| UT-DAO-US8-26 | วิชาในแผนผิด key | วิชาซ้ำ, `sort_order` ซ้ำ, รหัสวิชาไม่มีอยู่, `plan_id` ไม่มีอยู่ | ถูกปฏิเสธด้วย `pk_study_plan_course`, `uq_study_plan_course_order`, `fk_study_plan_course_course`, `fk_study_plan_course_plan` |  | ยังไม่รัน |
-| UT-DAO-US8-27 | ลบแผนแล้ววิชาในแผนหายตาม | `DELETE` P-BASIC | แถวของ P-BASIC ใน `study_plan_course` หมด (11 → 7); แถวของแผนอื่นและ `course` ยังอยู่ |  | ยังไม่รัน |
-| UT-DAO-US8-28 | วิชาโทซ้ำในหลักสูตร | ชื่อซ้ำกับ MN-1, `sort_order` ซ้ำกับ MN-1 | ถูกปฏิเสธด้วย `uq_study_minor`, `uq_study_minor_order`; `sort_order = 1` ใน `CUR_B` insert ได้ |  | ยังไม่รัน |
-| UT-DAO-US8-29 | วิชาในวิชาโทผิดเงื่อนไข | ชั้นปี 2 / 5, ภาค 3, วิชาซ้ำต่างภาค, `sort_order` ซ้ำ, รหัสวิชาไม่มีอยู่ | ถูกปฏิเสธด้วย constraint ตามรายละเอียด |  | ยังไม่รัน |
-| UT-DAO-US8-30 | ลบวิชาโทแล้ววิชาในวิชาโทหายตาม | `DELETE` MN-1 | แถวของ MN-1 ใน `study_minor_course` หมด (6 → 2); MN-2, MN-OTHER ยังอยู่ |  | ยังไม่รัน |
+| UT-DAO-US8-23 | ชั้นปีกับ `plan_type` ไม่สอดคล้องกัน | `@ParameterizedTest` 7 ค่า (ดูรายละเอียด) | ทุกค่าถูกปฏิเสธด้วย `ck_study_plan_plan_type` | PASS 7/7 | PASS |
+| UT-DAO-US8-24 | ภาคเรียนนอก 1, 2 | `study_plan.semester` = 3 และ 0 | ถูกปฏิเสธด้วย `ck_study_plan_semester` | PASS 2/2 | PASS |
+| UT-DAO-US8-25 | แผนซ้ำในหลักสูตร ชั้นปี ภาค (รวมกรณี `plan_type` เป็น `NULL`) | ซ้ำกับ P-BASIC และซ้ำกับ P-COOP | ถูกปฏิเสธด้วย `uq_study_plan`; ปี 4 ภาค 1 `CO_OP` ใหม่ insert ได้ | PASS 3/3 | PASS |
+| UT-DAO-US8-26 | วิชาในแผนผิด key | วิชาซ้ำ, `sort_order` ซ้ำ, รหัสวิชาไม่มีอยู่, `plan_id` ไม่มีอยู่ | ถูกปฏิเสธด้วย `pk_study_plan_course`, `uq_study_plan_course_order`, `fk_study_plan_course_course`, `fk_study_plan_course_plan` | PASS 4/4 | PASS |
+| UT-DAO-US8-27 | ลบแผนแล้ววิชาในแผนหายตาม | `DELETE` P-BASIC | แถวของ P-BASIC ใน `study_plan_course` หมด (11 → 7); แถวของแผนอื่นและ `course` ยังอยู่ | PASS | PASS |
+| UT-DAO-US8-28 | วิชาโทซ้ำในหลักสูตร | ชื่อซ้ำกับ MN-1, `sort_order` ซ้ำกับ MN-1 | ถูกปฏิเสธด้วย `uq_study_minor`, `uq_study_minor_order`; `sort_order = 1` ใน `CUR_B` insert ได้ | PASS 3/3 | PASS |
+| UT-DAO-US8-29 | วิชาในวิชาโทผิดเงื่อนไข | ชั้นปี 2 / 5, ภาค 3, วิชาซ้ำต่างภาค, `sort_order` ซ้ำ, รหัสวิชาไม่มีอยู่ | ถูกปฏิเสธด้วย constraint ตามรายละเอียด | PASS 6/6 | PASS |
+| UT-DAO-US8-30 | ลบวิชาโทแล้ววิชาในวิชาโทหายตาม | `DELETE` MN-1 | แถวของ MN-1 ใน `study_minor_course` หมด (6 → 2); MN-2, MN-OTHER ยังอยู่ | PASS | PASS |
 
 ### รายละเอียดขั้นตอนการทดสอบ (UT-DAO-US8-23 ถึง 30)
 
@@ -528,8 +527,8 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 - **Related:** ER Constraint · **Test method:** `insertMinor_duplicateNameOrOrder_throwsConstraintViolation` (`@ParameterizedTest` 2 ค่า) และ `insertMinor_sameOrderInOtherCurriculum_succeeds`
 - **Test Steps:**
   1. insert `study_minor (CS, CUR_A, "วิทยาการข้อมูล", 9)` ชื่อซ้ำกับ MN-1
-  2. insert `study_minor (CS, CUR_A, "การออกแบบและพัฒนาผลิตภัณฑ์ดิจิทัล", 1)` `sort_order` ซ้ำกับ MN-1
-  3. (เทสแยก) insert `study_minor (CS, CUR_B, "การออกแบบและพัฒนาผลิตภัณฑ์ดิจิทัล", 1)`
+  2. insert `study_minor (CS, CUR_A, "วิศวกรรมซอฟต์แวร์", 1)` `sort_order` ซ้ำกับ MN-1
+  3. (เทสแยก) insert `study_minor (CS, CUR_B, "วิศวกรรมซอฟต์แวร์", 1)`
 - **Expected Result:**
   - ข้อ 1 throw ด้วย `uq_study_minor` · ข้อ 2 throw ด้วย `uq_study_minor_order`
   - ข้อ 3 insert ได้ (ลำดับปุ่มแยกตามหลักสูตร)
@@ -562,6 +561,52 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 
 ---
 
+## Test Cases ส่วนที่ 6: วิชาในวิชาโทพร้อม `plan_type` (เพิ่มใน US8-T09)
+
+เพิ่มใน T09 หลังเพิ่ม `plan_type` เข้า PK ของ `study_minor_course` (ทีมเลือกทางเลือก ก) เพราะวิชาโทวิชาเดียวกันเรียนต่างภาคตามแผน เช่น CS440 แผนหัวข้อพิเศษเรียนปี 4/1 แต่แผนสหกิจเรียนปี 3/1 แถวใน fixture ทั้งหมดเป็น `SPECIAL_PROJECT` เคสในส่วนนี้ insert แถว `CO_OP` เพิ่มเองในเทส
+
+| TC ID | สถานการณ์ | Input | Expected Result | Actual Result | Status |
+| --- | --- | --- | --- | --- | --- |
+| UT-DAO-US8-31 | วิชาเดียวกันในวิชาโทอยู่ต่างภาคตามแผน | เพิ่ม `(MN-1, T8F01, CO_OP, 3/1, 1)` แล้ว `MN-1.coursesOf(...)` | `courses` มี 5 แถว · `(CO_OP, 3, 1)` = `[T8F01]` · `(CO_OP, 4, 1)` = `[]` · `(SPECIAL_PROJECT, 3, 1)` = `[T8N01, T8N02, T8M05]` · `(SPECIAL_PROJECT, 4, 1)` = `[T8F01]` | ตรงตามที่คาด | PASS |
+| UT-DAO-US8-32 | วิชาโทที่มีวิชาในภาคนั้นเฉพาะแผนสหกิจ | เพิ่ม `(MN-2, T8N02, CO_OP, 3/2, 1)` แล้ว `findByDepartmentAndTerm(CS, 3, 2)` | ก่อนเพิ่มคืน list ว่าง · หลังเพิ่มคืน `[MN-2]` · `coursesOf(CO_OP, 3, 2)` = `[T8N02]` · `coursesOf(SPECIAL_PROJECT, 3, 2)` = `[]` | ตรงตามที่คาด | PASS |
+| UT-DAO-US8-33 | `plan_type` ของวิชาในวิชาโท | `(MN-1, T8G01, MINOR, 3/1, 9)` และ `(MN-1, T8N01, CO_OP, 3/1, 1)` | ค่าแรกถูกปฏิเสธด้วย `ck_study_minor_course_plan_type` · ค่าที่สอง insert ได้ (T8N01 ของ MN-1 มี 2 แถว) | ตรงตามที่คาด (2/2) | PASS |
+
+### รายละเอียดขั้นตอนการทดสอบ (UT-DAO-US8-31 ถึง 33)
+
+#### [UT-DAO-US8-31] วิชาเดียวกันในวิชาโทอยู่ต่างภาคตามแผน
+- **Related:** T05 (วิชาโทตามแผน), T06 (`StudyMinor.coursesOf(planType, studyYear, semester)`) · **Test method:** `coursesOf_coopPlan_returnsOnlyCoursesOfThatPlan`
+- **Test Steps:**
+  1. insert `study_minor_course (MN-1, T8F01, CO_OP, 3, 1, 1)` แล้ว `em.flush()` + `em.clear()`
+  2. โหลด MN-1 ด้วย `findWithCoursesById(MN-1).orElseThrow()` แล้ว `em.clear()`
+  3. เรียก `coursesOf` ด้วย `(CO_OP, 3, 1)`, `(CO_OP, 4, 1)`, `(SPECIAL_PROJECT, 3, 1)`, `(SPECIAL_PROJECT, 4, 1)`
+- **Expected Result:**
+  - `courses` มี 5 แถว (T8F01 มีแผนละ 1 แถว)
+  - `(CO_OP, 3, 1)` คืน `[T8F01]` · `(CO_OP, 4, 1)` คืน list ว่าง
+  - `(SPECIAL_PROJECT, 3, 1)` คืน `[T8N01, T8N02, T8M05]` (แถวของแผนสหกิจไม่ปน) · `(SPECIAL_PROJECT, 4, 1)` คืน `[T8F01]`
+
+#### [UT-DAO-US8-32] วิชาโทที่มีวิชาในภาคนั้นเฉพาะแผนสหกิจ
+- **Related:** T05 (`minors` ของชั้นปี 3–4) · **Test method:** `findByDepartmentAndTerm_courseOnlyInCoopPlan_returnsMinor`
+- **Test Steps:**
+  1. เรียก `findByDepartmentAndTerm(CS, 3, 2)`
+  2. insert `study_minor_course (MN-2, T8N02, CO_OP, 3, 2, 1)` แล้ว `em.flush()` + `em.clear()`
+  3. เรียก `findByDepartmentAndTerm(CS, 3, 2)` อีกครั้ง แล้วเรียก `coursesOf` ของผล
+- **Expected Result:**
+  - ข้อ 1 คืน list ว่าง
+  - ข้อ 3 คืน `[MN-2]` (query ไม่กรอง `plan_type` แผนไหนมีวิชาในภาคนั้นก็คืนวิชาโท)
+  - `coursesOf(CO_OP, 3, 2)` คืน `[T8N02]` · `coursesOf(SPECIAL_PROJECT, 3, 2)` คืน list ว่าง
+
+#### [UT-DAO-US8-33] `plan_type` ของวิชาในวิชาโท (`ck_study_minor_course_plan_type`, PK ที่มี `plan_type`)
+- **Related:** ER Constraint · **Test method:** `insertMinorCourse_invalidRow_throwsConstraintViolation` ค่าที่ 7 และ `insertMinorCourse_sameCourseOtherPlanType_succeeds`
+- **Test Steps:**
+  1. insert `study_minor_course (MN-1, T8G01, 'MINOR', 3, 1, 9)` (ค่าที่ 7 ของ `@CsvSource` เดียวกับ UT-DAO-US8-29)
+  2. (เทสแยก) insert `(MN-1, T8N01, 'CO_OP', 3, 1, 1)` ซึ่งรหัสวิชา ภาค และ `sort_order` ซ้ำกับแถว `SPECIAL_PROJECT` ใน fixture
+  3. นับแถวของ MN-1 รหัส T8N01
+- **Expected Result:**
+  - ข้อ 1 throw `PersistenceException` ที่มี `ConstraintViolationException` ของ `ck_study_minor_course_plan_type`
+  - ข้อ 2 insert ได้ (ไม่ชน `pk_study_minor_course` และ `uq_study_minor_course_order` เพราะทั้งสองมี `plan_type`) · ข้อ 3 ได้ `2`
+
+---
+
 ## สิ่งที่ต้องแก้ใน T06 / T09
 
 ตรวจ SQL ใน [ER Diagram ของ US8-T06](../T06/US8-T06-ER-Diagram.md) กับ SQL Server 2025 (`mcr.microsoft.com/mssql/server:2025-latest`) โดย insert ข้อมูลตั้งต้นของเอกสารนี้แล้วลองทุกค่าในส่วนที่ 5: constraint ทุกตัวปฏิเสธตามที่คาด ยกเว้น 1 ข้อ
@@ -582,7 +627,7 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 
 ## Traceability Matrix
 
-คอลัมน์ CoS ใช้เลข Conditions of Satisfaction ของการ์ด US8 หลังทีมตัด TC2 และ TC5 เดิมออก (1 = เพิ่มวิชาที่จำเป็นต้องลงทะเบียนตามแผน, 2 = ไม่เพิ่มวิชาที่มีในตารางซ้ำ, 3 = เวลาชน) แบบเดียวกับ [US8-T14](../T14/US8-T14-design-it-api-dao.md) และ [US8-T16](../T16/US8-T16-uat-test-cases.md) ส่วน "T04" คือกรณีที่การ์ด US8-T04 ให้ครอบคลุมเพิ่ม และ "T05" คือกรณีจาก US8-T05 ที่ไม่ได้อยู่ใน CoS
+คอลัมน์ CoS ใช้เลข Conditions of Satisfaction ของการ์ด US8 หลังทีมตัด TC2 และ TC5 เดิมออก (1 = เพิ่มวิชาที่จำเป็นต้องลงทะเบียนตามแผน, 2 = ไม่เพิ่มวิชาที่มีในตารางซ้ำ, 3 = เวลาชน) แบบเดียวกับ US8-T14 (PR #86) และ US8-T16 (PR #85) ส่วน "T04" คือกรณีที่การ์ด US8-T04 ให้ครอบคลุมเพิ่ม และ "T05" คือกรณีจาก US8-T05 ที่ไม่ได้อยู่ใน CoS
 
 | CoS / ข้อกำหนดของ US8 | บทบาทของชั้น DAO ที่ต้องรองรับ | TC ID ที่ครอบคลุม |
 | --- | --- | --- |
@@ -621,8 +666,8 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 - [Sequence Diagram ดูแผนการเรียน](../T06/US8-T06-Sequence-Diagram-StudyPlans.md) (US8-T06)
 - [DTO & API Spec](../T05/US8-DTO-API-Spec.md) (US8-T05)
 - [API Class Diagram](../T05/US8-API-Class-Diagram.md) (US8-T05)
-- [Integration Test Cases ระหว่าง API กับ DAO](../T14/US8-T14-design-it-api-dao.md) (US8-T14)
-- [UAT Test Cases](../T16/US8-T16-uat-test-cases.md) (US8-T16)
+- Integration Test Cases ระหว่าง API กับ DAO (US8-T14 · PR #86)
+- UAT Test Cases (US8-T16 · PR #85)
 - [US1-T06 DAO Class Diagram](../../US1/T06/US1-T06-DAO-Class-Diagram.md)
 - [US1-T12 Design Unit Test Cases ส่วน DAO](../../US1/T12/US1-T12%20Design%20Unit%20Test%20Cases%20ส่วน%20DAO.md)
 - [US2-T12 Design Unit Test Cases ส่วน DAO](../../US2/T12/US2-T12-DAO-Unit-Test-Cases.md)
