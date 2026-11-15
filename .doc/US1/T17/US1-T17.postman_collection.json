@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "US1-T17 Integration Test API (IT-13–19)",
-    "description": "ทดสอบสัญญา API ของ US1 ตาม US1-T13 Integration Test Cases หัวข้อ 6 (IT-13 ถึง IT-19)\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย profile stub-tu และ DB มี seed V20261014_2010__seed_courses_2568_1.sql\n- บัญชี {{username}} ยังไม่ถูกล็อก\n\ncollection นี้ **ลบตาราง 2568/1 ของ {{username}} ทั้งหมด** ตอนเริ่มและตอนจบ จึงใช้บัญชี 6609000001 ไม่ใช่บัญชี demo 6609000000\nต้องรันตามลำดับ (Run collection) เพราะ request ถัดไปใช้ token, sectionId และตารางที่ request ก่อนหน้าสร้างไว้",
+    "description": "ทดสอบสัญญา API ของ US1 ตาม US1-T13 Integration Test Cases หัวข้อ 6 (IT-13 ถึง IT-19)\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย profile stub-tu และ DB มี seed V20261014_2010__seed_courses_2568_1.sql และ V20261114_2100__seed_study_plans.sql (2568/1 มี 37 วิชา)\n- บัญชี {{username}} ยังไม่ถูกล็อก\n\ncollection นี้ **ลบตาราง 2568/1 ของ {{username}} ทั้งหมด** ตอนเริ่มและตอนจบ จึงใช้บัญชี 6609000001 ไม่ใช่บัญชี demo 6609000000\nต้องรันตามลำดับ (Run collection) เพราะ request ถัดไปใช้ token, sectionId และตารางที่ request ก่อนหน้าสร้างไว้",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -44,9 +44,9 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('200 ได้ 9 วิชาของ 2568/1', () => {",
+              "pm.test('200 ได้ 37 วิชาของ 2568/1', () => {",
               "  pm.response.to.have.status(200);",
-              "  pm.expect(pm.response.json()).to.have.lengthOf(9);",
+              "  pm.expect(pm.response.json()).to.have.lengthOf(37);",
               "});",
               "// เก็บเป็นตัวแปร sec_<รหัสวิชา>_<กลุ่ม> เช่น sec_CS111_030002 เพราะ sectionId เป็น IDENTITY ไม่คงที่",
               "pm.response.json().forEach((course) => course.sections.forEach((section) =>",
