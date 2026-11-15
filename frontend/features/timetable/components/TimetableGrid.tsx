@@ -57,7 +57,7 @@ const TimetableGrid = ({
     <section ref={timetableSectionRef} className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-bold">ตารางเรียนจำลอง</h2>
-        <div className="flex items-start gap-3">
+        <div className="flex flex-wrap items-start gap-3">
           <p className="py-2 text-sm text-slate-600">
             หน่วยกิต {totalCredits} / {maxCredits}
           </p>

@@ -173,6 +173,7 @@ export const useTimetable = () => {
     addCourse,
     removeCourse,
     removeCourses,
+    applyPlanTimetable: showWriteResult,
     dismissConflictAlert: () => setConflictAlertDismissed(true),
   };
 };

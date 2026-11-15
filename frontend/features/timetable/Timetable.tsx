@@ -1,6 +1,7 @@
 "use client";
 
 import CourseSearchPanel from "../courses/components/CourseSearchPanel";
+import CurriculumPlanLauncher from "../curriculum-plan/components/CurriculumPlanLauncher";
 import AddedCoursesList from "./components/AddedCoursesList";
 import ConflictAlert from "./components/ConflictAlert";
 import TimetableGrid from "./components/TimetableGrid";
@@ -29,6 +30,7 @@ const Timetable = () => {
     addCourse,
     removeCourse,
     removeCourses,
+    applyPlanTimetable,
     dismissConflictAlert,
     setAcademicYear,
     setSemester,
@@ -68,6 +70,13 @@ const Timetable = () => {
         maxCredits={maxCredits}
         academicYear={academicYear}
         semester={semester}
+      />
+
+      {/* แบนเนอร์จัดตารางเรียนตามเล่มหลักสูตร */}
+      <CurriculumPlanLauncher
+        academicYear={selectedAcademicYear}
+        disabled={addDisabled}
+        onApplyTimetable={applyPlanTimetable}
       />
 
       {/* รายการวิชาที่เพิ่มแล้ว รองรับลบรายวิชา ลบที่เลือก และลบทั้งหมดพร้อมกล่องยืนยัน */}
