@@ -1,0 +1,33 @@
+Browser: Chrome/131.0.6778.204 | http://localhost:3000 | บัญชี 6609000000 | เคส 1,2,3
+
+=== UAT-US4-01 กด Logout แล้วออกจากระบบและกลับหน้า Login ทันที ===
+  [PASS] ขั้น 1: อยู่ที่ / Navbar แสดง 6609000000
+  [PASS] ขั้น 2: กด "ออกจากระบบ" แล้ว token ใน session ถูกล้าง
+  [PASS] ขั้น 3: อยู่ที่ /login เห็นหัวข้อ Login ใช้เวลา 87 ms หลังกด
+=> UAT-US4-01: Pass
+
+
+=== UAT-US4-02 หลัง Logout กด Back ต้องไม่แสดงข้อมูลเดิม ===
+  [PASS] ขั้น 1: เห็น CS180 ในตาราง และรหัส 6609000000 บน Navbar
+  [PASS] ขั้น 2: อยู่ที่ /login
+  [PASS] ขั้น 3: กด Back แล้วอยู่ที่ /login
+  [PASS] ขั้น 4: ไม่พบ CS180 หรือ 6609000000 บนหน้าจอ
+  [PASS] ขั้น 5: / → /login, /dashboard → /login
+=> UAT-US4-02: Pass
+
+
+=== UAT-US4-03 ไม่มีการใช้งานเกินเวลาที่กำหนด ระบบ Logout อัตโนมัติ ===
+  [PASS] ขั้น 1: เข้าสู่ระบบเวลา 01:00:06
+  รอ 870 วินาที โดยไม่ใช้งาน...
+  [PASS] ขั้น 2: ผ่านไป 870 วินาที อยู่ที่ / ยังเข้าสู่ระบบอยู่
+  [FAIL] ขั้น 3: ถูก Logout หลังไม่ใช้งาน 899 วินาที token ถูกล้าง มีข้อความแจ้งเซสชันหมดอายุ
+  [PASS] ขั้น 4: กด Back แล้วอยู่ที่ /login
+=> UAT-US4-03: Fail
+
+| Test Case | ผล | หมายเหตุ |
+| --- | --- | --- |
+| UAT-US4-01 | Pass | - |
+| UAT-US4-02 | Pass | เตรียมข้อมูล: เพิ่ม CS180 820001 ผ่าน POST /api/timetable/entries (status 409 มีอยู่แล้ว) / ข้อมูลเสริม: GET /api/timetable ไม่มี token ได้ 401, ใช้ token เดิมที่คัดลอกไว้ก่อน Logout ได้ 200 (backend ยังไม่เพิกถอน token ตอน logout ใช้ได้จนหมดอายุ 3 ชม.) |
+| UAT-US4-03 | Fail | Inactivity Timeout ที่ใช้ทดสอบ: 900 วินาที |
+
+บันทึกผลที่ D:\CS261\CS261-G3-MockTimetableTU\.doc\US4\T20\evidence\uat-results.json
