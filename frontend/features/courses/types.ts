@@ -12,7 +12,8 @@ export type DayOfWeek =
 export type CourseCategory =
   | "MAJOR"
   | "GENERAL_EDUCATION"
-  | "FREE_ELECTIVE";
+  | "FREE_ELECTIVE"
+  | "MINOR";
 
 // รูปแบบข้อมูลหนึ่งคาบจาก Course/Timetable API; startTime/endTime ใช้รูป HH:mm
 // รายการนี้ถูกใช้ทั้งแสดงรายละเอียดใน CourseCard และวางตำแหน่งใน TimetableGrid

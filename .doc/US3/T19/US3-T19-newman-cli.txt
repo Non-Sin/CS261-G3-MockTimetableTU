@@ -1,0 +1,97 @@
+(node:15792) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+newman
+
+US3-T19 System Test (API)
+
+→ ST-10-1 POST login ไม่ส่ง username/password → 400
+  POST http://localhost:8080/api/auth/login [400 Bad Request, 578B, 47ms]
+  √  400 ProblemDetail มี errors ของ username และ password
+
+→ ST-10-2 GET /api/users/me ไม่มี Authorization → 401
+  GET http://localhost:8080/api/users/me [401 Unauthorized, 596B, 10ms]
+  √  401 จาก JwtAuthenticationFilter ไม่มีข้อมูลผู้ใช้
+
+→ ST-10-3 GET /api/users/me token ไม่ถูกต้อง → 401
+  GET http://localhost:8080/api/users/me [401 Unauthorized, 596B, 6ms]
+  √  401 จาก JwtAuthenticationFilter ไม่มีข้อมูลผู้ใช้
+
+→ ST-11 POST login TU API ใช้งานไม่ได้ ×5 → 503 ทุกครั้ง
+  POST http://localhost:8080/api/auth/login [503 Service Unavailable, 734B, 22ms]
+  √  ครั้งที่ 1: 503 TU_API_UNAVAILABLE ไม่นับ attempt (ไม่กลายเป็น 429)
+
+Attempting to set next request to ST-11 POST login TU API ใช้งานไม่ได้ ×5 → 503 ทุกครั้ง
+
+→ ST-11 POST login TU API ใช้งานไม่ได้ ×5 → 503 ทุกครั้ง
+  POST http://localhost:8080/api/auth/login [503 Service Unavailable, 734B, 20ms]
+  √  ครั้งที่ 2: 503 TU_API_UNAVAILABLE ไม่นับ attempt (ไม่กลายเป็น 429)
+
+Attempting to set next request to ST-11 POST login TU API ใช้งานไม่ได้ ×5 → 503 ทุกครั้ง
+
+→ ST-11 POST login TU API ใช้งานไม่ได้ ×5 → 503 ทุกครั้ง
+  POST http://localhost:8080/api/auth/login [503 Service Unavailable, 734B, 21ms]
+  √  ครั้งที่ 3: 503 TU_API_UNAVAILABLE ไม่นับ attempt (ไม่กลายเป็น 429)
+
+Attempting to set next request to ST-11 POST login TU API ใช้งานไม่ได้ ×5 → 503 ทุกครั้ง
+
+→ ST-11 POST login TU API ใช้งานไม่ได้ ×5 → 503 ทุกครั้ง
+  POST http://localhost:8080/api/auth/login [503 Service Unavailable, 734B, 19ms]
+  √  ครั้งที่ 4: 503 TU_API_UNAVAILABLE ไม่นับ attempt (ไม่กลายเป็น 429)
+
+Attempting to set next request to ST-11 POST login TU API ใช้งานไม่ได้ ×5 → 503 ทุกครั้ง
+
+→ ST-11 POST login TU API ใช้งานไม่ได้ ×5 → 503 ทุกครั้ง
+  POST http://localhost:8080/api/auth/login [503 Service Unavailable, 734B, 20ms]
+  √  ครั้งที่ 5: 503 TU_API_UNAVAILABLE ไม่นับ attempt (ไม่กลายเป็น 429)
+
+→ ST-05 POST login รหัสผิด ×5 → 401 ×4 แล้ว 429 (900 วินาที)
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 41ms]
+  √  ครั้งที่ 1: 401 INVALID_CREDENTIALS
+
+Attempting to set next request to ST-05 POST login รหัสผิด ×5 → 401 ×4 แล้ว 429 (900 วินาที)
+
+→ ST-05 POST login รหัสผิด ×5 → 401 ×4 แล้ว 429 (900 วินาที)
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 36ms]
+  √  ครั้งที่ 2: 401 INVALID_CREDENTIALS
+
+Attempting to set next request to ST-05 POST login รหัสผิด ×5 → 401 ×4 แล้ว 429 (900 วินาที)
+
+→ ST-05 POST login รหัสผิด ×5 → 401 ×4 แล้ว 429 (900 วินาที)
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 30ms]
+  √  ครั้งที่ 3: 401 INVALID_CREDENTIALS
+
+Attempting to set next request to ST-05 POST login รหัสผิด ×5 → 401 ×4 แล้ว 429 (900 วินาที)
+
+→ ST-05 POST login รหัสผิด ×5 → 401 ×4 แล้ว 429 (900 วินาที)
+  POST http://localhost:8080/api/auth/login [401 Unauthorized, 653B, 33ms]
+  √  ครั้งที่ 4: 401 INVALID_CREDENTIALS
+
+Attempting to set next request to ST-05 POST login รหัสผิด ×5 → 401 ×4 แล้ว 429 (900 วินาที)
+
+→ ST-05 POST login รหัสผิด ×5 → 401 ×4 แล้ว 429 (900 วินาที)
+  POST http://localhost:8080/api/auth/login [429 Too Many Requests, 862B, 41ms]
+  √  ครั้งที่ 5: 429 ACCOUNT_LOCKED retryAfterSeconds 899–900
+
+→ ST-06-1 POST login รหัสถูกขณะยังถูกระงับ → 429 เวลาที่เหลือลดลง
+  POST http://localhost:8080/api/auth/login [429 Too Many Requests, 862B, 23ms]
+  √  429 ACCOUNT_LOCKED ทันทีแม้รหัสผ่านถูก และ retryAfterSeconds ลดลง
+
+┌─────────────────────────┬──────────────────┬──────────────────┐
+│                         │         executed │           failed │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              iterations │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│                requests │               14 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│            test-scripts │               14 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│      prerequest-scripts │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              assertions │               14 │                0 │
+├─────────────────────────┴──────────────────┴──────────────────┤
+│ total run duration: 4.5s                                      │
+├───────────────────────────────────────────────────────────────┤
+│ total data received: 3.72kB (approx)                          │
+├───────────────────────────────────────────────────────────────┤
+│ average response time: 26ms [min: 6ms, max: 47ms, s.d.: 11ms] │
+└───────────────────────────────────────────────────────────────┘

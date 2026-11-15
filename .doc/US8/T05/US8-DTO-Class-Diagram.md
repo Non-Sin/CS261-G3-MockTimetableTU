@@ -17,11 +17,12 @@ classDiagram
     class StudyMinorResponse {
         <<US8 record>>
         -minorId: Long
+        -planType: PlanType
         -curriculumName: String
         -minorName: String
         -totalCredits: int
         -courses: List~StudyPlanCourseResponse~
-        +of(minor: StudyMinor, courses: List~Course~)$ StudyMinorResponse
+        +of(minor: StudyMinor, planType: PlanType, courses: List~Course~)$ StudyMinorResponse
     }
     class StudyPlanResponse {
         <<US8 record>>
@@ -109,6 +110,7 @@ classDiagram
         MAJOR
         GENERAL_EDUCATION
         FREE_ELECTIVE
+        MINOR
     }
     class TimetableResponse {
         <<US1 record>>
@@ -142,7 +144,7 @@ classDiagram
 | `StudyPlanListResponse` | `GET /api/study-plans` | ผลการค้นหา preset ตาม `department` ของนักศึกษา + `studyYear` + `semester` ไม่พบได้ `plans: []` |
 | `StudyPlanResponse` | 〃 | preset 1 หลักสูตร (ปี 3–4 = 1 หลักสูตร × 1 แผน) `totalCredits` คำนวณใน `of()` จากผลรวม `credits` ของ `courses` ไม่ได้เก็บใน DB · `planType` เป็น `null` สำหรับปี 1–2 และ**ส่ง** `"planType": null` ใน JSON (ไม่ใส่ `NON_NULL`) |
 | `PlanType` | 〃 | แผนของชั้นปีที่ 3–4 `SPECIAL_PROJECT` = ทำหัวข้อพิเศษ, `CO_OP` = สหกิจศึกษา ข้อความภาษาไทยอยู่ฝั่ง frontend ชื่อไม่ใช้ `track` เพราะซ้ำกับ `users.track` (ภาคปกติ/พิเศษ) ของ US3 |
-| `StudyMinorResponse` | 〃 | วิชาโท 1 ตัวเลือก มีเฉพาะชั้นปีที่ 3–4 (ปี 1–2 ได้ `minors` ว่าง) มีเฉพาะวิชาของ `studyYear` + `semester` ที่ขอ (วิชาโทที่ไม่มีวิชาในภาคนี้ไม่ถูกส่งมา) `totalCredits` คำนวณใน `of()` · ปุ่ม "ไม่เรียนวิชาโท" ไม่ได้มาจาก DTO นี้ |
+| `StudyMinorResponse` | 〃 | วิชาโท 1 ตัวเลือกของ 1 แผน (`planType`) วิชาโทเดียวกันมีได้ 2 รายการ UI กรองตามแผนที่เลือก มีเฉพาะชั้นปีที่ 3–4 (ปี 1–2 ได้ `minors` ว่าง) มีเฉพาะวิชาของ `planType` + `studyYear` + `semester` ที่ขอ (แผนที่ไม่มีวิชาในภาคนี้ไม่ถูกส่งมา) `totalCredits` คำนวณใน `of()` · ปุ่ม "ไม่เรียนวิชาโท" ไม่ได้มาจาก DTO นี้ |
 | `StudyPlanCourseResponse` | 〃 | วิชาใน preset/วิชาโท เรียงตาม `sortOrder` ยังไม่มีข้อมูล section ใช้ซ้ำทั้งสองที่ |
 | `ApplyPlanRequest` | `POST /api/timetable/apply-plan` | body · `planId` และ `academicYear` เป็น `@NotNull` (ไม่ส่ง → 400) · `minorId` ไม่บังคับ `null` = ไม่เรียนวิชาโท ส่งมากับ preset ปี 1–2 → 400 `MINOR_NOT_ALLOWED` · `dryRun` เป็น primitive จึงได้ `false` เมื่อไม่ส่ง |
 | `ApplyPlanResponse` | 〃 | `minorId` ส่งกลับตาม request (`null` ได้) · `timetable` เป็น `null` เมื่อ `dryRun: true` และเป็น `TimetableResponse` ของ US1 เมื่อยืนยัน |
@@ -154,7 +156,7 @@ classDiagram
 | Static method | หน้าที่ |
 | --- | --- |
 | `StudyPlanResponse.of(plan, courses)` | แปลง entity `StudyPlan` พร้อมวิชาที่เรียงตาม `sortOrder` แล้ว และคำนวณ `totalCredits` |
-| `StudyMinorResponse.of(minor, courses)` | แปลง entity `StudyMinor` พร้อมวิชาของภาคที่ขอที่เรียงตาม `sortOrder` แล้ว และคำนวณ `totalCredits` |
+| `StudyMinorResponse.of(minor, planType, courses)` | แปลง entity `StudyMinor` พร้อมวิชาของแผนและภาคที่ขอ (`minor.coursesOf(planType, studyYear, semester)` ที่เรียงตาม `sortOrder` แล้ว) และคำนวณ `totalCredits` |
 | `StudyPlanCourseResponse.from(course)` | แปลง entity `Course` ของ US1 |
 | `AddedPlanCourseResponse.from(section, source)` | แปลง `Section` ที่เลือก อ่านข้อมูลวิชาจาก `section.getCourse()` |
 | `SkippedPlanCourseResponse.alreadyInTimetable(...)` ฯลฯ | 1 factory ต่อ 1 `reason` สร้าง `message` ภาษาไทยให้ด้วย เช่น `"TU100 อยู่ในตารางแล้ว (Sec 780002)"` ใส่ field เสริมเฉพาะที่ reason นั้นใช้ จึงไม่มีทางสร้าง object ที่ field ไม่ตรงกับ reason |
