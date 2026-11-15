@@ -54,7 +54,7 @@
 
 | คลาส | เคส | หมายเหตุ |
 | --- | --- | --- |
-| `support/StudyPlanFixture` | ข้อมูลตั้งต้น | แบบเดียวกับ `DaoFixture` ของ US1 แต่ใช้ข้อมูลของ US8 เท่านั้น; เพิ่ม T09 ครบจาก revision ของ T12 |
+| `support/StudyPlanFixture` | ข้อมูลตั้งต้น | แบบเดียวกับ `DaoFixture` ของ US1 แต่ใช้ข้อมูลของ US8 เท่านั้น แถววิชาโททั้งหมดเป็น `SPECIAL_PROJECT` |
 | `StudyPlanRepositoryTest` | 01 – 08 | |
 | `StudyMinorRepositoryTest` | 09 – 15, 31 – 32 | เพิ่ม T09 หลังแก้ไข schema ด้วย `plan_type` |
 | `PlanSectionLookupTest` | 16 – 18 | ไม่เพิ่มลงใน `SectionRepositoryTest` ของ US1 |
@@ -563,42 +563,47 @@ id ของ `timetable_entry` เป็น IDENTITY ทำให้ Hibernate �
 
 ## Test Cases ส่วนที่ 6: วิชาในวิชาโทพร้อม `plan_type` (เพิ่มใน US8-T09)
 
-เพิ่มเข้ามาหลังจากแก้ไข schema ใน T09 โดยเพิ่ม `plan_type` ลงใน `study_minor_course` เพื่อให้วิชาเดียวกันสามารถมี plan type ต่างกันได้ (ทีมเลือกตัวเลือก ก ใน T12)
+เพิ่มใน T09 หลังเพิ่ม `plan_type` เข้า PK ของ `study_minor_course` (ทีมเลือกทางเลือก ก) เพราะวิชาโทวิชาเดียวกันเรียนต่างภาคตามแผน เช่น CS440 แผนหัวข้อพิเศษเรียนปี 4/1 แต่แผนสหกิจเรียนปี 3/1 แถวใน fixture ทั้งหมดเป็น `SPECIAL_PROJECT` เคสในส่วนนี้ insert แถว `CO_OP` เพิ่มเองในเทส
 
 | TC ID | สถานการณ์ | Input | Expected Result | Actual Result | Status |
 | --- | --- | --- | --- | --- | --- |
-| UT-DAO-US8-31 | โหลดวิชาจากวิชาโทเฉพาะเมื่อแผนเป็น COOP | `MN-1.coursesOf(PlanType.CO_OP, 3, 1)` | คืนแค่วิชาที่มี `plan_type = CO_OP` ในภาค 3/1 ของ MN-1 (ปัจจุบัน fixture ทั้งหมดใช้ `SPECIAL_PROJECT`) | PASS | PASS |
-| UT-DAO-US8-32 | กรองวิชาโทที่มีวิชาเฉพาะแผนเทอม | `findByDepartmentAndTerm(CS, 3, 1)` หลังเพิ่มวิชาใน COOP plan | คืน minor ที่มีวิชาเปิดเฉพาะใน COOP ของภาค 3/1 เท่านั้น (อยู่แล้ว MN-1 ส่วนที่ 1 ไม่เปลี่ยน) | PASS | PASS |
-| UT-DAO-US8-33 | วิชาในวิชาโทซ้ำกรณี `plan_type` ต่างกัน | วิชาซ้ำภาคเดียว `plan_type` ต่าง: `(MN-1, T8N01, 3, 1, SPECIAL_PROJECT)` และ `(MN-1, T8N01, 3, 1, CO_OP)` | ค่า 1 ถูกปฏิเสธด้วย `ck_study_minor_course_plan_type` (plan_type บังคับ); ค่า 2 (`CO_OP`) insert ได้ (แยกตาม plan_type) | PASS 2/2 | PASS |
+| UT-DAO-US8-31 | วิชาเดียวกันในวิชาโทอยู่ต่างภาคตามแผน | เพิ่ม `(MN-1, T8F01, CO_OP, 3/1, 1)` แล้ว `MN-1.coursesOf(...)` | `courses` มี 5 แถว · `(CO_OP, 3, 1)` = `[T8F01]` · `(CO_OP, 4, 1)` = `[]` · `(SPECIAL_PROJECT, 3, 1)` = `[T8N01, T8N02, T8M05]` · `(SPECIAL_PROJECT, 4, 1)` = `[T8F01]` | ตรงตามที่คาด | PASS |
+| UT-DAO-US8-32 | วิชาโทที่มีวิชาในภาคนั้นเฉพาะแผนสหกิจ | เพิ่ม `(MN-2, T8N02, CO_OP, 3/2, 1)` แล้ว `findByDepartmentAndTerm(CS, 3, 2)` | ก่อนเพิ่มคืน list ว่าง · หลังเพิ่มคืน `[MN-2]` · `coursesOf(CO_OP, 3, 2)` = `[T8N02]` · `coursesOf(SPECIAL_PROJECT, 3, 2)` = `[]` | ตรงตามที่คาด | PASS |
+| UT-DAO-US8-33 | `plan_type` ของวิชาในวิชาโท | `(MN-1, T8G01, MINOR, 3/1, 9)` และ `(MN-1, T8N01, CO_OP, 3/1, 1)` | ค่าแรกถูกปฏิเสธด้วย `ck_study_minor_course_plan_type` · ค่าที่สอง insert ได้ (T8N01 ของ MN-1 มี 2 แถว) | ตรงตามที่คาด (2/2) | PASS |
 
 ### รายละเอียดขั้นตอนการทดสอบ (UT-DAO-US8-31 ถึง 33)
 
-#### [UT-DAO-US8-31] โหลดวิชาจากวิชาโทเฉพาะเมื่อแผนเป็น COOP
-- **Related:** T05 (แผน COOP), T06 (entity `StudyMinor.coursesOf(planType, ...)`) · **Test method:** `coursesOf_coopPlan_returnsOnlyCoursesOfThatPlan`
+#### [UT-DAO-US8-31] วิชาเดียวกันในวิชาโทอยู่ต่างภาคตามแผน
+- **Related:** T05 (วิชาโทตามแผน), T06 (`StudyMinor.coursesOf(planType, studyYear, semester)`) · **Test method:** `coursesOf_coopPlan_returnsOnlyCoursesOfThatPlan`
 - **Test Steps:**
-  1. โหลด MN-1 ด้วย `findWithCoursesById(MN-1).orElseThrow()` แล้ว `em.clear()`
-  2. เรียก `mn1.coursesOf(PlanType.CO_OP, 3, 1)`
+  1. insert `study_minor_course (MN-1, T8F01, CO_OP, 3, 1, 1)` แล้ว `em.flush()` + `em.clear()`
+  2. โหลด MN-1 ด้วย `findWithCoursesById(MN-1).orElseThrow()` แล้ว `em.clear()`
+  3. เรียก `coursesOf` ด้วย `(CO_OP, 3, 1)`, `(CO_OP, 4, 1)`, `(SPECIAL_PROJECT, 3, 1)`, `(SPECIAL_PROJECT, 4, 1)`
 - **Expected Result:**
-  - ปัจจุบัน fixture ทั้ง MN-1 ใช้ `plan_type = SPECIAL_PROJECT` ทั้งหมด
-  - คืน list ว่าง (ไม่มีวิชาของ MN-1 ที่มี `plan_type = CO_OP` ภาค 3/1)
-  - ไม่ throw ไม่ใช่ error ถ้าไม่มีวิชา (เหมือน UT-DAO-US8-15 ค่า `(3, 2)`)
+  - `courses` มี 5 แถว (T8F01 มีแผนละ 1 แถว)
+  - `(CO_OP, 3, 1)` คืน `[T8F01]` · `(CO_OP, 4, 1)` คืน list ว่าง
+  - `(SPECIAL_PROJECT, 3, 1)` คืน `[T8N01, T8N02, T8M05]` (แถวของแผนสหกิจไม่ปน) · `(SPECIAL_PROJECT, 4, 1)` คืน `[T8F01]`
 
-#### [UT-DAO-US8-32] กรองวิชาโทที่มีวิชาเฉพาะแผนเทอม
-- **Related:** T05 (แผน COOP), T06 ส่วน 2 · **Test method:** `findByDepartmentAndTerm_courseOnlyInCoopPlan_returnsMinor`
+#### [UT-DAO-US8-32] วิชาโทที่มีวิชาในภาคนั้นเฉพาะแผนสหกิจ
+- **Related:** T05 (`minors` ของชั้นปี 3–4) · **Test method:** `findByDepartmentAndTerm_courseOnlyInCoopPlan_returnsMinor`
 - **Test Steps:**
-  1. `findByDepartmentAndTerm(CS, 3, 1)` (fixture ไม่มีเพิ่มเติม)
+  1. เรียก `findByDepartmentAndTerm(CS, 3, 2)`
+  2. insert `study_minor_course (MN-2, T8N02, CO_OP, 3, 2, 1)` แล้ว `em.flush()` + `em.clear()`
+  3. เรียก `findByDepartmentAndTerm(CS, 3, 2)` อีกครั้ง แล้วเรียก `coursesOf` ของผล
 - **Expected Result:**
-  - ถ้า fixture เพิ่มวิชาใน MN-1 เฉพาะ `plan_type = CO_OP` ของภาค 3/1 query ก็ต้องส่ง MN-1 กลับมา (ค่า `exists` subquery ใน `findByDepartmentAndTerm`)
-  - ปัจจุบัน fixture เดิม MN-1 ทั้งหมด `SPECIAL_PROJECT` ทั้ง 3/1 และ 4/1 จึงผ่านเคสนี้โดย MN-1 ยังอยู่เพราะ `SPECIAL_PROJECT` ครบถ้วน
+  - ข้อ 1 คืน list ว่าง
+  - ข้อ 3 คืน `[MN-2]` (query ไม่กรอง `plan_type` แผนไหนมีวิชาในภาคนั้นก็คืนวิชาโท)
+  - `coursesOf(CO_OP, 3, 2)` คืน `[T8N02]` · `coursesOf(SPECIAL_PROJECT, 3, 2)` คืน list ว่าง
 
-#### [UT-DAO-US8-33] วิชาในวิชาโทซ้ำกรณี `plan_type` ต่างกัน
-- **Related:** ER Constraint เพิ่มเติม `ck_study_minor_course_plan_type` · **Test method:** `insertMinorCourse_invalidRow_throwsConstraintViolation` (ค่าที่ 7 - parameterized) และ `insertMinorCourse_sameCourseOtherPlanType_succeeds`
+#### [UT-DAO-US8-33] `plan_type` ของวิชาในวิชาโท (`ck_study_minor_course_plan_type`, PK ที่มี `plan_type`)
+- **Related:** ER Constraint · **Test method:** `insertMinorCourse_invalidRow_throwsConstraintViolation` ค่าที่ 7 และ `insertMinorCourse_sameCourseOtherPlanType_succeeds`
 - **Test Steps:**
-  1. insert `study_minor_course` ค่าที่ 7: `(MN-1, T8N01, 3, 1, 1, 'SPECIAL_PROJECT')` ซ้ำเดิม `pk` ต่างแต่ `plan_type` เพิ่ม → ต้อง throw
-  2. (เทสแยก) insert `(MN-1, T8N01, 3, 1, 1, 'CO_OP')` อื่นจาก `SPECIAL_PROJECT` ที่มีอยู่ → insert ได้
+  1. insert `study_minor_course (MN-1, T8G01, 'MINOR', 3, 1, 9)` (ค่าที่ 7 ของ `@CsvSource` เดียวกับ UT-DAO-US8-29)
+  2. (เทสแยก) insert `(MN-1, T8N01, 'CO_OP', 3, 1, 1)` ซึ่งรหัสวิชา ภาค และ `sort_order` ซ้ำกับแถว `SPECIAL_PROJECT` ใน fixture
+  3. นับแถวของ MN-1 รหัส T8N01
 - **Expected Result:**
-  - ข้อ 1 throw `PersistenceException` ที่มี `ConstraintViolationException` ของ constraint ใหม่ `ck_study_minor_course_plan_type` (ถ้าใช้ CHECK)
-  - ข้อ 2 insert ได้ ทั้ง `SPECIAL_PROJECT` และ `CO_OP` ของ T8N01 ภาค 3/1 ต่อ MN-1 ได้ต่างกัน
+  - ข้อ 1 throw `PersistenceException` ที่มี `ConstraintViolationException` ของ `ck_study_minor_course_plan_type`
+  - ข้อ 2 insert ได้ (ไม่ชน `pk_study_minor_course` และ `uq_study_minor_course_order` เพราะทั้งสองมี `plan_type`) · ข้อ 3 ได้ `2`
 
 ---
 
