@@ -8,6 +8,7 @@ import type {
   PlanSemester,
   PlanType,
   SkippedPlanCourse,
+  StudyMinor,
   StudyPlanList,
   StudyYear,
 } from "../types";
@@ -18,6 +19,22 @@ type UseCurriculumPlanOptions = {
 };
 
 type KeyedValue<T> = { key: string; value: T };
+
+/**
+ * วิชาโทที่เลือกได้ของหลักสูตรที่เลือก API ส่ง 1 รายการต่อ 1 วิชาโท × 1 แผน (US8-T05)
+ * เลือกแผนแล้ว → เฉพาะรายการของแผนนั้น · ยังไม่เลือกแผน → ไม่ซ้ำตาม minorId (รายการแรก)
+ */
+const minorsFor = (
+  list: StudyPlanList,
+  curriculum: string | null,
+  planType: PlanType | null,
+): StudyMinor[] => {
+  const inCurriculum = list.minors.filter((m) => !curriculum || m.curriculumName === curriculum);
+  if (planType) return inCurriculum.filter((m) => m.planType === planType);
+  return inCurriculum.filter(
+    (m, index) => inCurriculum.findIndex((other) => other.minorId === m.minorId) === index,
+  );
+};
 
 const toUserErrorMessage = (error: unknown, fallback: string) => {
   if (error instanceof ApiError && error.message && !error.message.startsWith("HTTP ")) {
@@ -108,6 +125,14 @@ export const useCurriculumPlan = ({
   const selectPlanType = (nextType: PlanType) => {
     if (nextType === selectedPlanType) return;
     setSelectedPlanType(nextType);
+    // แผนใหม่ไม่มีรายการของวิชาโทที่เลือกไว้ → กลับเป็น "ไม่เรียนวิชาโท"
+    if (
+      selectedMinorId !== null &&
+      validPlanList !== null &&
+      !minorsFor(validPlanList, activeCurriculum, nextType).some((m) => m.minorId === selectedMinorId)
+    ) {
+      setSelectedMinorId(null);
+    }
     setConfirmError(null);
     lastPreviewKeyRef.current = null;
   };
@@ -142,9 +167,7 @@ export const useCurriculumPlan = ({
             : (curricula[0] ?? null);
 
         const nextMinors =
-          studyYear >= 3
-            ? data.minors.filter((m) => !nextCurriculum || m.curriculumName === nextCurriculum)
-            : [];
+          studyYear >= 3 ? minorsFor(data, nextCurriculum, selectedPlanType) : [];
 
         if (selectedMinorId !== null && !nextMinors.some((m) => m.minorId === selectedMinorId)) {
           setSelectedMinorId(null);
@@ -197,9 +220,7 @@ export const useCurriculumPlan = ({
 
   const availableMinors =
     studyYear !== null && studyYear >= 3 && validPlanList !== null
-      ? validPlanList.minors.filter(
-          (m) => !activeCurriculum || m.curriculumName === activeCurriculum,
-        )
+      ? minorsFor(validPlanList, activeCurriculum, requiresPlanType ? selectedPlanType : null)
       : [];
 
   const effectiveMinorId =
