@@ -1,13 +1,14 @@
 "use client";
 
 import CourseSearchPanel from "../courses/components/CourseSearchPanel";
+import CurriculumPlanLauncher from "../curriculum-plan/components/CurriculumPlanLauncher";
 import AddedCoursesList from "./components/AddedCoursesList";
 import ConflictAlert from "./components/ConflictAlert";
 import TimetableGrid from "./components/TimetableGrid";
 import { useTimetable } from "./hooks/useTimetable";
 
 // หน้าหลักประกอบแต่ละส่วนและส่งข้อมูล/เหตุการณ์ต่อกัน โดยไม่ถือกฎคำนวณตารางไว้ใน JSX
-const Timetable = () => {
+export const TimetableContent = ({ state }: { state: ReturnType<typeof useTimetable> }) => {
   const {
     timetable,
     loadError,
@@ -29,10 +30,11 @@ const Timetable = () => {
     addCourse,
     removeCourse,
     removeCourses,
+    applyPlanTimetable,
     dismissConflictAlert,
     setAcademicYear,
     setSemester,
-  } = useTimetable();
+  } = state;
 
   return (
     <div className="space-y-4 text-slate-800">
@@ -70,6 +72,13 @@ const Timetable = () => {
         semester={semester}
       />
 
+      {/* แบนเนอร์จัดตารางเรียนตามเล่มหลักสูตร */}
+      <CurriculumPlanLauncher
+        academicYear={selectedAcademicYear}
+        disabled={addDisabled}
+        onApplyTimetable={applyPlanTimetable}
+      />
+
       {/* รายการวิชาที่เพิ่มแล้ว รองรับลบรายวิชา ลบที่เลือก และลบทั้งหมดพร้อมกล่องยืนยัน */}
       <AddedCoursesList
         entries={entries}
@@ -95,6 +104,12 @@ const Timetable = () => {
       />
     </div>
   );
+};
+
+// ใช้เดี่ยวได้เหมือนเดิม ส่วนหน้าที่มีหลายเมนูส่ง state ชุดเดียวเข้า TimetableContent
+const Timetable = () => {
+  const state = useTimetable();
+  return <TimetableContent state={state} />;
 };
 
 export default Timetable;

@@ -21,7 +21,7 @@ export type ScheduleSlot = {
   dayOfWeek: DayOfWeek;
   startTime: string;
   endTime: string;
-  room: string;
+  room: string | null;
 };
 
 // Section ที่ผู้ใช้เลือกเพิ่ม: หนึ่ง section อาจมีหลาย ScheduleSlot หลายวัน
