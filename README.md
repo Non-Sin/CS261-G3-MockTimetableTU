@@ -90,6 +90,8 @@ Frontend เรียก `/api/*` แล้ว Next.js จะ rewrite ไปท�
 | GET | `/api/courses?academicYear=2568&semester=1&q=&category=` | รายวิชาที่เปิดในภาคนั้น พร้อมกลุ่มเรียนและคาบเรียน (US1) |
 | GET | `/api/timetable?academicYear=2568&semester=1` | ตารางเรียนจำลองของฉัน พร้อมหน่วยกิตรวมและเวลาชน (US1) |
 | POST | `/api/timetable/entries` | เพิ่มกลุ่มเรียนลงตาราง (`{ "sectionId": 305 }`) ตอบ 201 พร้อมตารางทั้งก้อน หรือ 409 พร้อม `code` (US1) |
+| GET | `/api/electives?academicYear=2568&currentSemester=1&q=&semester=&day=&timeSlot=&group=&excludeConflicts=` | วิชาเสรีแนะนำพร้อมตัวกรอง (US6) |
+| GET | `/api/electives/{courseCode}?academicYear=2568&currentSemester=1` | รายละเอียดวิชาเสรี Sec และรีวิว (US6) |
 
 Error ทุกตัวตอบกลับเป็น [ProblemDetail (RFC 9457)](https://www.rfc-editor.org/rfc/rfc9457) เช่น
 `{ "status": 400, "title": "Bad Request", "detail": "Validation failed", "errors": { "name": "must not be blank" } }`
