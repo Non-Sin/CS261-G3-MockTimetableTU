@@ -2,7 +2,7 @@
 
 ## ขอบเขตการทดสอบ
 
-ออกแบบ Unit Test ชั้น DAO จำนวน **27 เคส** สำหรับ Repository ใหม่ (`QuotaInfoRepository`, `QuotaRoundRepository`), เมธอด query ใหม่บน Repository เดิม (`CourseRepository.searchAllCourses`, `SectionRepository.findOfferedSemestersByCourseCodesAndYear`) และข้อกำหนด Schema/Constraints ของตารางใหม่ 5 ตาราง (`course_quota_info`, `quota_condition`, `quota_round`, `quota_channel`, `quota_contact`) รวมถึงคอลัมน์ `course.course_name_th` ตามที่ออกแบบไว้ในเอกสาร US7-T06 เพื่อใช้เป็นข้อกำหนดในการพัฒนาและเขียนเทสต์ใน US7-T09
+ออกแบบ Unit Test ชั้น DAO จำนวน **28 เคส** สำหรับ Repository ใหม่ (`QuotaInfoRepository`, `QuotaRoundRepository`), เมธอด query ใหม่บน Repository เดิม (`CourseRepository.searchAllCourses`, `SectionRepository.findOfferedSemestersByCourseCodesAndYear`) และข้อกำหนด Schema/Constraints ของตารางใหม่ 5 ตาราง (`course_quota_info`, `quota_condition`, `quota_round`, `quota_channel`, `quota_contact`) รวมถึงคอลัมน์ `course.course_name_th` ตามที่ออกแบบไว้ในเอกสาร US7-T06 เพื่อใช้เป็นข้อกำหนดในการพัฒนาและเขียนเทสต์ใน US7-T09
 
 - **User Story:** US7 ค้นหาช่องทางและขั้นตอนการขอโควตา
 - **Branch:** `docs/US7-T12-design-unit-test-dao`
@@ -15,11 +15,11 @@
 
 | ส่วน | Repository / Schema | Method / เป้าหมาย | TC ID |
 | --- | --- | --- | --- |
-| 1 | `CourseRepository` (US1 + query US7) | `searchAllCourses(q, courseCodes)`, `findById(courseCode)` | `UT-DAO-US7-01` – `08` |
-| 2 | `SectionRepository` (US1 + query US7) | `findOfferedSemestersByCourseCodesAndYear(courseCodes, academicYear)` | `UT-DAO-US7-09` – `11` |
-| 3 | `QuotaInfoRepository` (ใหม่) | `findWithDetailsByCourseCodes(courseCodes)` | `UT-DAO-US7-12` – `16` |
-| 4 | `QuotaRoundRepository` (ใหม่) | `findByCourseCodesAndTerm(courseCodes, academicYear, semester)` | `UT-DAO-US7-17` – `20` |
-| 5 | Schema (Flyway migration ใหม่) | `course.course_name_th`, `PK`/`FK`/`UQ`/`CHECK`/`ON DELETE CASCADE` ของตาราง US7 | `UT-DAO-US7-21` – `27` |
+| 1 | `CourseRepository` (US1 + query US7) | `searchAllCourses(q, courseCodes)`, `findById(courseCode)` | `UT-DAO-US7-01` – `09` |
+| 2 | `SectionRepository` (US1 + query US7) | `findOfferedSemestersByCourseCodesAndYear(courseCodes, academicYear)` | `UT-DAO-US7-10` – `12` |
+| 3 | `QuotaInfoRepository` (ใหม่) | `findWithDetailsByCourseCodes(courseCodes)` | `UT-DAO-US7-13` – `17` |
+| 4 | `QuotaRoundRepository` (ใหม่) | `findByCourseCodesAndTerm(courseCodes, academicYear, semester)` | `UT-DAO-US7-18` – `21` |
+| 5 | Schema (Flyway migration ใหม่) | `course.course_name_th`, `PK`/`FK`/`UQ`/`CHECK`/`ON DELETE CASCADE` ของตาราง US7 | `UT-DAO-US7-22` – `28` |
 
 - **ประเภท:** Unit test ชั้น DAO ทดสอบกับฐานข้อมูล SQL Server จริงผ่าน Testcontainers ไม่ใช้ mock
 - **ไม่อยู่ในขอบเขต (ทดสอบในชั้น Service / Integration แทน):**
@@ -30,10 +30,10 @@
 
 | หัวข้อในการ์ด | TC ID |
 | --- | --- |
-| อ่านช่องทางขอโควตาตามรหัสวิชา | `UT-DAO-US7-12`, `14`, `17`, `18` |
-| วิชาที่มีหลายช่องทาง | `UT-DAO-US7-12`, `13`, `17` |
-| วิชาที่ไม่มีข้อมูล | `UT-DAO-US7-15`, `16`, `19`, `20` |
-| ค้นหาวิชาด้วยชื่อหรือรหัส | `UT-DAO-US7-01` – `08`, `09` – `11` |
+| อ่านช่องทางขอโควตาตามรหัสวิชา | `UT-DAO-US7-13`, `15`, `18`, `19` |
+| วิชาที่มีหลายช่องทาง | `UT-DAO-US7-13`, `14`, `18` |
+| วิชาที่ไม่มีข้อมูล | `UT-DAO-US7-16`, `17`, `20`, `21` |
+| ค้นหาวิชาด้วยชื่อหรือรหัส | `UT-DAO-US7-01` – `09`, `10` – `12` |
 
 ---
 
@@ -54,7 +54,7 @@
 1. แยก `QuotaFixture` ออกจาก `DaoFixture` ของ US1 โดยใช้รหัสวิชาขึ้นต้นด้วย `Q7` เพื่อไม่ชนกับข้อมูลทดสอบของ US1/US2/US8
 2. `@BeforeEach` เรียก `QuotaFixture.persist(em)` แล้วทำ `em.flush()` + `em.clear()` ทันที เพื่อให้ทุก query อ่านจาก SQL Server จริง (ไม่ใช้ L1 cache)
 3. ส่วนที่โหลด collection แบบ `LEFT JOIN FETCH` (`conditions`, `channels`, `contacts`) ต้องตรวจด้วย `PersistenceUnitUtil.isLoaded(...)` ด้วย เพื่อให้มั่นใจว่าใช้งานต่อได้จริงเมื่อ `open-in-view: false`
-4. เคสที่คาดว่าจะ throw exception (ส่วนที่ 5) ให้รันเป็นคำสั่งสุดท้ายของเทส หรือแยก 1 เคสต่อ 1 เมธอดเทส
+4. เคสทดสอบ Schema/Constraints ในส่วนที่ 5 (`UT-DAO-US7-23` – `27`) ใช้ **Native SQL (`em.getEntityManager().createNativeQuery("INSERT INTO ...").executeUpdate()`)** เพื่อไม่ติดข้อจำกัดของ entity แบบ read-only/`@Immutable` หรือ enum validation ใน Java ซึ่ง Hibernate จะ throw **`jakarta.persistence.PersistenceException`** ที่มี **`org.hibernate.exception.ConstraintViolationException`** อยู่ใน cause chain (ต่างจาก `repository.saveAndFlush(...)` ที่ Spring Data JPA จะแปลเป็น `DataIntegrityViolationException`) และให้รันเป็นคำสั่งสุดท้ายของแต่ละเมธอดเทส (แบบเดียวกับ `SchemaConstraintTest` และ `US8-T12`)
 
 ---
 
@@ -96,11 +96,12 @@
 | `UT-DAO-US7-01` | ปกติ | `QuotaFixture` (`Q7EL105`, `Q7EL295`, `Q7EL395`) | เรียก `searchAllCourses("q7el", null)` (ตัวพิมพ์เล็ก) | คืน 3 วิชาเรียงตาม `courseCode`: `Q7EL105`, `Q7EL295`, `Q7EL395` (จับคู่ prefix รหัสวิชาแบบ case-insensitive) |
 | `UT-DAO-US7-02` | ปกติ | `QuotaFixture` (`Q7OFF00` มี section เฉพาะปี 2568 ไม่มีในปี 2569) | เรียก `searchAllCourses("Q7OFF", null)` และ `searchAllCourses("data", null)` | คืน `Q7OFF00` ทั้งสองแบบ (พิสูจน์ว่า query ไม่กรอง `EXISTS Section` แบบ US1 และจับคู่คำหลังเครื่องหมาย `-` ใน `Archived Course-Data` ได้) |
 | `UT-DAO-US7-03` | ปกติ | `QuotaFixture` (`Q7MA211`: `courseNameTh = "แคลคูลัส 1"`) | เรียก `searchAllCourses("แคลคูลัส", null)` | คืน `[Q7MA211]` พร้อม `courseNameTh = "แคลคูลัส 1"` |
-| `UT-DAO-US7-04` | ปกติ (mine=true) | `QuotaFixture` | เรียก `searchAllCourses("Q7EL", List.of("Q7EL105", "Q7MA211"))` | คืนเฉพาะ `[Q7EL105]` (กรองเฉพาะวิชาที่อยู่ใน `courseCodes` และตรงคำค้น) |
-| `UT-DAO-US7-05` | ขอบเขต (escape wildcard) | `QuotaFixture` (`Q7NODAT`: `Special Topic_100%` / `หัวข้อพิเศษ 50_test!`) | เรียก `searchAllCourses("50_test!", null)` และ `searchAllCourses("100%", null)` | คืนเฉพาะ `[Q7NODAT]` ไม่ match วิชาอื่น (ตัวอักษร `_`, `%`, `!` ถูก escape เป็น literal) |
-| `UT-DAO-US7-06` | ข้อมูลว่าง (ไม่พบ) | `QuotaFixture` | เรียก `searchAllCourses("ZZZ999", null)` | คืน list ว่าง `[]` |
-| `UT-DAO-US7-07` | ข้อมูลว่าง (`courseCodes` ว่าง) | `QuotaFixture` | เรียก `searchAllCourses("Q7EL", List.of())` | คืน list ว่าง `[]` ทันทีโดยไม่เกิด SQL syntax error จาก `IN ()` |
-| `UT-DAO-US7-08` | ข้อมูลว่าง (`findById` ไม่พบ) | `QuotaFixture` | เรียก `findById("UNKNOWN999")` | คืน `Optional.empty()` |
+| `UT-DAO-US7-04` | ปกติ (`mine=true` พร้อมคำค้น) | `QuotaFixture` | เรียก `searchAllCourses("Q7EL", List.of("Q7EL105", "Q7MA211"))` | คืนเฉพาะ `[Q7EL105]` (กรองเฉพาะวิชาที่อยู่ใน `courseCodes` และตรงคำค้น) |
+| `UT-DAO-US7-05` | ขอบเขต (escape wildcard & ขอบเขตคำใน `courseName`) | `QuotaFixture` (`Q7NODAT`: `Special Topic_100%` / `หัวข้อพิเศษ 50_test!`) | เรียก `searchAllCourses("50_test!", null)`, `searchAllCourses("Topic_100%", null)`, `searchAllCourses("100%", null)` และ `searchAllCourses("50Xtest!", null)` | `"50_test!"` (substring ใน `courseNameTh`) และ `"Topic_100%"` (คำหลังช่องว่างใน `courseName`) คืน `[Q7NODAT]` · ส่วน **`"100%"` คืน list ว่าง `[]`** (เพราะ `100%` อยู่หลัง `_` ไม่ใช่ต้นคำหลังช่องว่าง/`-` และ `%` ไม่ทำงานเป็น wildcard) · และ `"50Xtest!"` คืน list ว่าง `[]` (เพราะ `_` ถูก escape เป็น literal) |
+| `UT-DAO-US7-06` | ปกติ (`q = null` และ `mine=true`/`false`) | `QuotaFixture` | เรียก `searchAllCourses(null, List.of("Q7MA211", "Q7EL105"))`, `searchAllCourses("", List.of("Q7MA211", "Q7EL105"))` และ `searchAllCourses(null, null)` | `q = null` และ `q = ""` กับ `courseCodes` คืน `[Q7EL105, Q7MA211]` (เรียงตาม `courseCode`) · ส่วน `searchAllCourses(null, null)` คืนทั้ง 8 วิชาของ `QuotaFixture` เรียงตาม `courseCode` และไม่เกิด SQL error จาก `null` |
+| `UT-DAO-US7-07` | ข้อมูลว่าง (ไม่พบ) | `QuotaFixture` | เรียก `searchAllCourses("ZZZ999", null)` | คืน list ว่าง `[]` |
+| `UT-DAO-US7-08` | ข้อมูลว่าง (`courseCodes` ว่าง) | `QuotaFixture` | เรียก `searchAllCourses("Q7EL", List.of())` และ `searchAllCourses(null, List.of())` | คืน list ว่าง `[]` ทันทีโดยไม่เกิด SQL syntax error จาก `IN ()` |
+| `UT-DAO-US7-09` | ข้อมูลว่าง (`findById` ไม่พบ) | `QuotaFixture` | เรียก `findById("UNKNOWN999")` | คืน `Optional.empty()` |
 
 ---
 
@@ -108,9 +109,9 @@
 
 | TC ID | ประเภท | Fixture | ขั้นตอน (Steps) | ผลที่คาดหวัง (Expected Result) |
 | --- | --- | --- | --- | --- |
-| `UT-DAO-US7-09` | ปกติ | `QuotaFixture` (`Q7EL105` เปิดภาค 1, 2 ปี 2569; `Q7MA211` เปิดภาค 2 ปี 2569) | เรียก `findOfferedSemestersByCourseCodesAndYear(List.of("Q7EL105", "Q7MA211"), 2569)` | คืน `(Q7EL105, 1)`, `(Q7EL105, 2)`, `(Q7MA211, 2)` เรียงตาม `courseCode, semester` และไม่ซ้ำแม้มีหลาย section |
-| `UT-DAO-US7-10` | ข้อมูลว่าง (ไม่เปิดสอนในปีนั้น) | `QuotaFixture` (`Q7OFF00` มี section เฉพาะปี 2568) | เรียก `findOfferedSemestersByCourseCodesAndYear(List.of("Q7OFF00"), 2569)` | คืน list ว่าง `[]` (ใช้ตัดสินสถานะ `NOT_OFFERED` ในปี 2569) |
-| `UT-DAO-US7-11` | ข้อมูลว่าง (`courseCodes` ว่าง) | `QuotaFixture` | เรียก `findOfferedSemestersByCourseCodesAndYear(List.of(), 2569)` | คืน list ว่าง `[]` โดยไม่เกิด SQL error |
+| `UT-DAO-US7-10` | ปกติ | `QuotaFixture` (`Q7EL105` เปิดภาค 1, 2 ปี 2569; `Q7MA211` เปิดภาค 2 ปี 2569) | เรียก `findOfferedSemestersByCourseCodesAndYear(List.of("Q7EL105", "Q7MA211"), 2569)` | คืน `(Q7EL105, 1)`, `(Q7EL105, 2)`, `(Q7MA211, 2)` เรียงตาม `courseCode, semester` และไม่ซ้ำแม้มีหลาย section |
+| `UT-DAO-US7-11` | ข้อมูลว่าง (ไม่เปิดสอนในปีนั้น) | `QuotaFixture` (`Q7OFF00` มี section เฉพาะปี 2568) | เรียก `findOfferedSemestersByCourseCodesAndYear(List.of("Q7OFF00"), 2569)` | คืน list ว่าง `[]` (ใช้ตัดสินสถานะ `NOT_OFFERED` ในปี 2569) |
+| `UT-DAO-US7-12` | ข้อมูลว่าง (`courseCodes` ว่าง) | `QuotaFixture` | เรียก `findOfferedSemestersByCourseCodesAndYear(List.of(), 2569)` | คืน list ว่าง `[]` โดยไม่เกิด SQL error |
 
 ---
 
@@ -118,11 +119,11 @@
 
 | TC ID | ประเภท | Fixture | ขั้นตอน (Steps) | ผลที่คาดหวัง (Expected Result) |
 | --- | --- | --- | --- | --- |
-| `UT-DAO-US7-12` | ปกติ (หลายช่องทาง) | `QuotaFixture` (`Q7EL105` มี 3 ช่องทาง, `Q7EL395` มี 2 เงื่อนไข) | เรียก `findWithDetailsByCourseCodes(List.of("Q7EL105", "Q7EL395"))` | คืน `CourseQuotaInfo` ของทั้ง 2 วิชา; `PersistenceUnitUtil.isLoaded` เป็น `true` สำหรับ `conditions`, `channels`, `contacts` ทุกตัว; `Q7EL105.channels` มีครบ 3 รายการเรียงตาม `sortOrder` (`QUOTA_SYSTEM` → `ONLINE_FORM` → `FACULTY_OFFICE`) และไม่มีแถวซ้ำจาก `LEFT JOIN FETCH` |
-| `UT-DAO-US7-13` | ปกติ (ค่า `NULL` ที่อนุญาต) | `QuotaFixture` (`Q7PC280` มี `channel.url=NULL`, `contact.url=NULL`; `Q7EL395` มี `relatedCourseCode` ทั้งมีค่าและ `NULL`) | เรียก `findWithDetailsByCourseCodes(List.of("Q7PC280", "Q7EL395"))` | อ่าน `Q7PC280.contacts` ได้ `"MS Teams wchumpon@tu.ac.th"` โดย `url == null` และ `Q7EL395.conditions` มีทั้ง `relatedCourseCode == "Q7EL295"` และ `null` |
-| `UT-DAO-US7-14` | ปกติ (`NOT_REQUIRED`) | `QuotaFixture` (`Q7EL295` มี `quota_required = false`, ไม่มี child rows) | เรียก `findWithDetailsByCourseCodes(List.of("Q7EL295"))` | คืน 1 แถวของ `Q7EL295` โดย `isQuotaRequired() == false` และ `conditions`, `channels`, `contacts` เป็นเซตว่างที่ถูก load แล้ว |
-| `UT-DAO-US7-15` | ข้อมูลว่าง (วิชาไม่มีข้อมูลโควตา) | `QuotaFixture` (`Q7NODAT` ไม่มีแถวใน `course_quota_info`) | เรียก `findWithDetailsByCourseCodes(List.of("Q7NODAT", "UNKNOWN999"))` | คืน list ว่าง `[]` (Service จะนำไปตีความเป็น `NO_DATA`) |
-| `UT-DAO-US7-16` | ข้อมูลว่าง (`courseCodes` ว่าง) | `QuotaFixture` | เรียก `findWithDetailsByCourseCodes(List.of())` | คืน list ว่าง `[]` โดยไม่เกิด SQL error |
+| `UT-DAO-US7-13` | ปกติ (หลายช่องทาง) | `QuotaFixture` (`Q7EL105` มี 3 ช่องทาง, `Q7EL395` มี 2 เงื่อนไข) | เรียก `findWithDetailsByCourseCodes(List.of("Q7EL105", "Q7EL395"))` | คืน `CourseQuotaInfo` ของทั้ง 2 วิชา; `PersistenceUnitUtil.isLoaded` เป็น `true` สำหรับ `conditions`, `channels`, `contacts` ทุกตัว; `Q7EL105.channels` มีครบ 3 รายการเรียงตาม `sortOrder` (`QUOTA_SYSTEM` → `ONLINE_FORM` → `FACULTY_OFFICE`) และไม่มีแถวซ้ำจาก `LEFT JOIN FETCH` |
+| `UT-DAO-US7-14` | ปกติ (ค่า `NULL` ที่อนุญาต) | `QuotaFixture` (`Q7PC280` มี `channel.url=NULL`, `contact.url=NULL`; `Q7EL395` มี `relatedCourseCode` ทั้งมีค่าและ `NULL`) | เรียก `findWithDetailsByCourseCodes(List.of("Q7PC280", "Q7EL395"))` | อ่าน `Q7PC280.contacts` ได้ `"MS Teams wchumpon@tu.ac.th"` โดย `url == null` และ `Q7EL395.conditions` มีทั้ง `relatedCourseCode == "Q7EL295"` และ `null` |
+| `UT-DAO-US7-15` | ปกติ (`NOT_REQUIRED`) | `QuotaFixture` (`Q7EL295` มี `quota_required = false`, ไม่มี child rows) | เรียก `findWithDetailsByCourseCodes(List.of("Q7EL295"))` | คืน 1 แถวของ `Q7EL295` โดย `isQuotaRequired() == false` และ `conditions`, `channels`, `contacts` เป็นเซตว่างที่ถูก load แล้ว |
+| `UT-DAO-US7-16` | ข้อมูลว่าง (วิชาไม่มีข้อมูลโควตา) | `QuotaFixture` (`Q7NODAT` ไม่มีแถวใน `course_quota_info`) | เรียก `findWithDetailsByCourseCodes(List.of("Q7NODAT", "UNKNOWN999"))` | คืน list ว่าง `[]` (Service จะนำไปตีความเป็น `NO_DATA`) |
+| `UT-DAO-US7-17` | ข้อมูลว่าง (`courseCodes` ว่าง) | `QuotaFixture` | เรียก `findWithDetailsByCourseCodes(List.of())` | คืน list ว่าง `[]` โดยไม่เกิด SQL error |
 
 ---
 
@@ -130,21 +131,21 @@
 
 | TC ID | ประเภท | Fixture | ขั้นตอน (Steps) | ผลที่คาดหวัง (Expected Result) |
 | --- | --- | --- | --- | --- |
-| `UT-DAO-US7-17` | ปกติ (หลายรอบ + `start_time`/`end_time`) | `QuotaFixture` (`Q7AN347` 4 รอบ `09:00`–`16:00`, `Q7EL105` 2 รอบปี 2569 และ 1 รอบปี 2568) | เรียก `findByCourseCodesAndTerm(List.of("Q7AN347", "Q7EL105"), 2569, 2)` | คืน `Q7AN347` 4 รอบเรียง `roundNo 1..4` พร้อม `startTime = 09:00`, `endTime = 16:00` และคืน `Q7EL105` เฉพาะ 2 รอบของปี 2569 ภาค 2 (ไม่ติดรอบปี 2568) |
-| `UT-DAO-US7-18` | ปกติ (กำหนดส่งวันเดียว `start_date = NULL`) | `QuotaFixture` (`Q7MA211`) | เรียก `findByCourseCodesAndTerm(List.of("Q7MA211"), 2569, 2)` | คืน 1 รอบโดย `startDate == null`, `startTime == null`, `endDate == 2026-10-20`, `endTime == 15:00` |
-| `UT-DAO-US7-19` | ข้อมูลว่าง (ภาคที่ไม่มีรอบ) | `QuotaFixture` (`Q7EL295`, `Q7EL105` ปี 2569 ภาค 1 ไม่มีรอบ) | เรียก `findByCourseCodesAndTerm(List.of("Q7EL295", "Q7EL105"), 2569, 1)` | คืน list ว่าง `[]` |
-| `UT-DAO-US7-20` | ข้อมูลว่าง (`courseCodes` ว่าง) | `QuotaFixture` | เรียก `findByCourseCodesAndTerm(List.of(), 2569, 2)` | คืน list ว่าง `[]` โดยไม่เกิด SQL error |
+| `UT-DAO-US7-18` | ปกติ (หลายรอบ + `start_time`/`end_time`) | `QuotaFixture` (`Q7AN347` 4 รอบ `09:00`–`16:00`, `Q7EL105` 2 รอบปี 2569 และ 1 รอบปี 2568) | เรียก `findByCourseCodesAndTerm(List.of("Q7AN347", "Q7EL105"), 2569, 2)` | คืน `Q7AN347` 4 รอบเรียง `roundNo 1..4` พร้อม `startTime = 09:00`, `endTime = 16:00` และคืน `Q7EL105` เฉพาะ 2 รอบของปี 2569 ภาค 2 (ไม่ติดรอบปี 2568) |
+| `UT-DAO-US7-19` | ปกติ (กำหนดส่งวันเดียว `start_date = NULL`) | `QuotaFixture` (`Q7MA211`) | เรียก `findByCourseCodesAndTerm(List.of("Q7MA211"), 2569, 2)` | คืน 1 รอบโดย `startDate == null`, `startTime == null`, `endDate == 2026-10-20`, `endTime == 15:00` |
+| `UT-DAO-US7-20` | ข้อมูลว่าง (ภาคที่ไม่มีรอบ) | `QuotaFixture` (`Q7EL295`, `Q7EL105` ปี 2569 ภาค 1 ไม่มีรอบ) | เรียก `findByCourseCodesAndTerm(List.of("Q7EL295", "Q7EL105"), 2569, 1)` | คืน list ว่าง `[]` |
+| `UT-DAO-US7-21` | ข้อมูลว่าง (`courseCodes` ว่าง) | `QuotaFixture` | เรียก `findByCourseCodesAndTerm(List.of(), 2569, 2)` | คืน list ว่าง `[]` โดยไม่เกิด SQL error |
 
 ---
 
 ### ส่วนที่ 5: Schema & Constraints (Flyway Migration ใหม่)
 
-| TC ID | ประเภท | Fixture | ขั้นตอน (Steps) | ผลที่คาดหวัง (Expected Result) |
+| TC ID | ประเภท | Fixture | ขั้นตอนและวิธี Insert (Steps) | ผลที่คาดหวัง & Exception (Expected Result) |
 | --- | --- | --- | --- | --- |
-| `UT-DAO-US7-21` | ปกติ (`NVARCHAR` + `NULL`) | `QuotaFixture` | บันทึก `course` ที่ `course_name_th = NULL` และอีกแถวที่มีอักขระไทย แล้ว query กลับมาอ่าน | บันทึกสำเร็จทั้งคู่และภาษาไทยไม่เพี้ยนเป็น `???` |
-| `UT-DAO-US7-22` | ผิดพลาด (FK ไม่มีวิชา) | `QuotaFixture` | insert `course_quota_info` ด้วย `course_code = "NO_COURSE"` | throw `DataIntegrityViolationException` (ละเมิด FK `course_quota_info -> course`) |
-| `UT-DAO-US7-23` | ผิดพลาด (URL ไม่ใช่ `https://`) | `QuotaFixture` | insert `quota_channel` และ `quota_contact` ด้วย `url = "http://insecure.example.com"` | throw `DataIntegrityViolationException` (ละเมิด `CHECK (url IS NULL OR url LIKE 'https://%')`) |
-| `UT-DAO-US7-24` | ผิดพลาด (`channel_type` นอก enum) | `QuotaFixture` | insert `quota_channel` ด้วย `channel_type = "WALK_IN"` | throw `DataIntegrityViolationException` (ละเมิด `CHECK (channel_type IN (...))`) |
-| `UT-DAO-US7-25` | ผิดพลาด (`quota_round` ผิด `semester` หรือวันที่ย้อนหลัง) | `QuotaFixture` | ทดสอบ 2 กรณีด้วย `@ParameterizedTest`: (1) `semester = 3` (2) `start_date = 2026-10-10`, `end_date = 2026-10-05` | throw `DataIntegrityViolationException` ทั้ง 2 กรณี |
-| `UT-DAO-US7-26` | ผิดพลาด (`UQ` ซ้ำ) | `QuotaFixture` | insert `quota_channel` (`Q7EL105`, `sort_order = 1`) ซ้ำ หรือ `quota_round` (`Q7EL105`, `2569`, `2`, `1`) ซ้ำ | throw `DataIntegrityViolationException` (ละเมิด `UNIQUE` constraint) |
-| `UT-DAO-US7-27` | ปกติ (`ON DELETE CASCADE`) | `QuotaFixture` | ลบแถว `course_quota_info` ของ `Q7EL105` แล้ว `flush` + `clear` | แถวลูกของ `Q7EL105` ใน `quota_condition`, `quota_round`, `quota_channel`, `quota_contact` ถูกลบตามทั้งหมด ส่วนแถวใน `course` ยังคงอยู่ |
+| `UT-DAO-US7-22` | ปกติ (`NVARCHAR` + `NULL`) | `QuotaFixture` | บันทึก `Course` 2 แถวด้วย `courseRepository.saveAndFlush(...)` (`courseNameTh = null` และ `courseNameTh = "ภาษาไทยทดสอบ"`) แล้ว `em.clear()` และเรียก `courseRepository.findById(...)` | บันทึกและอ่านคืนสำเร็จทั้งคู่ ไม่มี exception และภาษาไทยไม่เพี้ยนเป็น `???` |
+| `UT-DAO-US7-23` | ผิดพลาด (FK ไม่มีวิชา) | `QuotaFixture` | insert ด้วย **Native SQL**: `em.getEntityManager().createNativeQuery("INSERT INTO course_quota_info (course_code, quota_required) VALUES ('NO_COURSE', 1)").executeUpdate()` | throw **`PersistenceException`** ที่มี **`ConstraintViolationException`** ใน cause chain (ละเมิด FK `course_quota_info -> course`) |
+| `UT-DAO-US7-24` | ผิดพลาด (URL ไม่ใช่ `https://`) | `QuotaFixture` | insert ด้วย **Native SQL** (`createNativeQuery(...).executeUpdate()`) ทั้งใน `quota_channel` และ `quota_contact` โดยกำหนด `url = 'http://insecure.example.com'` | throw **`PersistenceException`** ที่มี **`ConstraintViolationException`** ใน cause chain ทั้ง 2 ตาราง (ละเมิด `CHECK (url IS NULL OR url LIKE 'https://%')`) |
+| `UT-DAO-US7-25` | ผิดพลาด (`channel_type` นอก enum) | `QuotaFixture` | insert ด้วย **Native SQL**: `em.getEntityManager().createNativeQuery("INSERT INTO quota_channel (course_code, sort_order, channel_type, label) VALUES ('Q7PC280', 2, 'WALK_IN', 'ติดต่อเอง')").executeUpdate()` | throw **`PersistenceException`** ที่มี **`ConstraintViolationException`** ใน cause chain (ละเมิด `CHECK (channel_type IN (...))`) |
+| `UT-DAO-US7-26` | ผิดพลาด (`quota_round` ผิด `semester` หรือวันที่ย้อนหลัง) | `QuotaFixture` | insert ด้วย **Native SQL** (`createNativeQuery(...).executeUpdate()`) ผ่าน `@ParameterizedTest` 2 กรณี: (1) `semester = 3` (2) `start_date = '2026-10-10'`, `end_date = '2026-10-05'` | throw **`PersistenceException`** ที่มี **`ConstraintViolationException`** ใน cause chain ทั้ง 2 กรณี (ละเมิด `CHECK (semester IN (1, 2))` และ `CHECK (start_date IS NULL OR end_date >= start_date)`) |
+| `UT-DAO-US7-27` | ผิดพลาด (`UQ` ซ้ำ) | `QuotaFixture` | insert ด้วย **Native SQL** (`createNativeQuery(...).executeUpdate()`) 2 กรณี: (1) `quota_channel` (`Q7EL105`, `sort_order = 1`) ซ้ำ (2) `quota_round` (`Q7EL105`, `2569`, `2`, `1`) ซ้ำ | throw **`PersistenceException`** ที่มี **`ConstraintViolationException`** ใน cause chain ทั้ง 2 กรณี (ละเมิด `UNIQUE` constraint) |
+| `UT-DAO-US7-28` | ปกติ (`ON DELETE CASCADE`) | `QuotaFixture` | รัน **Native SQL** `DELETE FROM course_quota_info WHERE course_code = 'Q7EL105'` แล้ว `em.flush()` + `em.clear()` จากนั้น query นับแถวที่เหลือ | แถวลูกของ `Q7EL105` ใน `quota_condition`, `quota_round`, `quota_channel`, `quota_contact` เหลือ `0` ทั้งหมด ส่วนแถว `Q7EL105` ใน `course` ยังคงอยู่ |
