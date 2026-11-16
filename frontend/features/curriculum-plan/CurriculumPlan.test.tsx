@@ -8,13 +8,19 @@ import Timetable from "../timetable/Timetable";
 import { buildTimetable, findCourse } from "../timetable/testFixtures";
 import type { Timetable as TimetableData } from "../timetable/types";
 import { applyPlan, getPlans } from "./api";
-import type { ApplyPlanResponse, StudyPlanList } from "./types";
+import type { ApplyPlanResponse, StudyMinor, StudyPlanList } from "./types";
 
 vi.mock("../timetable/api", () => ({ fetchTimetable: vi.fn(), addTimetableEntry: vi.fn() }));
 vi.mock("../courses/api", () => ({ fetchCourses: vi.fn() }));
 vi.mock("./api", () => ({ getPlans: vi.fn(), applyPlan: vi.fn() }));
 
 const CURRICULUM = "หลักสูตรวิทยาศาสตรบัณฑิต สาขาวิชาวิทยาการคอมพิวเตอร์ (ฉบับปรับปรุง พ.ศ. 2566)";
+
+/** API ส่งวิชาโท 1 รายการต่อ 1 แผน (US8-T05) fixture จึงมีทั้ง 2 แผนเหมือนข้อมูลจริง */
+const bothPlans = (minor: Omit<StudyMinor, "planType">): StudyMinor[] => [
+  { ...minor, planType: "SPECIAL_PROJECT" },
+  { ...minor, planType: "CO_OP" },
+];
 
 const YEAR_2_PLANS: StudyPlanList = {
   department: "วิทยาการคอมพิวเตอร์",
@@ -62,20 +68,20 @@ const YEAR_3_SEM1_PLANS: StudyPlanList = {
     },
   ],
   minors: [
-    {
+    ...bothPlans({
       minorId: 3,
       curriculumName: CURRICULUM,
       minorName: "วิทยาการข้อมูล",
       totalCredits: 3,
       courses: [{ courseCode: "ST216", courseName: "STATISTICS FOR SOCIAL SCIENCE 1", category: "FREE_ELECTIVE", credits: 3 }],
-    },
-    {
+    }),
+    ...bothPlans({
       minorId: 4,
       curriculumName: CURRICULUM,
       minorName: "ปัญญาประดิษฐ์",
       totalCredits: 3,
       courses: [{ courseCode: "LAS101", courseName: "CRITICAL THINKING", category: "GENERAL_EDUCATION", credits: 3 }],
-    },
+    }),
   ],
 };
 
@@ -104,26 +110,26 @@ const YEAR_3_SEM2_PLANS_WITH_MINOR: StudyPlanList = {
     },
   ],
   minors: [
-    {
+    ...bothPlans({
       minorId: 3,
       curriculumName: CURRICULUM,
       minorName: "วิทยาการข้อมูล",
       totalCredits: 3,
       courses: [{ courseCode: "ST216", courseName: "STATISTICS FOR SOCIAL SCIENCE 1", category: "FREE_ELECTIVE", credits: 3 }],
-    },
+    }),
   ],
 };
 
 const YEAR_3_SEM2_PLANS_WITHOUT_MINOR3: StudyPlanList = {
   ...YEAR_3_SEM2_PLANS_WITH_MINOR,
   minors: [
-    {
+    ...bothPlans({
       minorId: 5,
       curriculumName: CURRICULUM,
       minorName: "เดฟออปส์",
       totalCredits: 3,
       courses: [{ courseCode: "TU106", courseName: "CREATIVITY AND COMMUNICATION", category: "GENERAL_EDUCATION", credits: 3 }],
-    },
+    }),
   ],
 };
 
@@ -777,5 +783,35 @@ describe("US8-T07 UI + Unit Test UI การจัดตารางตาม�
     expect(
       await dialog2.findByText("วิชาแนะนำสำหรับ: ชั้นปีที่ 3 ภาคเรียนที่ 2 (แผนสหกิจศึกษา)"),
     ).toBeInTheDocument();
+  });
+
+  it("[US8-T08] วิชาโทกรองตาม planType ของแผนที่เลือก ไม่แสดงซ้ำ และล้างเมื่อแผนใหม่ไม่มีวิชาโทนั้น", async () => {
+    // ปัญญาประดิษฐ์ (4) มีเฉพาะแผนหัวข้อพิเศษ วิทยาการข้อมูล (3) มีทั้ง 2 แผน
+    vi.mocked(getPlans).mockResolvedValue({
+      ...YEAR_3_SEM1_PLANS,
+      minors: YEAR_3_SEM1_PLANS.minors.filter((m) => m.minorId === 3 || m.planType === "SPECIAL_PROJECT"),
+    });
+    vi.mocked(applyPlan).mockResolvedValue({ ...PREVIEW_RESPONSE, added: [], skipped: [] });
+
+    await renderTimetablePage();
+    const dialog = await openPlanModal();
+    await userEvent.click(dialog.getByRole("button", { name: "ชั้นปีที่ 3" }));
+    await userEvent.click(dialog.getByRole("button", { name: "ภาคเรียนที่ 1" }));
+
+    // ยังไม่เลือกแผน: วิชาโทไม่ซ้ำตาม minorId
+    expect(await dialog.findAllByRole("button", { name: "วิทยาการข้อมูล" })).toHaveLength(1);
+
+    await userEvent.click(dialog.getByRole("button", { name: "ทำหัวข้อพิเศษ" }));
+    await userEvent.click(dialog.getByRole("button", { name: "ปัญญาประดิษฐ์" }));
+    await waitFor(() =>
+      expect(applyPlan).toHaveBeenLastCalledWith({ planId: 21, minorId: 4, academicYear: 2568, dryRun: true }),
+    );
+
+    await userEvent.click(dialog.getByRole("button", { name: "สหกิจศึกษา" }));
+    expect(dialog.queryByRole("button", { name: "ปัญญาประดิษฐ์" })).not.toBeInTheDocument();
+    expect(dialog.getByRole("button", { name: "ไม่เรียนวิชาโท" })).toHaveAttribute("aria-pressed", "true");
+    await waitFor(() =>
+      expect(applyPlan).toHaveBeenLastCalledWith({ planId: 22, academicYear: 2568, dryRun: true }),
+    );
   });
 });

@@ -8,7 +8,7 @@ import TimetableGrid from "./components/TimetableGrid";
 import { useTimetable } from "./hooks/useTimetable";
 
 // หน้าหลักประกอบแต่ละส่วนและส่งข้อมูล/เหตุการณ์ต่อกัน โดยไม่ถือกฎคำนวณตารางไว้ใน JSX
-const Timetable = () => {
+export const TimetableContent = ({ state }: { state: ReturnType<typeof useTimetable> }) => {
   const {
     timetable,
     loadError,
@@ -34,7 +34,7 @@ const Timetable = () => {
     dismissConflictAlert,
     setAcademicYear,
     setSemester,
-  } = useTimetable();
+  } = state;
 
   return (
     <div className="space-y-4 text-slate-800">
@@ -104,6 +104,12 @@ const Timetable = () => {
       />
     </div>
   );
+};
+
+// ใช้เดี่ยวได้เหมือนเดิม ส่วนหน้าที่มีหลายเมนูส่ง state ชุดเดียวเข้า TimetableContent
+const Timetable = () => {
+  const state = useTimetable();
+  return <TimetableContent state={state} />;
 };
 
 export default Timetable;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Timetable from "../timetable/Timetable";
+import TimetableWorkspace from "../timetable/TimetableWorkspace";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import AuthGuard from "./components/AuthGuard";
 import AuthShell from "./components/AuthShell";
@@ -43,11 +43,9 @@ export default function MainMenuPage({ inactivityTimeoutMs }: { inactivityTimeou
               </div>
 
               {/* รอ profile สำเร็จก่อนโหลดตาราง และคง component ไว้เมื่อสลับเมนูเพื่อรักษาภาคเรียนที่เลือก */}
-              <div hidden={activeSection !== "timetable"}>
-                <Timetable />
-              </div>
+              <TimetableWorkspace activeSection={activeSection} onOpenQuota={() => setActiveSection("quota")} />
 
-              {activeSection !== "timetable" && (
+              {activeSection === "quota" && (
                 <section aria-labelledby="feature-pending-title" className="rounded-2xl border border-[#e3ebf5] bg-white px-6 py-14 text-center shadow-sm">
                   <span className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-[#fff0f1] text-[#c91725]">
                     <AuthIcon name={selectedSection.icon} width={28} height={28} />

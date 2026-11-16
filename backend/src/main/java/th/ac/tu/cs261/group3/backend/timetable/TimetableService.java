@@ -149,9 +149,7 @@ public class TimetableService {
                 Section b = entries.get(j).getSection();
                 for (ScheduleSlot x : a.getSlots()) {
                     for (ScheduleSlot y : b.getSlots()) {
-                        if (x.getDayOfWeek() == y.getDayOfWeek()
-                                && x.getStartTime().isBefore(y.getEndTime())
-                                && y.getStartTime().isBefore(x.getEndTime())) {
+                        if (ScheduleOverlap.overlaps(x, y)) {
                             LocalTime start = max(x.getStartTime(), y.getStartTime());
                             LocalTime end = min(x.getEndTime(), y.getEndTime());
                             Key key = new Key(a.getCourse().getCourseCode(), b.getCourse().getCourseCode(), x.getDayOfWeek());

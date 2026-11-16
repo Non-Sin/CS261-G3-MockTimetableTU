@@ -22,6 +22,7 @@ const CATEGORY_LABELS: Record<CourseCategory, string> = {
   MAJOR: "วิชาเฉพาะ",
   GENERAL_EDUCATION: "ศึกษาทั่วไป",
   FREE_ELECTIVE: "เลือกเสรี",
+  MINOR: "วิชาโท",
 };
 
 const SKIP_REASON_LABELS: Record<PlanSkipReason, string> = {
@@ -82,7 +83,6 @@ const buildRecommendationHeading = (
 
 const CurriculumPlanModal = ({
   isOpen,
-  academicYear,
   studyYear,
   semester,
   curricula,
