@@ -159,7 +159,7 @@ const TimetableGrid = ({
                             </span>
                           </div>
                           <div>{slot.startTime}-{slot.endTime}</div>
-                          <div>{slot.room}</div>
+                          <div>{slot.room ?? "ไม่ระบุ"}</div>
                         </div>
                       );
                     }),
@@ -208,7 +208,7 @@ const TimetableGrid = ({
                                   </span>
                                 </div>
                                 <div>{group.overlapStart}-{group.overlapEnd}</div>
-                                <div>{slot.room}</div>
+                                <div>{slot.room ?? "ไม่ระบุ"}</div>
                               </div>
                             );
                           })}

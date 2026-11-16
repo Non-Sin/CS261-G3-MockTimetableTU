@@ -83,7 +83,6 @@ const buildRecommendationHeading = (
 
 const CurriculumPlanModal = ({
   isOpen,
-  academicYear,
   studyYear,
   semester,
   curricula,
