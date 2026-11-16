@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "US1-T08 Mock Timetable API",
-    "description": "ทดสอบ API ของ US1 ตาม US1-T05 DTO & API Spec และ Test case 1–8 ของการ์ด US1\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย seed V20261014_2010 (2568/1) และ V20261114_2100 (แผนการเรียน US8 เพิ่มรายวิชา/กลุ่มเรียน 2568/1 และ 2568/2)\n- นักศึกษา demo (app.timetable.demo-student-id) ยังไม่มีตารางภาค 2568/1 และ 2568/2\n\nต้องรันตามลำดับ (Run collection) เพราะแต่ละ request ใช้ผลของ request ก่อนหน้า",
+    "description": "ทดสอบ API ของ US1 ตาม US1-T05 DTO & API Spec และ Test case 1–8 ของการ์ด US1\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย seed V20261014_2010 (2568/1) , V20261114_2100 (แผนการเรียน US8 เพิ่มรายวิชา/กลุ่มเรียน 2568/1 และ 2568/2) และ V20261116_1734 (วิชาเลือกเสรีแนะนำ US6 อีก 18 วิชา)\n- นักศึกษา demo (app.timetable.demo-student-id) ยังไม่มีตารางภาค 2568/1 และ 2568/2\n\nต้องรันตามลำดับ (Run collection) เพราะแต่ละ request ใช้ผลของ request ก่อนหน้า",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -29,9 +29,9 @@
       "name": "01 TC1 GET /api/courses รายวิชาภาค 2568/1",
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
         "const courses = pm.response.json();",
-        "pm.test('200 และได้ 37 วิชาเรียงตามรหัส (seed US1 + แผนการเรียน US8)', () => {",
+        "pm.test('200 และได้ 52 วิชาเรียงตามรหัส (seed US1 + แผนการเรียน US8 + วิชาเลือกเสรี US6)', () => {",
         "  pm.response.to.have.status(200);",
-        "  pm.expect(courses.map(c => c.courseCode)).to.eql(['CS100','CS101','CS102','CS111','CS180','CS213','CS221','CS223','CS224','CS240','CS241','CS261','CS301','CS331','CS341','CS345','CS346','CS361','CS373','CS374','CS384','CS403','CS404','CS440','EL105','EL295','JP171','LAS101','MA211','ST216','ST329','TU100','TU101','TU106','TU107','TU108','TU109']);",
+        "  pm.expect(courses.map(c => c.courseCode)).to.eql(['AS201','AT326','CS100','CS101','CS102','CS111','CS180','CS213','CS221','CS223','CS224','CS240','CS241','CS261','CS301','CS331','CS341','CS345','CS346','CS361','CS373','CS374','CS384','CS403','CS404','CS440','EG214','EL105','EL295','FD216','FR205','GE225','IS313','JC217','JP171','LAS101','MA211','PB317','PY200','PY250','PY252','PY320','RE468','ST216','ST329','TH291','TU100','TU101','TU106','TU107','TU108','TU109']);",
         "});",
         "pm.test('CS111 มี 2 กลุ่ม พร้อมคาบเรียนเรียงตามวัน เวลาเป็น HH:mm', () => {",
         "  const cs111 = courses.find(c => c.courseCode === 'CS111');",
@@ -106,8 +106,8 @@
     {
       "name": "06 GET /api/courses ภาคอื่น 2568/2",
       "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
-        "pm.test('ได้ 27 วิชาของ 2568/2', () => {",
-        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['CS111','CS180','CS217','CS222','CS223','CS232','CS242','CS246','CS251','CS271','CS301','CS303','CS305','CS314','CS332','CS342','CS343','CS365','CS366','CS370','CS372','EL395','LAS101','MA211','TU101','TU106','TU109']);",
+        "pm.test('ได้ 40 วิชาของ 2568/2', () => {",
+        "  pm.expect(pm.response.json().map(c => c.courseCode)).to.eql(['AN242','AN347','AS201','CS111','CS180','CS217','CS222','CS223','CS232','CS242','CS246','CS251','CS271','CS301','CS303','CS305','CS314','CS332','CS342','CS343','CS365','CS366','CS370','CS372','EG214','EL395','FD216','IS313','LAS101','MA211','PB317','PC280','PY200','PY250','PY252','PY320','TH291','TU101','TU106','TU109']);",
         "});"
       ] } }],
       "request": { "method": "GET", "url": "{{baseUrl}}/api/courses?academicYear=2568&semester=2" }
