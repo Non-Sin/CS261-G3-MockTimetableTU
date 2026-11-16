@@ -11,7 +11,7 @@ const router = vi.hoisted(() => ({ replace: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
 vi.mock("../users/api", () => ({ userApi: { getCurrentUser: vi.fn() } }));
 // แยกการตรวจ session/navbar ออกจาก API ของตารางที่มีชุดทดสอบของตัวเอง
-vi.mock("../timetable/Timetable", () => ({ default: () => <section aria-label="เนื้อหาตารางเรียน">ตารางเรียน</section> }));
+vi.mock("../timetable/TimetableWorkspace", () => ({ default: () => <section aria-label="เนื้อหาตารางเรียน">ตารางเรียน</section> }));
 const profile = { studentId: "6809610000", firstName: "Alysa", lastName: "Liu" };
 
 beforeEach(() => {
