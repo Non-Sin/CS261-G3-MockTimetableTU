@@ -1,0 +1,136 @@
+newman
+
+US8-T08 Study Plan API
+
+Root 00 GET /api/study-plans ไม่มี token → 401
+  GET http://localhost:8081/api/study-plans?studyYear=2&semester=1 [401 Unauthorized, 596B, 36ms]
+  Pass  401 ProblemDetail (ทุก endpoint ของ US8 ต้อง login)
+
+Root 01 POST login นักศึกษา CS (เตรียม token)
+  POST http://localhost:8081/api/auth/login [200 OK, 635B, 47ms]
+  Pass  200 ได้ token เป็น JWT
+
+Root 02 [setup] GET ตาราง 2568/1 เก็บ entryId ที่ค้างจากรอบก่อน
+  GET http://localhost:8081/api/timetable?academicYear=2568&semester=1 [200 OK, 551B, 17ms]
+  Pass  200 อ่านตาราง 2568/1 ของ {{csUser}}
+  -
+  | 'Using "postman.setNextRequest" is deprecated. Use "pm
+  | .execution.setNextRequest()" instead.'
+  -
+
+Attempting to set next request to 04 [IT-US8-01] GET ชั้นปี 2 ภาค 1 → แผนเดียว planType null ไม่มีวิชาโท
+
+Root 04 [IT-US8-01] GET ชั้นปี 2 ภาค 1 → แผนเดียว planType null ไม่มีวิชาโท
+  GET http://localhost:8081/api/study-plans?studyYear=2&semester=1 [200 OK, 1.51kB, 20ms]
+  Pass  200 กรองด้วย department ของนักศึกษา + ชั้นปี/ภาคที่ส่ง
+  Pass  ส่ง "planType": null ใน JSON (ไม่ตัดทิ้ง) และ minors ว่าง
+  Pass  totalCredits = ผลรวม credits ของ courses
+
+Root 05 [IT-US8-02] GET ชั้นปี 3 ภาค 1 → 2 แผน และวิชาโทแยกตามแผน
+  GET http://localhost:8081/api/study-plans?studyYear=3&semester=1 [200 OK, 7.01kB, 25ms]
+  Pass  200 ได้ทั้ง 2 แผน เรียง SPECIAL_PROJECT → CO_OP
+  Pass  วิชาโท 1 รายการต่อ 1 วิชาโท × 1 แผน
+  Pass  CS440 อยู่เฉพาะรายการ CO_OP ของวิชาโทวิทยาการข้อมูล (วิชาโทขึ้นกับแผน)
+
+Root 06 [IT-US8-04] GET ชั้นปี 4 ภาค 1 → วิชาโทมีเฉพาะแผนหัวข้อพิเศษ
+  GET http://localhost:8081/api/study-plans?studyYear=4&semester=1 [200 OK, 3.24kB, 24ms]
+  Pass  200 แผนสหกิจไม่มีวิชาโทในภาคนี้ จึงไม่มีรายการ CO_OP
+
+Root 07 [IT-US8-03] GET ชั้นปี 4 ภาค 2 → plans ว่าง ไม่ใช่ error
+  GET http://localhost:8081/api/study-plans?studyYear=4&semester=2 [200 OK, 561B, 19ms]
+  Pass  200 plans: [] และ minors: []
+
+Root 08 [IT-US8-28] GET studyYear=5 → 400 ไม่ใช่ 500
+  GET http://localhost:8081/api/study-plans?studyYear=5&semester=1 [400 Bad Request, 507B, 6ms]
+  Pass  400 ProblemDetail (ห้ามใส่ @Validated ที่ controller)
+
+Root 09 GET ไม่ส่ง studyYear → 400
+  GET http://localhost:8081/api/study-plans?semester=1 [400 Bad Request, 535B, 8ms]
+  Pass  400 ไม่ส่ง param ที่บังคับ
+
+Root 10 [IT-US8-06] POST dryRun แผนปี 2/1 ตารางว่าง → เพิ่มได้ทุกวิชา
+  POST http://localhost:8081/api/timetable/apply-plan [200 OK, 1.46kB, 32ms]
+  Pass  200 dryRun: true, timetable: null, minorId: null (ส่ง null ใน JSON)
+  Pass  ทุกวิชาของแผนอยู่ใน added พร้อม section และ source PLAN, skipped ว่าง
+
+Root 11 [IT-US8-22] GET ตารางหลัง dryRun → ไม่เปลี่ยน (ไม่เขียน DB)
+  GET http://localhost:8081/api/timetable?academicYear=2568&semester=1 [200 OK, 551B, 16ms]
+  Pass  200 entries ยังว่าง และ updatedAt เท่ากับหลัง setup (ไม่เขียน DB)
+
+Root 12 [IT-US8-07] POST dryRun แผนสหกิจปี 3/1 + วิชาโทวิทยาการข้อมูล → ได้ CS440 (MINOR)
+  POST http://localhost:8081/api/timetable/apply-plan [200 OK, 1.59kB, 33ms]
+  Pass  200 minorId ส่งกลับตาม request
+  Pass  CS440 อยู่ใน added เป็น source MINOR และวิชาของแผนหลักมาก่อนวิชาโท
+
+Root 13 POST dryRun แผนหัวข้อพิเศษปี 3/1 + วิชาโทเดียวกัน → ไม่มี CS440
+  POST http://localhost:8081/api/timetable/apply-plan [200 OK, 1.62kB, 33ms]
+  Pass  200 วิชาโทใช้วิชาของ planType ของ preset เท่านั้น
+
+Root 14 [IT-US8-11] POST dryRun แผนสหกิจปี 3/1 + วิชาโทปัญญาประดิษฐ์ → CS371 ไม่เปิดสอน
+  POST http://localhost:8081/api/timetable/apply-plan [200 OK, 1.67kB, 48ms]
+  Pass  200 CS371 เป็น NO_SECTION_AVAILABLE source MINOR ไม่มี field เสริม
+  Pass  วิชาอื่นยังเพิ่มได้ตามปกติ (ไม่ fail ทั้งชุด)
+
+Root 15 [IT-US8-23] POST minorId กับแผนชั้นปี 2 (ยืนยัน) → 400 MINOR_NOT_ALLOWED
+  POST http://localhost:8081/api/timetable/apply-plan [400 Bad Request, 629B, 16ms]
+  Pass  400 code MINOR_NOT_ALLOWED
+
+Root 16 GET ตารางหลัง 400 → ไม่เปลี่ยน (ไม่เขียน DB)
+  GET http://localhost:8081/api/timetable?academicYear=2568&semester=1 [200 OK, 551B, 20ms]
+  Pass  200 entries ยังว่าง และ updatedAt เท่ากับหลัง setup (ไม่เขียน DB)
+
+Root 17 [IT-US8-25] POST ไม่ส่ง planId และ academicYear → 400
+  POST http://localhost:8081/api/timetable/apply-plan [400 Bad Request, 588B, 8ms]
+  Pass  400 errors ระบุ field ที่ขาด
+
+Root 18 [IT-US8-26] POST planId ไม่มีในระบบ → 404
+  POST http://localhost:8081/api/timetable/apply-plan [404 Not Found, 559B, 17ms]
+  Pass  404 ProblemDetail
+
+Root 19 [IT-US8-26] POST minorId ไม่มีในระบบ → 404
+  POST http://localhost:8081/api/timetable/apply-plan [404 Not Found, 560B, 18ms]
+  Pass  404 ProblemDetail
+
+Root 20 [IT-US8-16][IT-US8-20] POST ยืนยันแผนปี 2/1 (ไม่ส่ง dryRun) → สร้างตารางและบันทึก
+  POST http://localhost:8081/api/timetable/apply-plan [200 OK, 3.5kB, 59ms]
+  Pass  200 ไม่ส่ง dryRun = false และคืน TimetableResponse ของ US1
+  Pass  timetable มีทุกวิชาที่ added ตรง section และหน่วยกิตรวมถูกต้อง
+
+Root 21 [IT-US8-21][IT-US8-19][IT-US8-08] POST ยืนยันซ้ำ → ไม่เพิ่มซ้ำ และไม่เขียน DB
+  POST http://localhost:8081/api/timetable/apply-plan [200 OK, 4.13kB, 37ms]
+  Pass  200 added ว่าง ทุกวิชาเป็น COURSE_ALREADY_IN_TIMETABLE พร้อม existingSectionNo
+  Pass  added ว่างจึงไม่เขียน DB: entries เท่าเดิม และ updatedAt ไม่เปลี่ยน
+
+Root 22 [IT-US8-09][IT-US8-10][IT-US8-17] POST dryRun แผนหัวข้อพิเศษปี 3/1 + วิชาโท ทับตารางปี 2 → ชน / หน่วยกิตเกิน
+  POST http://localhost:8081/api/timetable/apply-plan [200 OK, 2.47kB, 32ms]
+  Pass  200 มีวิชาที่ข้ามเพราะเวลาชน พร้อม conflictWith และ message
+  Pass  มีวิชาที่ข้ามเพราะหน่วยกิตเกิน 22 พร้อม currentCredits / maxCredits
+  Pass  วิชาที่เพิ่มไม่ทำให้หน่วยกิตรวมเกิน 22 และ timetable เป็น null
+
+Root 23 [cleanup] GET ตาราง 2568/1 เก็บ entryId
+  GET http://localhost:8081/api/timetable?academicYear=2568&semester=1 [200 OK, 2.45kB, 19ms]
+  Pass  200 อ่านตาราง 2568/1 ของ {{csUser}}
+
+Root 24 [cleanup] DELETE วิชาที่ทดสอบ คืนตารางว่าง
+  DELETE http://localhost:8081/api/timetable/entries?entryIds=60041,60042,60043,60044,60045,60046 [200 OK, 551B, 42ms]
+  Pass  200 ลบทุกวิชาแล้วตารางว่าง
+
+-----------------------------------------------------------------
+|                         |         executed |           failed |
+--------------------------+------------------+-------------------
+|              iterations |                1 |                0 |
+--------------------------+------------------+-------------------
+|                requests |               24 |                0 |
+--------------------------+------------------+-------------------
+|            test-scripts |               24 |                0 |
+--------------------------+------------------+-------------------
+|      prerequest-scripts |                0 |                0 |
+--------------------------+------------------+-------------------
+|              assertions |               35 |                0 |
+-----------------------------------------------------------------
+| total run duration: 2.6s                                      |
+-----------------------------------------------------------------
+| total data received: 27.96kB (approx)                         |
+-----------------------------------------------------------------
+| average response time: 26ms [min: 6ms, max: 59ms, s.d.: 13ms] |
+-----------------------------------------------------------------
