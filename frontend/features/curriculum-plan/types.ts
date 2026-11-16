@@ -22,6 +22,8 @@ export type StudyPlan = {
 
 export type StudyMinor = {
   minorId: number;
+  /** 1 รายการต่อ 1 วิชาโท × 1 แผน วิชาโทเดียวกันมีได้ 2 รายการ UI กรองตามแผนที่เลือก */
+  planType: PlanType;
   curriculumName: string;
   minorName: string;
   totalCredits: number;
