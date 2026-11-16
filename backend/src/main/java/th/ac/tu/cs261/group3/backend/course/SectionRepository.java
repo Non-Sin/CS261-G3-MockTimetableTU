@@ -44,4 +44,28 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     List<Section> findWithSlotsByCourseCodesAndTerm(@Param("courseCodes") Collection<String> courseCodes,
                                                     @Param("academicYear") int academicYear,
                                                     @Param("semester") int semester);
+
+    /**
+     * กลุ่มเรียนทุกภาคของปีการศึกษาที่ขอ พร้อมวิชาและคาบเรียน (US6 วิชาเลือกเสรีแนะนำ)
+     * ใช้ทั้งตัวกรองคาบในหน้ารายการ และ Sec ทั้งปี / {@code offeredSemesters} ในหน้ารายละเอียด
+     * <p>
+     * เรียงตามรหัสวิชา ภาค แล้วรหัสกลุ่ม (UI เลือก Sec แรกเป็นค่าเริ่มต้น)
+     * section ที่ไม่มีคาบ (e-learning) ยังอยู่ในผล
+     */
+    default List<Section> findByCourseCodesAndYear(Collection<String> courseCodes, int academicYear) {
+        if (courseCodes.isEmpty()) {
+            return List.of();
+        }
+        return findWithSlotsByCourseCodesAndYear(courseCodes, academicYear);
+    }
+
+    /** ใช้ผ่าน {@link #findByCourseCodesAndYear} ซึ่งกันกรณี list ว่างไว้แล้ว */
+    @Query("""
+            select s from Section s
+            join fetch s.course c
+            left join fetch s.slots
+            where c.courseCode in :courseCodes and s.academicYear = :academicYear
+            order by c.courseCode, s.semester, s.sectionNo""")
+    List<Section> findWithSlotsByCourseCodesAndYear(@Param("courseCodes") Collection<String> courseCodes,
+                                                    @Param("academicYear") int academicYear);
 }
