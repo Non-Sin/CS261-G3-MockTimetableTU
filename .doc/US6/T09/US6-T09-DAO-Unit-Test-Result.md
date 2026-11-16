@@ -168,9 +168,25 @@ seed นี้เพิ่มวิชา FREE_ELECTIVE ที่มีกลุ
 | 2568/1 GENERAL_EDUCATION | 9 | 9 |
 | 2568/1 / 2568/2 FREE_ELECTIVE | – | 16 / 13 |
 
+`q=thinking` (LAS101) และปี 2560 (`[]`) ก็ไม่เปลี่ยน
+
+### เอกสาร US1 ที่อัปเดตตาม seed นี้
+
+รายการรหัสวิชาด้านล่างได้จาก query จริงบน Testcontainers ชุดเดียวกับตารางข้างบน (ไม่ได้เรียงด้วยมือ)
+
+| เอกสาร | ที่เปลี่ยน |
+| --- | --- |
+| US1-T08 Postman collection | Preconditions เพิ่ม seed `V20261116_1734` · 01 รายวิชา 2568/1 เป็น 52 วิชา (เพิ่ม AS201, AT326, EG214, FD216, FR205, GE225, IS313, JC217, PB317, PY200, PY250, PY252, PY320, RE468, TH291) · 06 รายวิชา 2568/2 เป็น 40 วิชา (เพิ่ม AN242, AN347, AS201, EG214, FD216, IS313, PB317, PC280, PY200, PY250, PY252, PY320, TH291) |
+| US1-T17 Postman collection | Preconditions เพิ่ม seed `V20261116_1734__seed_electives.sql` · 01 Setup `lengthOf(52)` |
+| US1-T13 IT | ชุดข้อมูล A เป็น 52 วิชาของ 2568/1 |
+
+US1-T15 ST, US1-T16 UAT และ US1-T05 Spec ไม่ได้อ้างจำนวนรายวิชา จึงไม่ต้องแก้ ไม่แก้เอกสารผลการรันในอดีต (US1-T08 / T17 / T18 / T19 / T20 Test Result, US2-T17 Test Result, newman log, evidence) เพราะเป็นบันทึกของการรันครั้งนั้น
+
+ยังไม่ได้รัน Postman ทั้งสอง collection กับ backend จริงหลังแก้ เพราะต้อง apply seed นี้ลง `appdb` ในเครื่อง (เหตุผลเดียวกับที่ไม่รัน `BackendApplicationTests`) ควรรันด้วย newman หลัง PR นี้ merge
+
 ## สิ่งที่ต้องทำต่อ
 
-- อัปเดตจำนวนรายวิชาตามตารางข้างบนใน US1-T08 Postman (test "ได้ 37 วิชา" และ "ได้ 27 วิชาของ 2568/2"), US1-T17 Postman (`lengthOf(37)`) และชุดข้อมูล A ใน US1-T13 IT ไม่แก้เอกสารผลการรันในอดีต (เช่น US2-T17 Test Result)
+- รัน US1-T08 และ US1-T17 Postman ด้วย newman กับ backend ที่มี seed นี้ หลัง merge
 - กรอก Actual Result / Status ในเอกสาร US6-T12 ตามผลรายกรณีข้างบน
 - Service tests ตาม "ตารางส่งต่อ Service / UI tests" ของ T12 (ตัวกรองภาค/วัน/ช่วงเวลา/excludeConflicts, `offeredSemesters`, การเรียงตาม `InterestGroup` และ tags) ทำในงาน Service ของ US6 ไม่อยู่ใน 35 กรณีนี้
 - ตรวจจำนวนการ์ดในหน้ารายการเทียบ Prototype เมื่อมี API และ UI (seed มี 18 วิชาตามที่ T06 กำหนด)
