@@ -19,6 +19,9 @@ public class Course {
     @Column(name = "course_name", nullable = false, length = 200)
     private String courseName;
 
+    @Column(name = "course_name_th", length = 200)
+    private String courseNameTh;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private CourseCategory category;

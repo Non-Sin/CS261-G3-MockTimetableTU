@@ -1,5 +1,7 @@
 # US7-T08 — API และ DTO ของการค้นหาช่องทางขอโควตา
 
+> สถานะหลัง T09: มี `JpaQuotaDataReader` เชื่อมฐานข้อมูลจริงแล้ว ดู [US7-T09](../T09/README.md) ข้อความด้านล่างอธิบายขอบเขตตอนส่ง T08; test server ในเอกสารนี้ยังใช้ fixture แยกจากฐานข้อมูลเช่นเดิม
+
 งานนี้พัฒนา T08 ก่อน T09 ตามลำดับที่ตกลง จึงมี Controller, Service, DTO และ tests ของ API พร้อมแล้ว แต่ยังไม่เพิ่ม Entity, Repository query, schema หรือ seed ของโควตา
 
 ## การทำงานของ API

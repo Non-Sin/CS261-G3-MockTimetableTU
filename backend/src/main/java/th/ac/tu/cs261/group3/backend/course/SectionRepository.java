@@ -11,6 +11,21 @@ import java.util.Optional;
 
 public interface SectionRepository extends JpaRepository<Section, Long> {
 
+    /** US7 โหลดภาคที่เปิดสอนของทุกวิชาที่ขอใน query เดียว */
+    default List<Object[]> findOfferedSemestersByCourseCodesAndYear(Collection<String> courseCodes, int academicYear) {
+        if (courseCodes.isEmpty()) {
+            return List.of();
+        }
+        return findOfferedSemesters(courseCodes, academicYear);
+    }
+
+    @Query("""
+            select distinct s.course.courseCode, s.semester from Section s
+            where s.course.courseCode in :courseCodes and s.academicYear = :academicYear
+            order by s.course.courseCode, s.semester""")
+    List<Object[]> findOfferedSemesters(@Param("courseCodes") Collection<String> courseCodes,
+                                       @Param("academicYear") int academicYear);
+
     /**
      * โหลดวิชาและคาบเรียนมาพร้อม section (TimetableService.addEntry)
      * เพราะ service ใช้รหัสวิชาและหน่วยกิตต่อหลังจบ query และ {@code open-in-view: false}

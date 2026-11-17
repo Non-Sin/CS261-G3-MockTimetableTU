@@ -95,7 +95,7 @@ Frontend เรียก `/api/*` แล้ว Next.js จะ rewrite ไปท�
 | GET | `/api/quota/courses?academicYear=2568&semester=1&q=EL395&mine=false` | ค้นหาวิชาพร้อมสถานะและช่องทางขอโควตา ต้องมีคำค้นหรือ `mine=true`; ตอบ 200 พร้อม `total` และ `courses` (US7) |
 | GET | `/api/quota/courses/{courseCode}?academicYear=2568&semester=1` | ข้อมูลโควตารายวิชา ไม่มีรหัสวิชาในระบบตอบ 404; มีวิชาแต่ไม่มีข้อมูลโควตาตอบ 200 `NO_DATA` พร้อมรายการว่างเมื่อเปิดสอนในภาคนั้น (US7) |
 
-US7-T08 พัฒนา API ก่อน DAO: เมื่อยังไม่มี bean ที่ implement `quota.data.QuotaDataReader` จาก T09 คำขอที่ต้องอ่านข้อมูลจะตอบ `503 ProblemDetail` ไม่ใช้ข้อมูลจำลองหรือคืนรายการว่างแทน อ่านวิธีทดสอบแยกจาก DB และรายการที่ T09 ต้องเชื่อมใน [US7-T08](.doc/US7/T08/README.md)
+US7 เชื่อม API ของ T08 กับฐานข้อมูลผ่าน `JpaQuotaDataReader` ของ T09 แล้ว มี Flyway migration และ seed ตัวอย่างปี 2568 สำหรับ dev อ่านการออกแบบ DAO, วิธีทดสอบ และข้อควรระวังการอัปเกรดใน [US7-T09](.doc/US7/T09/README.md) ส่วนชุดทดสอบ API แบบแยกจาก DB อยู่ใน [US7-T08](.doc/US7/T08/README.md)
 
 Error ทุกตัวตอบกลับเป็น [ProblemDetail (RFC 9457)](https://www.rfc-editor.org/rfc/rfc9457) เช่น
 `{ "status": 400, "title": "Bad Request", "detail": "Validation failed", "errors": { "name": "must not be blank" } }`
