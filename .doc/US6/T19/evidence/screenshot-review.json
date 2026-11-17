@@ -1,0 +1,23 @@
+{
+  "included": [
+    {
+      "source": "08-timetable.jpg",
+      "artifact": "08-timetable.jpg",
+      "shows": "FR205 260001 Tuesday/Thursday 16:30-18:00; 3/22 credits"
+    },
+    {
+      "source": "13-credit-limit.jpg",
+      "artifact": "13-fixture-21-credits.jpg",
+      "shows": "T-FULL fixture with 7 elective courses; 21/22 credits; does not show modal state"
+    }
+  ],
+  "excluded": [
+    "09-conflict-timetable.jpg",
+    "10-already-added.jpg",
+    "12-duplicate-409.jpg",
+    "15-get-401-login.jpg",
+    "16-list-network-failure.jpg",
+    "16-detail-network-failure.jpg"
+  ],
+  "reason": "Only visually verified images matching the described state are included. Modal/error assertions use AX logs, real network JSON and DB evidence; other captures are not relied on."
+}

@@ -1,0 +1,224 @@
+[
+  {
+    "subcase": "academicYear=None",
+    "method": "GET",
+    "path": "/api/electives?currentSemester=1",
+    "requestBody": null,
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "Required parameter 'academicYear' is not present.",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "subcase": "currentSemester=None",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568",
+    "requestBody": null,
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "Required parameter 'currentSemester' is not present.",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "subcase": "currentSemester=3",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568&currentSemester=3",
+    "requestBody": null,
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "currentSemester ต้องเป็น 1 หรือ 2",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "subcase": "semester=3",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568&currentSemester=1&semester=3",
+    "requestBody": null,
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "semester ต้องเป็น 1 หรือ 2",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "subcase": "day=FUNDAY",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568&currentSemester=1&day=FUNDAY",
+    "requestBody": null,
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "Validation failed",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request",
+      "errors": {
+        "day": "Failed to convert value of type 'java.lang.String' to required type 'java.time.DayOfWeek'; Failed to convert from type [java.lang.String] to type [java.time.DayOfWeek] for value [FUNDAY]"
+      }
+    }
+  },
+  {
+    "subcase": "timeSlot=NIGHT",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568&currentSemester=1&timeSlot=NIGHT",
+    "requestBody": null,
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "Validation failed",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request",
+      "errors": {
+        "timeSlot": "Failed to convert value of type 'java.lang.String' to required type 'th.ac.tu.cs261.group3.backend.elective.dto.TimeSlot'; Failed to convert from type [java.lang.String] to type [th.ac.tu.cs261.group3.backend.elective.dto.TimeSlot] for value [NIGHT]"
+      }
+    }
+  },
+  {
+    "subcase": "group=SPORT",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568&currentSemester=1&group=SPORT",
+    "requestBody": null,
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "Validation failed",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request",
+      "errors": {
+        "group": "Failed to convert value of type 'java.lang.String' to required type 'th.ac.tu.cs261.group3.backend.elective.InterestGroup'; Failed to convert from type [java.lang.String] to type [th.ac.tu.cs261.group3.backend.elective.InterestGroup] for value [SPORT]"
+      }
+    }
+  },
+  {
+    "subcase": "excludeConflicts=maybe",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=maybe",
+    "requestBody": null,
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "Validation failed",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request",
+      "errors": {
+        "excludeConflicts": "Failed to convert value of type 'java.lang.String' to required type 'java.lang.Boolean'; Invalid boolean value [maybe]"
+      }
+    }
+  },
+  {
+    "subcase": "day=SUNDAY",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568&currentSemester=1&day=SUNDAY",
+    "requestBody": null,
+    "status": 200,
+    "expectedStatus": 200,
+    "pass": true,
+    "body": []
+  },
+  {
+    "subcase": "PY250 term 3",
+    "method": "GET",
+    "path": "/api/electives/PY250?academicYear=2568&currentSemester=3",
+    "requestBody": null,
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "currentSemester ต้องเป็น 1 หรือ 2",
+      "instance": "/api/electives/PY250",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "subcase": "CS111 term 1",
+    "method": "GET",
+    "path": "/api/electives/CS111?academicYear=2568&currentSemester=1",
+    "requestBody": null,
+    "status": 404,
+    "expectedStatus": 404,
+    "pass": true,
+    "body": {
+      "detail": "ไม่พบวิชาเสรีแนะนำ: CS111",
+      "instance": "/api/electives/CS111",
+      "status": 404,
+      "title": "Not Found"
+    }
+  },
+  {
+    "subcase": "SA240 term 1",
+    "method": "GET",
+    "path": "/api/electives/SA240?academicYear=2568&currentSemester=1",
+    "requestBody": null,
+    "status": 404,
+    "expectedStatus": 404,
+    "pass": true,
+    "body": {
+      "detail": "ไม่พบวิชาเสรีแนะนำ: SA240",
+      "instance": "/api/electives/SA240",
+      "status": 404,
+      "title": "Not Found"
+    }
+  },
+  {
+    "subcase": "missing sectionId",
+    "method": "POST",
+    "path": "/api/timetable/entries",
+    "requestBody": {},
+    "status": 400,
+    "expectedStatus": 400,
+    "pass": true,
+    "body": {
+      "detail": "Validation failed",
+      "instance": "/api/timetable/entries",
+      "status": 400,
+      "title": "Bad Request",
+      "errors": {
+        "sectionId": "must not be null"
+      }
+    }
+  },
+  {
+    "subcase": "nonexistent sectionId",
+    "method": "POST",
+    "path": "/api/timetable/entries",
+    "requestBody": {
+      "sectionId": 999999
+    },
+    "status": 404,
+    "expectedStatus": 404,
+    "pass": true,
+    "body": {
+      "detail": "Section not found with id: 999999",
+      "instance": "/api/timetable/entries",
+      "status": 404,
+      "title": "Not Found"
+    }
+  }
+]

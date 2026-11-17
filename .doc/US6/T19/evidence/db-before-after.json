@@ -1,0 +1,364 @@
+{
+  "01": {
+    "before": [],
+    "after": []
+  },
+  "02": {
+    "before": [],
+    "after": []
+  },
+  "03": {
+    "before": [],
+    "after": []
+  },
+  "04-empty": {
+    "before": [],
+    "after": []
+  },
+  "04-PY200": {
+    "before": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 1,
+        "updated_at": "2026-11-17T23:09:58+07:00",
+        "entries": [
+          {
+            "entry_id": 1,
+            "course_code": "PY200",
+            "section_no": "810001",
+            "section_id": 116
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 1,
+        "updated_at": "2026-11-17T23:09:58+07:00",
+        "entries": [
+          {
+            "entry_id": 1,
+            "course_code": "PY200",
+            "section_no": "810001",
+            "section_id": 116
+          }
+        ]
+      }
+    ]
+  },
+  "05": {
+    "before": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 2,
+        "updated_at": "2026-11-17T23:10:12+07:00",
+        "entries": [
+          {
+            "entry_id": 2,
+            "course_code": "JC217",
+            "section_no": "450001",
+            "section_id": 112
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 2,
+        "updated_at": "2026-11-17T23:10:12+07:00",
+        "entries": [
+          {
+            "entry_id": 2,
+            "course_code": "JC217",
+            "section_no": "450001",
+            "section_id": 112
+          }
+        ]
+      }
+    ]
+  },
+  "06": {
+    "before": [],
+    "after": []
+  },
+  "07": {
+    "before": [],
+    "after": []
+  },
+  "08": {
+    "before": [],
+    "after": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 3,
+        "updated_at": "2026-11-17T23:11:44+07:00",
+        "entries": [
+          {
+            "entry_id": 3,
+            "course_code": "FR205",
+            "section_no": "260001",
+            "section_id": 107
+          }
+        ]
+      }
+    ]
+  },
+  "09": {
+    "before": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 4,
+        "updated_at": "2026-11-17T23:11:58+07:00",
+        "entries": [
+          {
+            "entry_id": 4,
+            "course_code": "PY200",
+            "section_no": "810001",
+            "section_id": 116
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 4,
+        "updated_at": "2026-11-17T23:12:10+07:00",
+        "entries": [
+          {
+            "entry_id": 4,
+            "course_code": "PY200",
+            "section_no": "810001",
+            "section_id": 116
+          },
+          {
+            "entry_id": 5,
+            "course_code": "RE468",
+            "section_no": "810001",
+            "section_id": 124
+          }
+        ]
+      }
+    ]
+  },
+  "10": {
+    "before": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 5,
+        "updated_at": "2026-11-17T23:12:23+07:00",
+        "entries": [
+          {
+            "entry_id": 6,
+            "course_code": "FR205",
+            "section_no": "260001",
+            "section_id": 107
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 5,
+        "updated_at": "2026-11-17T23:12:23+07:00",
+        "entries": [
+          {
+            "entry_id": 6,
+            "course_code": "FR205",
+            "section_no": "260001",
+            "section_id": 107
+          }
+        ]
+      }
+    ]
+  },
+  "11": {
+    "before": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 6,
+        "updated_at": "2026-11-17T23:12:47+07:00",
+        "entries": [
+          {
+            "entry_id": 7,
+            "course_code": "PY200",
+            "section_no": "810001",
+            "section_id": 116
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 6,
+        "updated_at": "2026-11-17T23:12:58+07:00",
+        "entries": [
+          {
+            "entry_id": 7,
+            "course_code": "PY200",
+            "section_no": "810001",
+            "section_id": 116
+          },
+          {
+            "entry_id": 8,
+            "course_code": "FR205",
+            "section_no": "260001",
+            "section_id": 107
+          }
+        ]
+      }
+    ]
+  },
+  "12": {
+    "before": [],
+    "after": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 7,
+        "updated_at": "2026-11-17T23:13:32+07:00",
+        "entries": [
+          {
+            "entry_id": 9,
+            "course_code": "FR205",
+            "section_no": "260002",
+            "section_id": 108
+          }
+        ]
+      }
+    ]
+  },
+  "13": {
+    "before": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 8,
+        "updated_at": "2026-11-17T23:13:42+07:00",
+        "entries": [
+          {
+            "entry_id": 10,
+            "course_code": "PY200",
+            "section_no": "810001",
+            "section_id": 116
+          },
+          {
+            "entry_id": 11,
+            "course_code": "PY250",
+            "section_no": "820001",
+            "section_id": 118
+          },
+          {
+            "entry_id": 12,
+            "course_code": "AT326",
+            "section_no": "230001",
+            "section_id": 72
+          },
+          {
+            "entry_id": 13,
+            "course_code": "JC217",
+            "section_no": "450001",
+            "section_id": 112
+          },
+          {
+            "entry_id": 14,
+            "course_code": "AS201",
+            "section_no": "900001",
+            "section_id": 70
+          },
+          {
+            "entry_id": 15,
+            "course_code": "GE225",
+            "section_no": "320001",
+            "section_id": 109
+          },
+          {
+            "entry_id": 16,
+            "course_code": "PB317",
+            "section_no": "540001",
+            "section_id": 113
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "academic_year": 2568,
+        "semester": 1,
+        "timetable_id": 8,
+        "updated_at": "2026-11-17T23:13:42+07:00",
+        "entries": [
+          {
+            "entry_id": 10,
+            "course_code": "PY200",
+            "section_no": "810001",
+            "section_id": 116
+          },
+          {
+            "entry_id": 11,
+            "course_code": "PY250",
+            "section_no": "820001",
+            "section_id": 118
+          },
+          {
+            "entry_id": 12,
+            "course_code": "AT326",
+            "section_no": "230001",
+            "section_id": 72
+          },
+          {
+            "entry_id": 13,
+            "course_code": "JC217",
+            "section_no": "450001",
+            "section_id": 112
+          },
+          {
+            "entry_id": 14,
+            "course_code": "AS201",
+            "section_no": "900001",
+            "section_id": 70
+          },
+          {
+            "entry_id": 15,
+            "course_code": "GE225",
+            "section_no": "320001",
+            "section_id": 109
+          },
+          {
+            "entry_id": 16,
+            "course_code": "PB317",
+            "section_no": "540001",
+            "section_id": 113
+          }
+        ]
+      }
+    ]
+  },
+  "14": {
+    "before": [],
+    "after": []
+  },
+  "15": {
+    "before": [],
+    "after": []
+  },
+  "16": {
+    "before": [],
+    "after": []
+  }
+}

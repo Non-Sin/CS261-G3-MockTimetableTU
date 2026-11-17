@@ -1,0 +1,50 @@
+Browser tab: 6, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/".
+1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/
+	2 container รายละเอียดวิชาเสรี
+		3 container
+			4 heading รายละเอียดวิชาเสรี, Value: 2, ID: elective-detail-title
+				5 text รายละเอียดวิชาเสรี
+			6 button ปิดรายละเอียดวิชา
+		7 text FR205 อยู่ในตารางแล้ว (Sec 260002) 1 วิชาเพิ่มได้ 1 กลุ่มเรียน
+		8 heading FR205, Value: 3
+			9 text FR205
+		10 text เลือกเสรี
+		11 text เปิดเฉพาะเทอม
+		12 text 1
+		13 text 3.0
+		14 text  หน่วยกิต
+		15 text FRENCH FOR EVERYDAY LIFE
+		16 text ภาษาฝรั่งเศสในชีวิตประจำวัน
+		17 text รายวิชาที่ต้องขอโควตา
+		18 text อาจารย์ใจดี
+		19 text ไม่มีพื้นฐานเรียนได้
+		20 button ค้นหาช่องทางขอโควตา →
+		21 container กลุ่มเรียนและตารางเรียน (Sections)
+			22 text กลุ่มเรียนและตารางเรียน (Sections)
+			23 container
+				24 radio button (disabled, settable, integer) Description: Sec 260001 ภาคเรียนที่ 1, Value: 0
+				25 text Sec  260001 ภาคเรียนที่  1 วัน อังคาร 16:30  - 18:00  น. ห้องเรียน:  SC3-M10 วัน พฤหัสบดี 16:30  - 18:00  น. ห้องเรียน:  SC3-M10 ผู้สอน:  ผศ.ธรณินทร์ มีเพียร
+			26 container
+				27 radio button (disabled, settable, integer) Description: Sec 260002 ภาคเรียนที่ 1, Value: 0
+				28 text Sec  260002 ภาคเรียนที่  1 เพิ่มแล้ว วัน อังคาร 16:30  - 18:00  น. ห้องเรียน:  SC3-M11 วัน พฤหัสบดี 16:30  - 18:00  น. ห้องเรียน:  SC3-M11 ผู้สอน:  ผศ.นิธิ ศีลวัตกุล
+		29 container รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			30 heading รายละเอียดวิชา & รีวิวจากรุ่นพี่, Value: 3, ID: elective-reviews-title
+				31 text รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			32 content list
+				33 container
+					34 AXListMarker •
+					35 text เรียนภาษาฝรั่งเศสระดับ A2 ไม่มีพื้นฐานเรียนได้
+				36 container
+					37 AXListMarker •
+					38 text เรียนonsite ในคาบอาจารย์ชอบให้ฝึกพูดภาษาฝรั่งเศสกับเพื่อนในคลาส เป็นบทสนทนาในชีวิตประจำวัน
+				39 container
+					40 AXListMarker •
+					41 text มีงานกลุ่ม1งานเป็นงานนำเสนอเกี่ยวกับวัฒนธรรมฝรั่งเศส
+				42 container
+					43 AXListMarker •
+					44 text มีสอบ กลางภาค และ ปลายภาค
+		45 container
+			46 text อยู่ในตารางแล้ว
+			47 button (disabled) + เพิ่มลงตาราง
+
+The focused UI element is 1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/

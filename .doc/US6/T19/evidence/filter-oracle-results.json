@@ -1,0 +1,637 @@
+[
+  {
+    "snapshot": "01-list.ax.txt",
+    "params": {},
+    "fixture": "empty",
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "actualUI": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "02a-PY2.ax.txt",
+    "params": {
+      "q": "PY2"
+    },
+    "fixture": "empty",
+    "expected": [
+      "PY200",
+      "PY250",
+      "PY252"
+    ],
+    "actualUI": [
+      "PY200",
+      "PY250",
+      "PY252"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "02b-thai.ax.txt",
+    "params": {
+      "q": "ฝรั่งเศส"
+    },
+    "fixture": "empty",
+    "expected": [
+      "FR205"
+    ],
+    "actualUI": [
+      "FR205"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "02c-empty.ax.txt",
+    "params": {
+      "q": "SA240"
+    },
+    "fixture": "empty",
+    "expected": [],
+    "actualUI": [],
+    "pass": true
+  },
+  {
+    "snapshot": "02d-reset.ax.txt",
+    "params": {},
+    "fixture": "empty",
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "actualUI": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "03a-science.ax.txt",
+    "params": {
+      "group": "SCIENCE"
+    },
+    "fixture": "empty",
+    "expected": [
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280"
+    ],
+    "actualUI": [
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "03b-semester2.ax.txt",
+    "params": {
+      "semester": 2
+    },
+    "fixture": "empty",
+    "expected": [
+      "EG214",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "PB317",
+      "FD216",
+      "IS313",
+      "PC280"
+    ],
+    "actualUI": [
+      "EG214",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "PB317",
+      "FD216",
+      "IS313",
+      "PC280"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "03c-mon-morning.ax.txt",
+    "params": {
+      "day": "MONDAY",
+      "timeSlot": "MORNING"
+    },
+    "fixture": "empty",
+    "expected": [
+      "PY200",
+      "FD216",
+      "RE468"
+    ],
+    "actualUI": [
+      "PY200",
+      "FD216",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "03d-mon-morning-term2.ax.txt",
+    "params": {
+      "day": "MONDAY",
+      "timeSlot": "MORNING",
+      "semester": 2
+    },
+    "fixture": "empty",
+    "expected": [
+      "PY200"
+    ],
+    "actualUI": [
+      "PY200"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "03e-fri-morning.ax.txt",
+    "params": {
+      "day": "FRIDAY",
+      "timeSlot": "MORNING"
+    },
+    "fixture": "empty",
+    "expected": [
+      "PY252",
+      "AN242",
+      "AN347",
+      "FD216"
+    ],
+    "actualUI": [
+      "PY252",
+      "AN242",
+      "AN347",
+      "FD216"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "03f-fri-morning-term1.ax.txt",
+    "params": {
+      "day": "FRIDAY",
+      "timeSlot": "MORNING",
+      "semester": 1
+    },
+    "fixture": "empty",
+    "expected": [
+      "PY252"
+    ],
+    "actualUI": [
+      "PY252"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "03g-tue-evening.ax.txt",
+    "params": {
+      "day": "TUESDAY",
+      "timeSlot": "EVENING"
+    },
+    "fixture": "empty",
+    "expected": [
+      "FR205"
+    ],
+    "actualUI": [
+      "FR205"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "03h-wed-evening.ax.txt",
+    "params": {
+      "day": "WEDNESDAY",
+      "timeSlot": "EVENING"
+    },
+    "fixture": "empty",
+    "expected": [],
+    "actualUI": [],
+    "pass": true
+  },
+  {
+    "snapshot": "03i-reset.ax.txt",
+    "params": {},
+    "fixture": "empty",
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "actualUI": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "04a-empty-no-conflict.ax.txt",
+    "params": {
+      "excludeConflicts": true
+    },
+    "fixture": "empty",
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "JC217",
+      "RE468"
+    ],
+    "actualUI": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "04b-other-term-empty.ax.txt",
+    "params": {
+      "excludeConflicts": true,
+      "semester": 2
+    },
+    "fixture": "empty",
+    "expected": [],
+    "actualUI": [],
+    "pass": true
+  },
+  {
+    "snapshot": "04c-PY200-no-conflict.ax.txt",
+    "params": {
+      "excludeConflicts": true
+    },
+    "fixture": "PY200",
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "IS313",
+      "JC217"
+    ],
+    "actualUI": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "IS313",
+      "JC217"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "05a-adjacent.ax.txt",
+    "params": {
+      "excludeConflicts": true
+    },
+    "fixture": "JC217",
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "RE468"
+    ],
+    "actualUI": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "05b-FR205-adjacent.ax.txt",
+    "params": {
+      "excludeConflicts": true,
+      "q": "FR205"
+    },
+    "fixture": "JC217",
+    "expected": [
+      "FR205"
+    ],
+    "actualUI": [
+      "FR205"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "07a-term2-all.ax.txt",
+    "params": {
+      "currentSemester": 2
+    },
+    "fixture": "empty",
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "actualUI": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "07b-term2-no-conflict.ax.txt",
+    "params": {
+      "currentSemester": 2,
+      "excludeConflicts": true
+    },
+    "fixture": "empty",
+    "expected": [
+      "EG214",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "PB317",
+      "FD216",
+      "IS313",
+      "PC280"
+    ],
+    "actualUI": [
+      "EG214",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "PB317",
+      "FD216",
+      "IS313",
+      "PC280"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "11a-before-add.ax.txt",
+    "params": {
+      "excludeConflicts": true
+    },
+    "fixture": "PY200",
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "IS313",
+      "JC217"
+    ],
+    "actualUI": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "IS313",
+      "JC217"
+    ],
+    "pass": true
+  },
+  {
+    "snapshot": "11c-auto-refresh.ax.txt",
+    "params": {
+      "excludeConflicts": true
+    },
+    "fixture": "PY200-FR205",
+    "expected": [
+      "EG214",
+      "TH291",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "IS313",
+      "JC217"
+    ],
+    "actualUI": [
+      "EG214",
+      "TH291",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "IS313",
+      "JC217"
+    ],
+    "pass": true
+  }
+]

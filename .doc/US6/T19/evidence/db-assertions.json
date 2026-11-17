@@ -1,0 +1,87 @@
+[
+  {
+    "case": "01",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "02",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "03",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "04-empty",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "04-PY200",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "05",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "06",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "07",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "10",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "13",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "14",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "15",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "16",
+    "assertion": "DB unchanged including updated_at",
+    "pass": true
+  },
+  {
+    "case": "08",
+    "assertion": "Expected entries saved; same existing timetable and updated_at advanced when applicable",
+    "pass": true
+  },
+  {
+    "case": "09",
+    "assertion": "Expected entries saved; same existing timetable and updated_at advanced when applicable",
+    "pass": true
+  },
+  {
+    "case": "11",
+    "assertion": "Expected entries saved; same existing timetable and updated_at advanced when applicable",
+    "pass": true
+  },
+  {
+    "case": "12",
+    "assertion": "Expected entries saved; same existing timetable and updated_at advanced when applicable",
+    "pass": true
+  }
+]

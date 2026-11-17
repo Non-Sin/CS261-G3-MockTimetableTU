@@ -1,0 +1,146 @@
+[
+  {
+    "course_code": "EG214",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "LANGUAGE",
+    "reviews": 4,
+    "terms": 2
+  },
+  {
+    "course_code": "FR205",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "LANGUAGE",
+    "reviews": 4,
+    "terms": 1
+  },
+  {
+    "course_code": "TH291",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "LANGUAGE",
+    "reviews": 4,
+    "terms": 2
+  },
+  {
+    "course_code": "JC217",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "MEDIA",
+    "reviews": 4,
+    "terms": 1
+  },
+  {
+    "course_code": "RE468",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "MEDIA",
+    "reviews": 4,
+    "terms": 1
+  },
+  {
+    "course_code": "PY200",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "PSYCHOLOGY",
+    "reviews": 4,
+    "terms": 2
+  },
+  {
+    "course_code": "PY250",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "PSYCHOLOGY",
+    "reviews": 4,
+    "terms": 2
+  },
+  {
+    "course_code": "PY252",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "PSYCHOLOGY",
+    "reviews": 4,
+    "terms": 2
+  },
+  {
+    "course_code": "PY320",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "PSYCHOLOGY",
+    "reviews": 4,
+    "terms": 2
+  },
+  {
+    "course_code": "AT326",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "SCIENCE",
+    "reviews": 4,
+    "terms": 1
+  },
+  {
+    "course_code": "FD216",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "SCIENCE",
+    "reviews": 4,
+    "terms": 2
+  },
+  {
+    "course_code": "IS313",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "SCIENCE",
+    "reviews": 4,
+    "terms": 2
+  },
+  {
+    "course_code": "PC280",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "SCIENCE",
+    "reviews": 4,
+    "terms": 1
+  },
+  {
+    "course_code": "AN242",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "SOCIETY",
+    "reviews": 4,
+    "terms": 1
+  },
+  {
+    "course_code": "AN347",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "SOCIETY",
+    "reviews": 4,
+    "terms": 1
+  },
+  {
+    "course_code": "AS201",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "SOCIETY",
+    "reviews": 4,
+    "terms": 2
+  },
+  {
+    "course_code": "GE225",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "SOCIETY",
+    "reviews": 4,
+    "terms": 1
+  },
+  {
+    "course_code": "PB317",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interest_group": "SOCIETY",
+    "reviews": 4,
+    "terms": 2
+  }
+]

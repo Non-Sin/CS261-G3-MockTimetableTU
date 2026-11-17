@@ -1,0 +1,43 @@
+Browser tab: 6, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/".
+1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/
+	2 container รายละเอียดวิชาเสรี
+		3 container
+			4 heading รายละเอียดวิชาเสรี, Value: 2, ID: elective-detail-title
+				5 text รายละเอียดวิชาเสรี
+			6 button ปิดรายละเอียดวิชา
+		7 heading AN242, Value: 3
+			8 text AN242
+		9 text เลือกเสรี
+		10 text เปิดเฉพาะเทอม
+		11 text 2
+		12 text 3.0
+		13 text  หน่วยกิต
+		14 text INTRODUCTION TO MUSEUM STUDIES
+		15 text พิพิธภัณฑ์ศึกษาเบื้องต้น
+		16 text ไม่มีสอบ
+		17 text อาจารย์ใจดี
+		18 text ไม่มีพื้นฐานเรียนได้
+		19 container กลุ่มเรียนและตารางเรียน (Sections)
+			20 text กลุ่มเรียนและตารางเรียน (Sections)
+			21 container
+				22 radio button (disabled, settable, integer) Description: Sec 870001 ภาคเรียนที่ 2, Value: 0
+				23 text Sec  870001 ภาคเรียนที่  2 (ตารางเรียนปัจจุบันคือภาคเรียนที่  1 ) วัน ศุกร์ 09:30  - 12:30  น. ห้องเรียน:  ไม่ระบุ ผู้สอน:  ผศ.ดร.เทียมสูรย์ สิริศรีศักดิ์
+		24 container รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			25 heading รายละเอียดวิชา & รีวิวจากรุ่นพี่, Value: 3, ID: elective-reviews-title
+				26 text รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			27 content list
+				28 container
+					29 AXListMarker •
+					30 text เกี่ยวกับประวัติศาสตร์ความเป็นมาและการเปลี่ยนแปลงของพิพิธภัณฑ์
+				31 container
+					32 AXListMarker •
+					33 text บรรยายและมีพูดคุยในห้องนิดหน่อย งานมีควิซท้ายคาบตอบไม่เกิน 1 นาที
+				34 container
+					35 AXListMarker •
+					36 text มีงานกลุ่มตอนกลางภาค และ ปลายภาค
+				37 container
+					38 AXListMarker •
+					39 text ไม่มีสอบ กลางภาค และ ปลายภาค
+		40 button (disabled) + เพิ่มลงตาราง
+
+The focused UI element is 6 button ปิดรายละเอียดวิชา
