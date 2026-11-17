@@ -51,7 +51,7 @@ class QuotaMigrationTest {
                       AND s.academic_year = 2568 AND s.semester = 1 GROUP BY t.timetable_id""");
         }
         Flyway flyway = flyway(url, null);
-        assertThat(flyway.migrate().migrationsExecuted).isEqualTo(2);
+        assertThat(flyway.migrate().migrationsExecuted).isEqualTo(3);
         assertSeedData(url);
         try (Connection connection = connect(url); var statement = connection.createStatement()) {
             var names = statement.executeQuery("""
