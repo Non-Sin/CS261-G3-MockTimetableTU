@@ -16,20 +16,29 @@ classDiagram
     class ElectiveService {
         <<US6 Service>>
         -electiveRepository: ElectiveRepository
+        -sectionRepository: SectionRepository
         -timetableService: TimetableService
         +search(studentId: String, academicYear: int, currentSemester: int, criteria: ElectiveSearchCriteria) List~ElectiveSummaryResponse~
         +getDetail(studentId: String, courseCode: String, academicYear: int, currentSemester: int) ElectiveDetailResponse
-        -validateSemester(name: String, semester: Integer) void
-        -matchesSection(section: Section, currentSemester: int, criteria: ElectiveSearchCriteria, timetable: TimetableResponse) boolean
-        -toSectionResponse(section: Section, currentSemester: int, timetable: TimetableResponse) ElectiveSectionResponse
+        -validateSemester(name: String, semester: Integer) void$
+        -matchesSection(section: Section, currentSemester: int, criteria: ElectiveSearchCriteria, timetable: TimetableResponse) boolean$
+        -toSectionResponse(section: Section, currentSemester: int, timetable: TimetableResponse) ElectiveSectionResponse$
+        -conflictWith(section: Section, timetable: TimetableResponse) List~String~$
+        -overlaps(dayA: DayOfWeek, startA: LocalTime, endA: LocalTime, dayB: DayOfWeek, startB: LocalTime, endB: LocalTime) boolean$
     }
     class ScheduleOverlap {
-        <<US6 utility · ใช้ร่วมกับ US1>>
+        <<แผน · ยังไม่ implement ใน US6-T08>>
         +overlaps(dayA: DayOfWeek, startA: LocalTime, endA: LocalTime, dayB: DayOfWeek, startB: LocalTime, endB: LocalTime) boolean$
         +conflictWith(section: Section, timetable: TimetableResponse) List~String~$
     }
     class ElectiveRepository {
-        <<T06 ออกแบบ>>
+        <<US6-T09>>
+        +searchRecommended(academicYear: int, q: String, group: InterestGroup) List~ElectiveInfo~
+        +findRecommendedByCode(courseCode: String, academicYear: int) Optional~ElectiveInfo~
+    }
+    class SectionRepository {
+        <<US1 + method ของ US6-T09>>
+        +findByCourseCodesAndYear(courseCodes: Collection~String~, academicYear: int) List~Section~
     }
     class CurrentStudentProvider {
         <<US1 interface>>
@@ -76,10 +85,11 @@ classDiagram
     ElectiveController --> ElectiveService
     ElectiveController --> CurrentStudentProvider
     CurrentStudentProvider <|.. SecurityContextStudentProvider
-    ElectiveService --> ElectiveRepository : วิชา + Sec ทั้งปี
+    ElectiveService --> ElectiveRepository : วิชาเสรีแนะนำ + tags
+    ElectiveService --> SectionRepository : Sec + คาบทั้งปี
     ElectiveService --> TimetableService : getTimetable() ตารางปัจจุบัน
-    ElectiveService ..> ScheduleOverlap : ตรวจเวลาชน
-    TimetableService ..> ScheduleOverlap : findConflicts() ใช้ overlaps()
+    ElectiveService ..> ScheduleOverlap : แผน ย้าย conflictWith/overlaps มาที่นี่
+    TimetableService ..> ScheduleOverlap : แผน findConflicts() ใช้ overlaps()
     ElectiveService ..> ResourceNotFoundException : throws
     ElectiveService ..> ResponseStatusException : throws
     GlobalExceptionHandler ..> ResourceNotFoundException : จัดการ
@@ -89,14 +99,15 @@ classDiagram
 | ส่วน | หน้าที่ |
 | --- | --- |
 | `ElectiveController` | `@RestController @RequestMapping("/api/electives")` · `search` = `GET` รับ `academicYear`, `currentSemester` ด้วย `@RequestParam` และ param ที่เหลือด้วย `@ModelAttribute ElectiveSearchCriteria` · `getDetail` = `GET /{courseCode}` · ทั้งสองตอบ `200` ขอ `studentId` จาก `CurrentStudentProvider` แล้วส่งต่อให้ service |
-| `ElectiveService.search` | `@Transactional(readOnly = true)` · ลำดับตาม API Spec: `validateSemester` ทั้ง `currentSemester` และ `semester` (400) → ถ้า `excludeConflicts` เรียก `getTimetable` → ดึงวิชาตาม `q`, `group` พร้อม Sec ทั้งปีจาก `ElectiveRepository` → เก็บวิชาที่มีอย่างน้อย 1 Sec ผ่าน `matchesSection` → แปลงด้วย `ElectiveSummaryResponse.from` เรียงตาม `InterestGroup` แล้ว `courseCode` |
-| `ElectiveService.getDetail` | `validateSemester` (400) → หาวิชาเสรีแนะนำที่มี Sec ในปีนั้น (404) → `getTimetable` → `toSectionResponse` ทุก Sec → `ElectiveDetailResponse.of` |
-| `matchesSection` | กติกาการกรองข้อ 3 ใน API Spec ทั้งหมดอยู่ที่นี่: `semester`, `day` + `timeSlot` ในคาบเดียวกัน (`TimeSlot.contains`), และ `excludeConflicts` (Sec ต้องอยู่ `currentSemester`, `ScheduleOverlap.conflictWith` ว่าง และ `courseCode` ไม่อยู่ใน `timetable.entries`) |
-| `toSectionResponse` | `inTimetable` = `sectionId` อยู่ใน `timetable.entries` · `conflictWith` = `ScheduleOverlap.conflictWith` เฉพาะ Sec ที่ `selectable` (อีกภาค = `[]`) |
-| `ScheduleOverlap` | กติกาชนจุดเดียวของระบบ `overlaps` = วันเดียวกัน `&& startA < endB && startB < endA` รับเป็นค่า primitive จึงใช้ได้ทั้งกับ entity `ScheduleSlot` (US1) และ `ScheduleSlotResponse` ใน `TimetableResponse` (US6) · `conflictWith` คืนรหัสวิชาในตารางที่ชนกับ Sec นี้ ไม่ซ้ำ ตามลำดับใน `entries` และข้าม entry ที่เป็นวิชาเดียวกับ Sec (ไม่นับว่าชนกับตัวเอง) |
+| `ElectiveService.search` | `@Transactional(readOnly = true)` · ลำดับตาม API Spec: `validateSemester` ทั้ง `currentSemester` และ `semester` (400) → ถ้า `excludeConflicts` เรียก `getTimetable` → ดึงวิชาตาม `q`, `group` จาก `ElectiveRepository.searchRecommended` (ไม่พบ = `[]` ไม่ query Sec) → Sec ทั้งปีจาก `SectionRepository.findByCourseCodesAndYear` → เก็บวิชาที่มีอย่างน้อย 1 Sec ผ่าน `matchesSection` → แปลงด้วย `ElectiveSummaryResponse.from` เรียงตาม `InterestGroup` แล้ว `courseCode` |
+| `ElectiveService.getDetail` | `validateSemester` (400) → `findRecommendedByCode` (404 ก่อนโหลดตาราง) → `getTimetable` → `findByCourseCodesAndYear([courseCode])` เรียงภาคแล้ว `sectionNo` → โหลด `description` (LAZY) ใน transaction → `toSectionResponse` ทุก Sec → `ElectiveDetailResponse.of` |
+| `matchesSection` | กติกาการกรองข้อ 3 ใน API Spec ทั้งหมดอยู่ที่นี่: `semester`, `day` + `timeSlot` ในคาบเดียวกัน (`TimeSlot.contains`), และ `excludeConflicts` (Sec ต้องอยู่ `currentSemester`, `conflictWith` ว่าง และ `courseCode` ไม่อยู่ใน `timetable.entries`) |
+| `toSectionResponse` | `inTimetable` = `sectionId` อยู่ใน `timetable.entries` · `conflictWith` เฉพาะ Sec ที่ `selectable` (อีกภาค = `[]`) |
+| `conflictWith` / `overlaps` (private ใน `ElectiveService`) | **ที่ implement ใน US6-T08** ตามทางเลือก B ที่ทีมเลือก: ใช้สูตรเดียวกับ `TimetableService.findConflicts` ของ US1 · `conflictWith` คืนรหัสวิชาในตารางที่ชนกับ Sec นี้ ไม่ซ้ำ ตามลำดับใน `entries` ข้ามวิชาเดียวกัน · ย้ายไป `ScheduleOverlap` หลัง `feature/US8-T08-develop-api-dto` merge (branch นั้นสร้าง `timetable/ScheduleOverlap` และแก้ `findConflicts` บรรทัดเดียวกันไว้แล้ว ถ้าทำซ้ำจะ merge ชนกัน) |
+| `ScheduleOverlap` (แผน) | กติกาชนจุดเดียวของระบบ `overlaps` = วันเดียวกัน `&& startA < endB && startB < endA` รับเป็นค่า primitive จึงใช้ได้ทั้งกับ entity `ScheduleSlot` (US1) และ `ScheduleSlotResponse` ใน `TimetableResponse` (US6) · `conflictWith` คืนรหัสวิชาในตารางที่ชนกับ Sec นี้ ไม่ซ้ำ ตามลำดับใน `entries` และข้าม entry ที่เป็นวิชาเดียวกับ Sec (ไม่นับว่าชนกับตัวเอง) |
 | `TimetableService.getTimetable` (US1) | ให้ตารางปัจจุบันพร้อม `entries[].sectionId`, `courseCode`, `schedules` ซึ่งพอสำหรับตรวจเวลาชนและ `inTimetable` โดยไม่ต้องเพิ่ม method ใน US1 ยังไม่มีตาราง = ได้ `entries: []` |
 | `TimetableService.findConflicts` (US1) | แก้ 1 จุด: เปลี่ยนเงื่อนไข `isBefore` ใน loop เป็นเรียก `ScheduleOverlap.overlaps` เพื่อไม่ให้กติกาชนมีสองชุด เป็นไฟล์ของ US1 ต้องบอกเจ้าของและแยก PR เล็กตาม CONTRIBUTING ผลลัพธ์ของ US1 ไม่เปลี่ยน |
-| `ElectiveRepository` | query วิชาเสรีแนะนำตาม `q` / `group` และ Sec + คาบของทั้งปี ชื่อ method และจะแยก repository หรือเพิ่มใน `CourseRepository` / `SectionRepository` เดิมเป็นงานของ US6-T06 (DAO Class Diagram) |
+| `ElectiveRepository` / `SectionRepository` | ตาม US6-T06 DAO Class Diagram และ implement ใน US6-T09: `searchRecommended` / `findRecommendedByCode` กรอง eligibility + `q` / `group` และ fetch course + tags · `findByCourseCodesAndYear` โหลด Sec + คาบทั้งปี (list ว่างไม่ออก SQL) · T06 เพิ่ม `SectionRepository` เป็น field ของ service ตามที่วาดด้านบน |
 | `CurrentStudentProvider` (US1) / `SecurityContextStudentProvider` (US3) | ให้ `studentId` จาก JWT ของผู้ใช้ปัจจุบัน ไม่มี token ถูกกันที่ `SecurityConfig` (401) ก่อนถึง controller |
 | `ResourceNotFoundException` | `getDetail` ไม่พบวิชา / ไม่ใช่วิชาเสรีแนะนำ / ไม่มี Sec ในปีนั้น → `404` ผ่าน `handleNotFound` เดิม |
 | `ResponseStatusException` | `currentSemester` หรือ `semester` ไม่ใช่ 1, 2 → `400` · `GlobalExceptionHandler` จัดการผ่าน `ResponseEntityExceptionHandler` ที่สืบทอดมา ไม่ต้องเพิ่ม handler หรือ `code` ใหม่ (400 จาก param ผิดชนิด/enum ผิดค่า Spring จัดการเองเช่นกัน) |
@@ -104,7 +115,7 @@ classDiagram
 | `timetableApi.addTimetableEntry` (US1) | ปุ่ม "+ เพิ่มลงตาราง" ใน modal ส่ง `sectionId` ของ Sec ที่เลือก error 409 อ่าน `ApiError.code` / `message` ตามตารางผลลัพธ์ใน API Spec |
 | `apiFetch` | ตัวเดิมใน `lib/api.ts` แนบ `Authorization` ให้อัตโนมัติ และ 401 → `expireSession()` กลับหน้า Login |
 
-ไม่ได้วาด entity (`Course`, `Section`, `ScheduleSlot`, ข้อมูลแนะนำวิชา) และ method ใน repository เพราะเป็นงานของ Extended API Class Diagram ใน US6-T06 แบบเดียวกับที่ US1, US2 แยกไว้ ส่วน component หน้าจอ (`ElectivesPage`, ตัวกรอง, การ์ด, modal) ออกแบบใน US6-T07 ตาม [UI Prototype](./ui-prototype)
+ไม่ได้วาด entity (`Course`, `Section`, `ScheduleSlot`, `ElectiveInfo`) เพราะอยู่ใน Extended API Class Diagram และ DAO Class Diagram ของ US6-T06 แบบเดียวกับที่ US1, US2 แยกไว้ ส่วน method ของ repository วาดเฉพาะที่ `ElectiveService` เรียก (ปรับหลัง implement ใน US6-T08) ส่วน component หน้าจอ (`ElectivesPage`, ตัวกรอง, การ์ด, modal) ออกแบบใน US6-T07 ตาม [UI Prototype](./ui-prototype)
 
 **ทำไมพึ่ง `TimetableService` แทนอ่าน `TimetableEntryRepository` เอง:** `getTimetable` คืนข้อมูลที่ต้องใช้ครบแล้ว และยังรวมกฎ "ยังไม่มีตาราง = ว่าง" ไว้ที่เดียว ถ้าภายหลัง US1 เปลี่ยนวิธีเก็บตาราง US6 ไม่ต้องแก้ ข้อเสียคือได้ `conflicts` ของตารางมาด้วยโดยไม่ใช้ ซึ่งตารางมีไม่เกิน 22 หน่วยกิต (ราว 7 วิชา) จึงไม่กระทบประสิทธิภาพ
 
