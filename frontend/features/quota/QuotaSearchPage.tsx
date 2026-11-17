@@ -26,6 +26,7 @@ const QuotaSearchPage = ({ academicYear, semester, myCourseCodes }: QuotaSearchP
   const { input, setInput, mine, changeMine, state, search, clear, selectCourse, retry } = useQuotaSearch({
     academicYear,
     semester,
+    myCourseCodes,
   });
 
   const requestedQuery =

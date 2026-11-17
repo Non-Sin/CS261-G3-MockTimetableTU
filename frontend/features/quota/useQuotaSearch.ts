@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ApiError } from "@/lib/api";
 import { getCourseQuota, searchQuotaCourses } from "./api";
 import type { QuotaCourse } from "./types";
@@ -14,16 +14,30 @@ export type QuotaSearchState =
   | { status: "notFound"; request: QuotaRequest }
   | { status: "error"; request: QuotaRequest };
 
-type UseQuotaSearchOptions = { academicYear: number; semester: number };
+type UseQuotaSearchOptions = {
+  academicYear: number;
+  semester: number;
+  myCourseCodes?: string[];
+};
 
 // ถือ state ของหน้าค้นหา: คำค้น, checkbox, และผลลัพธ์ (idle/loading/success/notFound/error)
 // ไม่เรียก API เมื่อคำค้นว่างและไม่ได้ติ๊ก checkbox (backend จะตอบ 400 QUOTA_SEARCH_QUERY_REQUIRED)
-export function useQuotaSearch({ academicYear, semester }: UseQuotaSearchOptions) {
+export function useQuotaSearch({ academicYear, semester, myCourseCodes }: UseQuotaSearchOptions) {
   const [input, setInput] = useState("");
   const [mine, setMine] = useState(false);
   const [state, setState] = useState<QuotaSearchState>({ status: "idle" });
   // นับลำดับคำขอ เพื่อไม่ใช้ผลของคำขอเก่าที่ตอบกลับมาช้ากว่าคำขอใหม่
   const latestRequestId = useRef(0);
+
+  // รีเซ็ตตัวกรองและผลค้นหาเมื่อแผนการเรียนกลายเป็นว่าง พร้อมตัดผลคำขอเก่าทิ้ง
+  useEffect(() => {
+    if (myCourseCodes && myCourseCodes.length === 0 && mine) {
+      latestRequestId.current += 1; // ทิ้งผลของคำขอที่ยังค้างอยู่ ป้องกันผลเก่ากลับมาทับ
+      setMine(false);
+      setInput("");
+      setState({ status: "idle" });
+    }
+  }, [myCourseCodes, mine]);
 
   const run = useCallback(
     (request: QuotaRequest) => {

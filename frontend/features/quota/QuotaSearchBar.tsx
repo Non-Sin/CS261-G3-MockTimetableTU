@@ -74,7 +74,7 @@ const QuotaSearchBar = ({
       >
         <input
           type="checkbox"
-          checked={mine}
+          checked={hasPlan && mine}
           disabled={!hasPlan}
           onChange={(event) => onMineChange(event.target.checked)}
           className="size-4 accent-[#d4151e]"

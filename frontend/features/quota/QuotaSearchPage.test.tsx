@@ -196,4 +196,62 @@ describe("QuotaSearchPage", () => {
     await waitFor(() => expect(screen.queryByRole("article", { name: /EL395/ })).not.toBeInTheDocument());
     expect(screen.getByRole("article", { name: /CS232/ })).toBeInTheDocument();
   });
+
+  it("รีเซ็ตตัวกรองและผลค้นหาเมื่อแผนกลายเป็นว่าง พร้อมป้องกันผล request เก่ากลับมาทับ", async () => {
+    let resolveSearch!: (value: ReturnType<typeof searchResponse>) => void;
+    searchMock.mockReturnValue(new Promise((resolve) => { resolveSearch = resolve; }));
+
+    // 1. เริ่มต้นด้วยการมีวิชาในตาราง เช่น ["MA211"]
+    const { rerender } = render(
+      <QuotaSearchPage academicYear={2568} semester={1} myCourseCodes={["MA211"]} />
+    );
+
+    const checkbox = screen.getByRole("checkbox", { name: /เฉพาะวิชาในแผนของฉัน/ });
+    expect(checkbox).toBeEnabled();
+    expect(checkbox).not.toBeChecked();
+
+    // 2. ผู้ใช้ติ๊กตัวกรอง "เฉพาะวิชาในแผนของฉัน" ขณะที่คำขอกำลังส่ง
+    await userEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+    expect(screen.getByRole("status", { name: "กำลังโหลดข้อมูลโควตา" })).toBeInTheDocument();
+
+    // 3. การลบวิชาในตารางสำเร็จ แผนกลายเป็นว่าง (myCourseCodes เปลี่ยนเป็น [])
+    rerender(<QuotaSearchPage academicYear={2568} semester={1} myCourseCodes={[]} />);
+
+    // 4. Checkbox ต้องถูกรีเซ็ต (ไม่ติ๊ก) และถูก disabled
+    expect(checkbox).not.toBeChecked();
+    expect(checkbox).toBeDisabled();
+
+    // 5. ผลค้นหาถูกรีเซ็ตกลับสู่หน้า Guide ทันที
+    expect(screen.getByText(GUIDE_TITLE)).toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+
+    // 6. เมื่อ request เก่า (mine: true) ตอบกลับมาช้า ผลลัพธ์ต้องไม่กลับมาทับหน้าจอ
+    resolveSearch(searchResponse([COURSE_MA211], { mine: true }));
+    await waitFor(() => {
+      expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    });
+    expect(screen.getByText(GUIDE_TITLE)).toBeInTheDocument();
+  });
+
+  it("รีเซ็ตตัวกรองและลบการ์ดเดิมเมื่อแผนกลายเป็นว่างหลังจากโหลดผลสำเร็จแล้ว", async () => {
+    searchMock.mockResolvedValue(searchResponse([COURSE_MA211], { mine: true }));
+    const { rerender } = render(
+      <QuotaSearchPage academicYear={2568} semester={1} myCourseCodes={["MA211"]} />
+    );
+
+    const checkbox = screen.getByRole("checkbox", { name: /เฉพาะวิชาในแผนของฉัน/ });
+    await userEvent.click(checkbox);
+    expect(await screen.findByRole("article", { name: /MA211/ })).toBeInTheDocument();
+
+    // แผนกลายเป็นว่าง
+    rerender(<QuotaSearchPage academicYear={2568} semester={1} myCourseCodes={[]} />);
+
+    // การ์ดเดิมต้องหายไป กลับสู่หน้า Guide และ checkbox ต้องไม่ถูกติ๊ก + disabled
+    expect(checkbox).not.toBeChecked();
+    expect(checkbox).toBeDisabled();
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    expect(screen.getByText(GUIDE_TITLE)).toBeInTheDocument();
+  });
 });
