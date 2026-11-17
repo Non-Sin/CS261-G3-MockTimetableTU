@@ -29,14 +29,11 @@ export function useQuotaSearch({ academicYear, semester, myCourseCodes }: UseQuo
   // นับลำดับคำขอ เพื่อไม่ใช้ผลของคำขอเก่าที่ตอบกลับมาช้ากว่าคำขอใหม่
   const latestRequestId = useRef(0);
 
-  // เมื่อแผนการเรียนกลายเป็นว่าง ให้รีเซ็ตตัวกรองและผลค้นหากลับสู่สถานะเริ่มต้น
+  // เมื่อแผนการเรียนกลายเป็นว่าง ให้แสดงผลเสมือน mine=false และ state=idle
+  // โดยใช้ derived value แทนการ setState ระหว่าง render (ซึ่งละเมิด React Hooks rules)
   const hasPlan = (myCourseCodes?.length ?? 0) > 0;
-  if (myCourseCodes && !hasPlan && mine) {
-    latestRequestId.current += 1; // ทิ้งผลของคำขอที่ยังค้างอยู่ ป้องกันผลเก่ากลับมาทับ
-    setMine(false);
-    setInput("");
-    setState({ status: "idle" });
-  }
+  const effectiveMine = hasPlan ? mine : false;
+  const effectiveState: QuotaSearchState = hasPlan ? state : { status: "idle" };
 
   const run = useCallback(
     (request: QuotaRequest) => {
@@ -103,5 +100,5 @@ export function useQuotaSearch({ academicYear, semester, myCourseCodes }: UseQuo
     if (state.status === "error") run(state.request);
   };
 
-  return { input, setInput, mine, changeMine, state, search, clear, selectCourse, retry };
+  return { input, setInput, mine: effectiveMine, changeMine, state: effectiveState, search, clear, selectCourse, retry };
 }
