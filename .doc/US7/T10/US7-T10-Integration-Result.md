@@ -27,13 +27,13 @@
    - **การแก้ไข:** ปรับให้รีเซ็ตเป็น `idle` เฉพาะกรณี `!hasPlan` และคำขอก่อนหน้าเป็นคำขอแบบ `mine === true` (`isStaleMineSearch`) เพื่อให้ค้นหาด้วยคำค้นปกติและกดชิปรหัสวิชาได้แม้ตารางเรียนว่าง รวมถึงปรับ `clear()` ให้ใช้ `effectiveMine` และ `retry()` ให้ตรวจ `effectiveState.status === "error"`
 2. **ข้อมูล seed โควตาให้ตรงชีท (`backend/src/main/resources/db/seed/V20261118_0020__seed_quota_from_sheets.sql` + `QuotaMigrationTest.java`):**
    - **ปัญหา:** `V20261117_1812` มีเฉพาะ 6 วิชาตัวอย่าง โดยใส่ `EL295` เป็น `NOT_REQUIRED` (`0`) แทน `REQUIRED` และไม่ได้ใส่ข้อมูลวิชาต้องขอโควตาจากชีท (`EL105`, `ST216`, `AN347`, `FD216`, `IS313`, `TH291`, `EG214`, `FR205`, `JC217`, `AS201`, `PB317`) รวมถึงวิชา `CS*` / `โควตา=FALSE` ที่ต้องเป็น `NOT_REQUIRED`
-   - **การแก้ไข:** เพิ่มไฟล์ Flyway seed ใหม่ (ไม่แก้ไฟล์เดิมที่ merge แล้ว) เพื่อปรับ `EL295` เป็น `REQUIRED` และเติมข้อมูลจากชีทให้ครบ (ผูกกับ `academic_year = 2568` และคง `TU101` เป็น `NO_DATA` เพื่อกระทบระบบและเทสต์เดิมน้อยที่สุด) พร้อมอัปเดต `QuotaMigrationTest` ให้ตรวจจำนวนไฟล์หลัง `20261116.1734` เป็น `3`
+   - **การแก้ไข:** เพิ่มไฟล์ Flyway seed ใหม่ (ไม่แก้ไฟล์เดิมที่ merge แล้ว) เพื่อปรับ `EL295` เป็น `REQUIRED` และเติมข้อมูลจากชีทให้ครบ โดยผูกรอบคำร้องจากชีทไว้เฉพาะ **ภาคเรียนที่ 2 (`semester = 2`, `academic_year = 2568`)** ส่วนภาค 1 ของวิชาใหม่ (`EL295`, `EL105`, `ST216`, `FD216`, `IS313`, `TH291`, `EG214`) จะยังไม่มีรอบเพื่อให้หน้าเว็บแสดง *"ยังไม่ประกาศช่วงเวลายื่นคำร้องของภาคนี้"* (คงรอบภาค 1 เดิมของ `EL395`/`MA211`/`LAS101` และคง `TU101` เป็น `NO_DATA` เพื่อไม่กระทบเทสต์เดิม) พร้อมอัปเดต `QuotaMigrationTest` ให้ตรวจจำนวนไฟล์หลัง `20261116.1734` เป็น `3`
 
 ## 2. สภาพแวดล้อม
 
 - รันครบทั้งชุดด้วย `docker compose up -d --build` (`sqlserver`, `db-init`, `backend` profile `stub-tu`, `frontend` บน `http://localhost:3000`)
 - ทดสอบผ่านเบราว์เซอร์จริงที่ `http://localhost:3000` ด้วยบัญชี `6609000001` (มีตารางภาค 1/2568 7 วิชา) และ `6609000004` (ภาค 2/2568 ตารางว่าง 0 วิชา) และยิง API ตรงที่ `http://localhost:8080` สำหรับเส้นทางที่ UI บล็อกไว้ล่วงหน้า (`401`, `400` `QUOTA_SEARCH_QUERY_REQUIRED`, `semester=3`, `q` > 50 ตัวอักษร, `GET /api/quota/courses/DM201` → `404`)
-- ข้อมูลตัวอย่างโควตามาจาก Flyway seed `V20261117_1812__seed_quota_examples.sql` และ `V20261118_0020__seed_quota_from_sheets.sql` (และยืนยันหลังอัปเดต seed ผ่าน API จริงว่า `EL295`, `EL105`, `ST216`, `AN347`, `FD216`, `IS313`, `TH291`, `EG214` คืน `REQUIRED` พร้อมรอบ/ช่องทาง, `CS100`/`CS101`/`CS232`/`CS301` คืน `NOT_REQUIRED`, `TU101` คง `NO_DATA` และ `FR205` ภาค 2 คง `NOT_OFFERED`)
+- ข้อมูลตัวอย่างโควตามาจาก Flyway seed `V20261117_1812__seed_quota_examples.sql` และ `V20261118_0020__seed_quota_from_sheets.sql` (ยืนยันผ่าน API จริงทั้งภาค 1 และ 2: `EL295`, `FD216`, `IS313`, `TH291`, `EG214` คืน `REQUIRED` แบบ `rounds=[]` ในภาค 1 และคืนรอบตามชีทในภาค 2; `AN347` คืน `NOT_OFFERED` ในภาค 1 และ `REQUIRED` 4 รอบในภาค 2; `CS100`–`CS440` คืน `NOT_REQUIRED`; `TU101` คง `NO_DATA`; `FR205` ภาค 2 คง `NOT_OFFERED`; หมายเหตุ: `EL105` และ `ST216` ยังมี section เฉพาะภาค 1 ใน seed เดิมของ US8 จึงคืน `REQUIRED` (`rounds=[]`) ในภาค 1 และ `NOT_OFFERED` ในภาค 2)
 
 ## 3. ผลการทดสอบอัตโนมัติ
 
@@ -63,7 +63,7 @@
 
 | # | เส้นทาง | วิธีทดสอบ | ผลที่ได้ | สถานะ |
 | --- | --- | --- | --- | --- |
-| D-01 | กดชิปรหัสวิชาที่อ้างถึง (`EL295`) | UI ในการ์ด `EL395` กดปุ่มชิป `EL295` | ช่องค้นหาเปลี่ยนเป็น `EL295`, เรียก `GET /api/quota/courses/EL295` ได้ `200 OK`, แทนที่ด้วยการ์ด `EL295` (และหลังเติม seed `V20261118_0020` คืน `REQUIRED` 2 รอบ + LITU ตรงตามชีท) | PASS |
+| D-01 | กดชิปรหัสวิชาที่อ้างถึง (`EL295`) | UI ในการ์ด `EL395` กดปุ่มชิป `EL295` | ช่องค้นหาเปลี่ยนเป็น `EL295`, เรียก `GET /api/quota/courses/EL295` ได้ `200 OK`, แทนที่ด้วยการ์ด `EL295` (หลังเติม seed `V20261118_0020` คืน `REQUIRED`: ภาค 1 แสดง *"ยังไม่ประกาศช่วงเวลายื่นคำร้องของภาคนี้"* และภาค 2 แสดง 2 รอบ + LITU ตามชีท) | PASS |
 | D-02 | ดึงรายละเอียดวิชาไม่มีข้อมูล (`NO_DATA`) | API `GET /api/quota/courses/TU101?academicYear=2568&semester=1` | `200 OK` `quotaStatus: "NO_DATA"` (ไม่ใช่ 404) ตาม Sequence Diagram | PASS |
 | D-03 | ดึงรายละเอียดวิชาไม่เปิดในภาค (`NOT_OFFERED`) | API `GET /api/quota/courses/FR205?academicYear=2568&semester=2` | `200 OK` `quotaStatus: "NOT_OFFERED"` | PASS |
 | D-04 | ดึงรายละเอียดวิชาที่ไม่มีในตาราง `course` (`404`) | API `GET /api/quota/courses/DM201?academicYear=2568&semester=1` | `404 Not Found` (`detail: "ไม่พบรายวิชา DM201"`) | PASS |
