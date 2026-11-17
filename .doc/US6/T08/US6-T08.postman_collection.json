@@ -1,0 +1,1667 @@
+{
+  "info": {
+    "name": "US6-T08 Elective API",
+    "description": "ทดสอบ GET /api/electives และ GET /api/electives/{courseCode} ตาม US6-T05 DTO & API Spec, US6-T06 Sequence Diagram และ IT ของ US6-T13 กับข้อมูล seed จริง (V20261116_1734__seed_electives.sql ของ US6-T09 18 วิชา และ V20261014_2010__seed_courses_2568_1.sql)\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย profile stub-tu\n- บัญชี {{csUser}} เป็นนักศึกษา ภาควิชาวิทยาการคอมพิวเตอร์ ใน stub\n\nต้องรันตามลำดับ (Run collection) request 02–03 ล้างตาราง 2568/1 ของ {{csUser}} ก่อน และ 51–52 ล้างหลังจบ จึงรันซ้ำได้ sectionId อ่านจาก response ของ 04, 29, 30 ไม่ hard-code\n\nผลที่คาดหวังของรายการคำนวณจาก seed 18 วิชา (US6-T13 เขียนไว้สำหรับ 3 วิชา FR205, TH291, PY250)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 [IT-US6-30] GET /api/electives ไม่มี token → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail (ทุก endpoint ของ US6 ต้อง login)', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "01 POST login นักศึกษา CS (เตรียม token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ได้ token เป็น JWT', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const token = pm.response.json().token;",
+              "  pm.expect(token.split('.')).to.have.lengthOf(3);",
+              "  pm.collectionVariables.set('token', token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{csUser}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "02 [setup] GET ตาราง 2568/1 เก็บ entryId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 อ่านตาราง 2568/1', () => pm.response.to.have.status(200));",
+              "const ids = pm.response.json().entries.map(e => e.entryId);",
+              "pm.collectionVariables.set('entryIds', ids.join(','));",
+              "if (ids.length === 0) { postman.setNextRequest(\"04 [setup] GET /api/courses \\u0e2b\\u0e32 sectionId \\u0e02\\u0e2d\\u0e07 TU100 820001 \\u0e41\\u0e25\\u0e30 CS213 050001\"); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "03 [setup] DELETE ทุกวิชาให้ตารางว่าง (T-EMPTY)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ตารางว่าง', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().entries).to.have.lengthOf(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{entryIds}}"
+      }
+    },
+    {
+      "name": "04 [setup] GET /api/courses หา sectionId ของ TU100 820001 และ CS213 050001",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 พบ TU100 820001 และ CS213 050001 ใน seed', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const find = (code, no) => pm.response.json().find(c => c.courseCode === code).sections.find(s => s.sectionNo === no).sectionId;",
+              "  pm.collectionVariables.set('tu100Sec', find('TU100', '820001'));",
+              "  pm.collectionVariables.set('cs213Sec', find('CS213', '050001'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/courses?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "05 [IT-US6-01] ไม่มีตัวกรอง → 18 วิชาเรียงตามหมวดแล้วรหัส",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 \\u0e44\\u0e14\\u0e49 18 \\u0e27\\u0e34\\u0e0a\\u0e32\\u0e15\\u0e32\\u0e21\\u0e25\\u0e33\\u0e14\\u0e31\\u0e1a InterestGroup \\u0e41\\u0e25\\u0e49\\u0e27 courseCode\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"FR205\", \"TH291\", \"PY200\", \"PY250\", \"PY252\", \"PY320\", \"AN242\", \"AN347\", \"AS201\", \"GE225\", \"PB317\", \"AT326\", \"FD216\", \"IS313\", \"PC280\", \"JC217\", \"RE468\"]);",
+              "});",
+              "pm.test('ไม่มีวิชาที่ไม่ใช่วิชาเสรีแนะนำ (EL105, CS100, JP171)', () => {",
+              "  pm.expect(codes).to.not.include.members(['EL105', 'CS100', 'JP171']);",
+              "});",
+              "pm.test('นับต่อหมวด LANGUAGE 3, PSYCHOLOGY 4, SOCIETY 5, SCIENCE 4, MEDIA 2', () => {",
+              "  const count = g => body.filter(c => c.group === g).length;",
+              "  pm.expect([count('LANGUAGE'), count('PSYCHOLOGY'), count('SOCIETY'), count('SCIENCE'), count('MEDIA')]).to.eql([3, 4, 5, 4, 2]);",
+              "});",
+              "pm.test('[IT-US6-02] การ์ด FR205 / TH291 / PY250 ตาม Spec', () => {",
+              "  const c = code => body.find(x => x.courseCode === code);",
+              "  pm.expect(c('FR205')).to.eql({ courseCode: 'FR205', courseName: 'FRENCH FOR EVERYDAY LIFE', courseNameTh: 'ภาษาฝรั่งเศสในชีวิตประจำวัน', credits: 3, group: 'LANGUAGE', requiresQuota: true, offeredSemesters: [1], tags: ['KIND_INSTRUCTOR', 'NO_PREREQUISITE'] });",
+              "  pm.expect(c('TH291').offeredSemesters).to.eql([1, 2]);",
+              "  pm.expect(c('TH291').tags).to.eql(['NO_EXAM']);",
+              "  pm.expect(c('PY250').requiresQuota).to.eql(false);",
+              "  pm.expect(c('PY250').tags).to.eql(['NO_ATTENDANCE', 'NO_GROUP_WORK']);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "06 [IT-US6-03] q=py2 → รหัสขึ้นต้น ไม่สนตัวพิมพ์",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 [PY200, PY250, PY252] (PY320 \\u0e44\\u0e21\\u0e48\\u0e02\\u0e36\\u0e49\\u0e19\\u0e15\\u0e49\\u0e19\\u0e14\\u0e49\\u0e27\\u0e22 PY2)\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"PY200\", \"PY250\", \"PY252\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&q=py2"
+      }
+    },
+    {
+      "name": "07 [IT-US6-04] q=ฝรั่งเศส → ชื่อไทยมีคำนี้กลางชื่อ",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 [FR205]\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"FR205\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&q=%E0%B8%9D%E0%B8%A3%E0%B8%B1%E0%B9%88%E0%B8%87%E0%B9%80%E0%B8%A8%E0%B8%AA"
+      }
+    },
+    {
+      "name": "08 [IT-US6-04] q=everyday → คำขึ้นต้นในชื่ออังกฤษ",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 [FR205, FD216] (FOOD TECHNOLOGY IN EVERYDAY LIFE \\u0e01\\u0e47\\u0e21\\u0e35\\u0e04\\u0e33\\u0e19\\u0e35\\u0e49)\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"FR205\", \"FD216\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&q=everyday"
+      }
+    },
+    {
+      "name": "09 [IT-US6-04] q=DAY → อยู่กลางคำ EVERYDAY ไม่ใช่ต้นคำ",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 []\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&q=DAY"
+      }
+    },
+    {
+      "name": "10 [IT-US6-05] q=SA240 → 200 [] ไม่ใช่ 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 []\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&q=SA240"
+      }
+    },
+    {
+      "name": "11 [IT-US6-07] group=PSYCHOLOGY",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 \\u0e40\\u0e09\\u0e1e\\u0e32\\u0e30\\u0e2b\\u0e21\\u0e27\\u0e14\\u0e08\\u0e34\\u0e15\\u0e27\\u0e34\\u0e17\\u0e22\\u0e32 4 \\u0e27\\u0e34\\u0e0a\\u0e32\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"PY200\", \"PY250\", \"PY252\", \"PY320\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&group=PSYCHOLOGY"
+      }
+    },
+    {
+      "name": "12 [IT-US6-08] semester=2 (currentSemester ยังเป็น 1)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 13 \\u0e27\\u0e34\\u0e0a\\u0e32\\u0e17\\u0e35\\u0e48\\u0e21\\u0e35 Sec \\u0e20\\u0e32\\u0e04 2 \\u0e44\\u0e21\\u0e48\\u0e21\\u0e35 FR205 (\\u0e40\\u0e1b\\u0e34\\u0e14\\u0e40\\u0e09\\u0e1e\\u0e32\\u0e30\\u0e20\\u0e32\\u0e04 1)\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"TH291\", \"PY200\", \"PY250\", \"PY252\", \"PY320\", \"AN242\", \"AN347\", \"AS201\", \"PB317\", \"FD216\", \"IS313\", \"PC280\"]);",
+              "});",
+              "pm.test('offeredSemesters ไม่หดตามตัวกรอง (TH291 ยังเป็น [1, 2])', () => {",
+              "  pm.expect(body.find(c => c.courseCode === 'TH291').offeredSemesters).to.eql([1, 2]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&semester=2"
+      }
+    },
+    {
+      "name": "13 [IT-US6-09] day=TUESDAY&timeSlot=EVENING",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 [FR205] (\\u0e04\\u0e32\\u0e1a 16:30 \\u0e2d\\u0e22\\u0e39\\u0e48\\u0e0a\\u0e48\\u0e27\\u0e07\\u0e40\\u0e22\\u0e47\\u0e19)\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"FR205\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&day=TUESDAY&timeSlot=EVENING"
+      }
+    },
+    {
+      "name": "14 [IT-US6-09] day=THURSDAY&timeSlot=AFTERNOON",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 [EG214, TH291, PB317] (13:30 \\u0e2d\\u0e22\\u0e39\\u0e48\\u0e0a\\u0e48\\u0e27\\u0e07\\u0e1a\\u0e48\\u0e32\\u0e22)\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"TH291\", \"PB317\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&day=THURSDAY&timeSlot=AFTERNOON"
+      }
+    },
+    {
+      "name": "15 [IT-US6-10] day=TUESDAY&timeSlot=MORNING",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 \\u0e21\\u0e35 PY250 \\u0e08\\u0e32\\u0e01 Sec 230001 \\u0e20\\u0e32\\u0e04 2\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"PY250\", \"AT326\", \"IS313\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&day=TUESDAY&timeSlot=MORNING"
+      }
+    },
+    {
+      "name": "16 [IT-US6-10] day=TUESDAY&timeSlot=MORNING&semester=1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 PY250 \\u0e2b\\u0e32\\u0e22\\u0e40\\u0e1e\\u0e23\\u0e32\\u0e30\\u0e44\\u0e21\\u0e48\\u0e21\\u0e35 Sec \\u0e20\\u0e32\\u0e04 1 \\u0e17\\u0e35\\u0e48\\u0e40\\u0e23\\u0e35\\u0e22\\u0e19\\u0e2d\\u0e31\\u0e07\\u0e04\\u0e32\\u0e23\\u0e40\\u0e0a\\u0e49\\u0e32\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"AT326\", \"IS313\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&day=TUESDAY&timeSlot=MORNING&semester=1"
+      }
+    },
+    {
+      "name": "17 [IT-US6-11] day=MONDAY&timeSlot=MORNING → ต้องตรงในคาบเดียวกันของ Sec เดียวกัน",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 \\u0e44\\u0e21\\u0e48\\u0e21\\u0e35 PY250 (\\u0e21\\u0e35\\u0e04\\u0e32\\u0e1a\\u0e08\\u0e31\\u0e19\\u0e17\\u0e23\\u0e4c\\u0e1a\\u0e48\\u0e32\\u0e22\\u0e01\\u0e31\\u0e1a\\u0e2d\\u0e31\\u0e07\\u0e04\\u0e32\\u0e23\\u0e40\\u0e0a\\u0e49\\u0e32\\u0e04\\u0e19\\u0e25\\u0e30 Sec)\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"PY200\", \"FD216\", \"RE468\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&day=MONDAY&timeSlot=MORNING"
+      }
+    },
+    {
+      "name": "18 [IT-US6-12] excludeConflicts=true ตารางว่าง",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 15 \\u0e27\\u0e34\\u0e0a\\u0e32\\u0e17\\u0e35\\u0e48\\u0e21\\u0e35 Sec \\u0e20\\u0e32\\u0e04 1 (\\u0e44\\u0e21\\u0e48\\u0e21\\u0e35 AN242, AN347, PC280 \\u0e17\\u0e35\\u0e48\\u0e40\\u0e1b\\u0e34\\u0e14\\u0e40\\u0e09\\u0e1e\\u0e32\\u0e30\\u0e20\\u0e32\\u0e04 2)\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"FR205\", \"TH291\", \"PY200\", \"PY250\", \"PY252\", \"PY320\", \"AS201\", \"GE225\", \"PB317\", \"AT326\", \"FD216\", \"IS313\", \"JC217\", \"RE468\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&excludeConflicts=true"
+      }
+    },
+    {
+      "name": "19 [IT-US6-13] excludeConflicts=true&semester=2 → []",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 [] \\u0e44\\u0e21\\u0e48\\u0e43\\u0e0a\\u0e48 error\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&excludeConflicts=true&semester=2"
+      }
+    },
+    {
+      "name": "20 [IT-US6-35] day=SUNDAY → 200 []",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 [] \\u0e44\\u0e21\\u0e48\\u0e43\\u0e0a\\u0e48 400\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&day=SUNDAY"
+      }
+    },
+    {
+      "name": "21 [IT-US6-34] ไม่ส่ง academicYear → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail ไม่ใช่ 500', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?currentSemester=1"
+      }
+    },
+    {
+      "name": "22 [IT-US6-34] ไม่ส่ง currentSemester → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail ไม่ใช่ 500', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}"
+      }
+    },
+    {
+      "name": "23 [IT-US6-34] currentSemester=3 → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail ไม่ใช่ 500', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().detail).to.eql(\"currentSemester \\u0e15\\u0e49\\u0e2d\\u0e07\\u0e40\\u0e1b\\u0e47\\u0e19 1 \\u0e2b\\u0e23\\u0e37\\u0e2d 2\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=3"
+      }
+    },
+    {
+      "name": "24 [IT-US6-34] semester=3 → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail ไม่ใช่ 500', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().detail).to.eql(\"semester \\u0e15\\u0e49\\u0e2d\\u0e07\\u0e40\\u0e1b\\u0e47\\u0e19 1 \\u0e2b\\u0e23\\u0e37\\u0e2d 2\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&semester=3"
+      }
+    },
+    {
+      "name": "25 [IT-US6-34] day=FUNDAY → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail ไม่ใช่ 500', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&day=FUNDAY"
+      }
+    },
+    {
+      "name": "26 [IT-US6-34] timeSlot=NIGHT → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail ไม่ใช่ 500', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&timeSlot=NIGHT"
+      }
+    },
+    {
+      "name": "27 [IT-US6-34] group=SPORT → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail ไม่ใช่ 500', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&group=SPORT"
+      }
+    },
+    {
+      "name": "28 [IT-US6-34] excludeConflicts=maybe → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail ไม่ใช่ 500', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&excludeConflicts=maybe"
+      }
+    },
+    {
+      "name": "29 [IT-US6-18] GET /api/electives/PY250 ตารางว่าง",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d = pm.response.json();",
+              "pm.test('200 ข้อมูลวิชา หน่วยกิต ป้าย และรีวิว 4 ข้อ', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(d.courseNameTh).to.eql('จิตวิทยาบุคลิกภาพและการปรับตน');",
+              "  pm.expect(d.credits).to.eql(3);",
+              "  pm.expect(d.offeredSemesters).to.eql([1, 2]);",
+              "  pm.expect(d.description).to.have.lengthOf(4);",
+              "  pm.expect(d.description[2]).to.eql('ไม่มีงานกลุ่ม');",
+              "});",
+              "pm.test('Sec 820001 ภาค 1 เลือกได้ · Sec 230001 ภาค 2 เลือกไม่ได้ ห้อง null', () => {",
+              "  pm.expect(d.sections.map(s => [s.sectionNo, s.semester, s.selectable, s.inTimetable])).to.eql([['820001', 1, true, false], ['230001', 2, false, false]]);",
+              "  pm.expect(d.sections[0].schedules).to.eql([{ dayOfWeek: 'MONDAY', startTime: '13:30', endTime: '16:30', room: 'LC1-201' }]);",
+              "  pm.expect(d.sections[0].instructor).to.eql('อ.วรรณปรัชญ์ พิทักษ์ไพบูลย์กิจ');",
+              "  pm.expect(d.sections[1].schedules[0].room).to.eql(null);",
+              "  pm.expect(d.sections.every(s => s.conflictWith.length === 0)).to.be.true;",
+              "});",
+              "pm.collectionVariables.set('py250Sec1', d.sections[0].sectionId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/PY250?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "30 [IT-US6-19] GET /api/electives/FR205 ตารางว่าง",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d = pm.response.json();",
+              "pm.test('200 2 Sec ภาค 1 เลือกได้ทั้งคู่ ต้องขอโควตา', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(d.requiresQuota).to.be.true;",
+              "  pm.expect(d.sections.map(s => [s.sectionNo, s.semester, s.selectable, s.inTimetable, s.conflictWith.length])).to.eql([['260001', 1, true, false, 0], ['260002', 1, true, false, 0]]);",
+              "  pm.expect(d.sections.map(s => s.instructor)).to.eql(['ผศ.ธรณินทร์ มีเพียร', 'ผศ.นิธิ ศีลวัตกุล']);",
+              "});",
+              "pm.collectionVariables.set('fr205Sec1', d.sections[0].sectionId);",
+              "pm.collectionVariables.set('fr205Sec2', d.sections[1].sectionId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/FR205?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "31 [IT-US6-20] GET /api/electives/PY250 currentSemester=2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 เปิดตารางภาค 2: Sec 230001 เลือกได้ Sec 820001 เลือกไม่ได้', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().sections.map(s => [s.sectionNo, s.selectable])).to.eql([['820001', false], ['230001', true]]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/PY250?academicYear={{academicYear}}&currentSemester=2"
+      }
+    },
+    {
+      "name": "32 [IT-US6-32] GET /api/electives/SA240 → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 ProblemDetail', () => {",
+              "  pm.response.to.have.status(404);",
+              "  pm.expect(pm.response.json().detail).to.eql('ไม่พบวิชาเสรีแนะนำ: SA240');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/SA240?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "33 [IT-US6-32] GET /api/electives/EL105 → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 ProblemDetail', () => {",
+              "  pm.response.to.have.status(404);",
+              "  pm.expect(pm.response.json().detail).to.eql('ไม่พบวิชาเสรีแนะนำ: EL105');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/EL105?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "34 [IT-US6-32] GET /api/electives/CS100 → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 ProblemDetail', () => {",
+              "  pm.response.to.have.status(404);",
+              "  pm.expect(pm.response.json().detail).to.eql('ไม่พบวิชาเสรีแนะนำ: CS100');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/CS100?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "35 [IT-US6-35] GET /api/electives/PY250 currentSemester=3 → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail ไม่ใช่ 500', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "  pm.expect(pm.response.json().detail).to.eql(\"currentSemester \\u0e15\\u0e49\\u0e2d\\u0e07\\u0e40\\u0e1b\\u0e47\\u0e19 1 \\u0e2b\\u0e23\\u0e37\\u0e2d 2\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/PY250?academicYear={{academicYear}}&currentSemester=3"
+      }
+    },
+    {
+      "name": "36 [setup T-TU100] POST TU100 820001",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 ' + pm.info.requestName, () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sectionId\": {{tu100Sec}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "37 [IT-US6-15] T-TU100 excludeConflicts=true",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 \\u0e44\\u0e21\\u0e48\\u0e21\\u0e35 PY250 (Sec \\u0e20\\u0e32\\u0e04 1 \\u0e08\\u0e31\\u0e19\\u0e17\\u0e23\\u0e4c 13:30\\u201316:30 \\u0e0a\\u0e19 TU100)\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"FR205\", \"TH291\", \"PY200\", \"PY252\", \"PY320\", \"AS201\", \"GE225\", \"PB317\", \"AT326\", \"FD216\", \"IS313\", \"JC217\", \"RE468\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&excludeConflicts=true"
+      }
+    },
+    {
+      "name": "38 [IT-US6-21] T-TU100 GET /api/electives/PY250",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 Sec 820001 conflictWith [TU100] แต่ยังเลือกได้ · Sec 230001 []', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().sections.map(s => [s.sectionNo, s.selectable, s.conflictWith])).to.eql([['820001', true, ['TU100']], ['230001', false, []]]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/PY250?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "39 [IT-US6-24] T-TU100 POST PY250 820001 → 201 พร้อม conflicts",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 ' + pm.info.requestName, () => pm.response.to.have.status(201));",
+              "pm.test('เวลาชนไม่ block: conflicts จันทร์ 13:30–16:30 TU100 กับ PY250', () => {",
+              "  const c = pm.response.json().conflicts;",
+              "  pm.expect(c).to.have.lengthOf(1);",
+              "  pm.expect([c[0].dayOfWeek, c[0].overlapStart, c[0].overlapEnd]).to.eql(['MONDAY', '13:30', '16:30']);",
+              "  pm.expect(c[0].courseCodes).to.have.members(['TU100', 'PY250']);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sectionId\": {{py250Sec1}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "40 [IT-US6-21] หลังเพิ่ม GET /api/electives/PY250 → inTimetable",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 Sec 820001 inTimetable true', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().sections.map(s => s.inTimetable)).to.eql([true, false]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/PY250?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "41 [setup] GET ตาราง 2568/1 เก็บ entryId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 อ่านตาราง 2568/1', () => pm.response.to.have.status(200));",
+              "const ids = pm.response.json().entries.map(e => e.entryId);",
+              "pm.collectionVariables.set('entryIds', ids.join(','));",
+              "if (ids.length === 0) { postman.setNextRequest(\"43 [setup T-CS213] POST CS213 050001\"); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "42 [setup] DELETE ทุกวิชาให้ตารางว่าง (T-EMPTY)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ตารางว่าง', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().entries).to.have.lengthOf(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{entryIds}}"
+      }
+    },
+    {
+      "name": "43 [setup T-CS213] POST CS213 050001",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 ' + pm.info.requestName, () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sectionId\": {{cs213Sec}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "44 [IT-US6-16] T-CS213 excludeConflicts=true",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 FR205 \\u0e2d\\u0e22\\u0e39\\u0e48 (16:30 \\u0e15\\u0e48\\u0e2d\\u0e01\\u0e31\\u0e19\\u0e1e\\u0e2d\\u0e14\\u0e35) \\u0e15\\u0e31\\u0e14 TH291 / PB317 / JC217 / PY320 \\u0e17\\u0e35\\u0e48\\u0e0a\\u0e19 \\u0e2d\\u0e31\\u0e07\\u0e04\\u0e32\\u0e23/\\u0e1e\\u0e24\\u0e2b\\u0e31\\u0e2a 15:00\\u201316:30\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"FR205\", \"PY200\", \"PY250\", \"PY252\", \"AS201\", \"GE225\", \"AT326\", \"FD216\", \"IS313\", \"RE468\"]);",
+              "});",
+              "pm.test('EG214 ยังอยู่ เพราะมี Sec อื่นที่ไม่ชน', () => pm.expect(codes).to.include('EG214'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&excludeConflicts=true"
+      }
+    },
+    {
+      "name": "45 [setup] GET ตาราง 2568/1 เก็บ entryId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 อ่านตาราง 2568/1', () => pm.response.to.have.status(200));",
+              "const ids = pm.response.json().entries.map(e => e.entryId);",
+              "pm.collectionVariables.set('entryIds', ids.join(','));",
+              "if (ids.length === 0) { postman.setNextRequest(\"47 [IT-US6-23] T-EMPTY POST FR205 260001 \\u2192 201\"); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "46 [setup] DELETE ทุกวิชาให้ตารางว่าง (T-EMPTY)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ตารางว่าง', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().entries).to.have.lengthOf(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{entryIds}}"
+      }
+    },
+    {
+      "name": "47 [IT-US6-23] T-EMPTY POST FR205 260001 → 201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 ' + pm.info.requestName, () => pm.response.to.have.status(201));",
+              "pm.test('ตาราง 2568/1 มี FR205 อังคาร/พฤหัส 16:30–18:00', () => {",
+              "  const e = pm.response.json().entries.find(x => x.courseCode === 'FR205');",
+              "  pm.expect(e.sectionNo).to.eql('260001');",
+              "  pm.expect(e.schedules.map(s => [s.dayOfWeek, s.startTime, s.endTime])).to.eql([['TUESDAY', '16:30', '18:00'], ['THURSDAY', '16:30', '18:00']]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sectionId\": {{fr205Sec1}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "48 [IT-US6-22] T-FR205 GET /api/electives/FR205",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 Sec 260001 inTimetable · conflictWith ว่างทั้ง 2 Sec (ข้ามวิชาเดียวกัน)', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().sections.map(s => [s.sectionNo, s.inTimetable, s.conflictWith])).to.eql([['260001', true, []], ['260002', false, []]]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives/FR205?academicYear={{academicYear}}&currentSemester=1"
+      }
+    },
+    {
+      "name": "49 [IT-US6-17][IT-US6-25] T-FR205 excludeConflicts=true",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 \\u0e44\\u0e21\\u0e48\\u0e21\\u0e35 FR205 (\\u0e2d\\u0e22\\u0e39\\u0e48\\u0e43\\u0e19\\u0e15\\u0e32\\u0e23\\u0e32\\u0e07\\u0e41\\u0e25\\u0e49\\u0e27) \\u0e41\\u0e21\\u0e49 Sec 260002 \\u0e44\\u0e21\\u0e48\\u0e0a\\u0e19\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"TH291\", \"PY200\", \"PY250\", \"PY252\", \"PY320\", \"AS201\", \"GE225\", \"PB317\", \"AT326\", \"FD216\", \"IS313\", \"JC217\", \"RE468\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&excludeConflicts=true"
+      }
+    },
+    {
+      "name": "50 [IT-US6-27] T-FR205 POST FR205 260002 → 409",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('409 ' + pm.info.requestName, () => pm.response.to.have.status(409));",
+              "pm.test('409 COURSE_ALREADY_IN_TIMETABLE พร้อม detail', () => {",
+              "  const p = pm.response.json();",
+              "  pm.expect(p.code).to.eql('COURSE_ALREADY_IN_TIMETABLE');",
+              "  pm.expect(p.detail).to.eql('FR205 อยู่ในตารางแล้ว (Sec 260001) 1 วิชาเพิ่มได้ 1 กลุ่มเรียน');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sectionId\": {{fr205Sec2}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "51 [setup] GET ตาราง 2568/1 เก็บ entryId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 อ่านตาราง 2568/1', () => pm.response.to.have.status(200));",
+              "const ids = pm.response.json().entries.map(e => e.entryId);",
+              "pm.collectionVariables.set('entryIds', ids.join(','));",
+              "if (ids.length === 0) { postman.setNextRequest(\"53 \\u0e08\\u0e1a: GET /api/electives?excludeConflicts=true \\u0e01\\u0e25\\u0e31\\u0e1a\\u0e40\\u0e1b\\u0e47\\u0e19 15 \\u0e27\\u0e34\\u0e0a\\u0e32\"); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "52 [setup] DELETE ทุกวิชาให้ตารางว่าง (T-EMPTY)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ตารางว่าง', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().entries).to.have.lengthOf(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{entryIds}}"
+      }
+    },
+    {
+      "name": "53 จบ: GET /api/electives?excludeConflicts=true กลับเป็น 15 วิชา",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const codes = body.map(c => c.courseCode);",
+              "pm.test(\"200 \\u0e15\\u0e32\\u0e23\\u0e32\\u0e07\\u0e27\\u0e48\\u0e32\\u0e07\\u0e41\\u0e25\\u0e49\\u0e27 \\u0e23\\u0e31\\u0e19\\u0e0b\\u0e49\\u0e33\\u0e44\\u0e14\\u0e49\", () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(codes).to.eql([\"EG214\", \"FR205\", \"TH291\", \"PY200\", \"PY250\", \"PY252\", \"PY320\", \"AS201\", \"GE225\", \"PB317\", \"AT326\", \"FD216\", \"IS313\", \"JC217\", \"RE468\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/electives?academicYear={{academicYear}}&currentSemester=1&excludeConflicts=true"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "csUser",
+      "value": "6609000001"
+    },
+    {
+      "key": "password",
+      "value": "Passw0rd!"
+    },
+    {
+      "key": "academicYear",
+      "value": "2568"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "entryIds",
+      "value": ""
+    },
+    {
+      "key": "tu100Sec",
+      "value": ""
+    },
+    {
+      "key": "cs213Sec",
+      "value": ""
+    },
+    {
+      "key": "py250Sec1",
+      "value": ""
+    },
+    {
+      "key": "fr205Sec1",
+      "value": ""
+    },
+    {
+      "key": "fr205Sec2",
+      "value": ""
+    }
+  ]
+}

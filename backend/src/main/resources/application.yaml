@@ -45,6 +45,10 @@ app:
   timetable:
     max-credits: 22                    # หน่วยกิตสูงสุดต่อภาคเรียน (CREDIT_LIMIT_EXCEEDED)
 
+  # --- Study plan (US8) ---
+  study-plan:
+    max-search-nodes: 50000            # เพดาน node ของ backtracking ใน PlanScheduler (ถึงแล้วคืนคำตอบดีที่สุดที่เจอ)
+
   # --- Login (US3) ---
   auth:
     max-attempts: 5                    # รหัสผิดติดต่อกันกี่ครั้งถึงล็อก (ACCOUNT_LOCKED)

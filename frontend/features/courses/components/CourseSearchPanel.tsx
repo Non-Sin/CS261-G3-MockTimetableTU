@@ -145,6 +145,7 @@ const CourseSearchPanel = ({
         <option value="MAJOR">วิชาเฉพาะ</option>
         <option value="GENERAL_EDUCATION">ศึกษาทั่วไป</option>
         <option value="FREE_ELECTIVE">วิชาเลือกเสรี</option>
+        <option value="MINOR">วิชาโท</option>
       </select>
 
       {coursesError && (

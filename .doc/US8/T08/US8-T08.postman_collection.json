@@ -1,0 +1,1013 @@
+{
+  "info": {
+    "name": "US8-T08 Study Plan API",
+    "description": "ทดสอบ GET /api/study-plans และ POST /api/timetable/apply-plan ตาม US8-T05 DTO & API Spec, US8-T06 Sequence Diagram และ IT ของ US8-T13 กับข้อมูล seed จริง (V20261114_2100__seed_study_plans.sql, V20261014_2010__seed_courses_2568_1.sql)\n\nPreconditions:\n- backend รันที่ {{baseUrl}} ด้วย profile stub-tu\n- บัญชี {{csUser}} เป็นนักศึกษา ภาควิชาวิทยาการคอมพิวเตอร์ ใน stub\n\nต้องรันตามลำดับ (Run collection) request 02–03 ล้างตาราง 2568/1 ของ {{csUser}} ก่อน และ 23–24 ล้างหลังจบ จึงรันซ้ำได้ planId / minorId อ่านจาก response ของ 04–05 ไม่ hard-code",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 GET /api/study-plans ไม่มี token → 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 ProblemDetail (ทุก endpoint ของ US8 ต้อง login)', () => {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/study-plans?studyYear=2&semester=1"
+      }
+    },
+    {
+      "name": "01 POST login นักศึกษา CS (เตรียม token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ได้ token เป็น JWT', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const token = pm.response.json().token;",
+              "  pm.expect(token.split('.')).to.have.lengthOf(3);",
+              "  pm.collectionVariables.set('token', token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{csUser}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "02 [setup] GET ตาราง 2568/1 เก็บ entryId ที่ค้างจากรอบก่อน",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 อ่านตาราง 2568/1 ของ {{csUser}}', () => pm.response.to.have.status(200));",
+              "const ids = pm.response.json().entries.map(e => e.entryId);",
+              "pm.collectionVariables.set('entryIds', ids.join(','));",
+              "pm.collectionVariables.set('updatedAtBefore', String(pm.response.json().updatedAt));",
+              "// ไม่มีวิชาในตาราง → ข้าม request ลบ",
+              "if (ids.length === 0) { postman.setNextRequest('04 [IT-US8-01] GET ชั้นปี 2 ภาค 1 → แผนเดียว planType null ไม่มีวิชาโท'); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "03 [setup] DELETE วิชาที่ค้าง ให้ตารางว่างก่อนทดสอบ",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ลบทุกวิชาแล้วตารางว่าง', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().entries).to.have.lengthOf(0);",
+              "});",
+              "pm.collectionVariables.set('updatedAtBefore', String(pm.response.json().updatedAt));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{entryIds}}"
+      }
+    },
+    {
+      "name": "04 [IT-US8-01] GET ชั้นปี 2 ภาค 1 → แผนเดียว planType null ไม่มีวิชาโท",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('200 กรองด้วย department ของนักศึกษา + ชั้นปี/ภาคที่ส่ง', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(body.department).to.eql('ภาควิชาวิทยาการคอมพิวเตอร์');",
+              "  pm.expect(body.studyYear).to.eql(2);",
+              "  pm.expect(body.semester).to.eql(1);",
+              "  pm.expect(body.plans).to.have.lengthOf(1);",
+              "});",
+              "pm.test('ส่ง \"planType\": null ใน JSON (ไม่ตัดทิ้ง) และ minors ว่าง', () => {",
+              "  pm.expect(pm.response.text()).to.include('\"planType\":null');",
+              "  pm.expect(body.minors).to.eql([]);",
+              "});",
+              "pm.test('totalCredits = ผลรวม credits ของ courses', () => {",
+              "  const p = body.plans[0];",
+              "  pm.expect(p.totalCredits).to.eql(p.courses.reduce((s, c) => s + c.credits, 0));",
+              "  pm.expect(p.courses[0]).to.have.all.keys('courseCode', 'courseName', 'category', 'credits');",
+              "});",
+              "pm.collectionVariables.set('planY2S1', body.plans[0].planId);",
+              "pm.collectionVariables.set('planY2S1Count', body.plans[0].courses.length);",
+              "pm.collectionVariables.set('planY2S1Credits', body.plans[0].totalCredits);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/study-plans?studyYear=2&semester=1"
+      }
+    },
+    {
+      "name": "05 [IT-US8-02] GET ชั้นปี 3 ภาค 1 → 2 แผน และวิชาโทแยกตามแผน",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('200 ได้ทั้ง 2 แผน เรียง SPECIAL_PROJECT → CO_OP', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(body.plans.map(p => p.planType)).to.eql(['SPECIAL_PROJECT', 'CO_OP']);",
+              "});",
+              "pm.test('วิชาโท 1 รายการต่อ 1 วิชาโท × 1 แผน', () => {",
+              "  body.minors.forEach(m => pm.expect(['SPECIAL_PROJECT', 'CO_OP']).to.include(m.planType));",
+              "  const ds = body.minors.filter(m => m.minorName === 'วิทยาการข้อมูล');",
+              "  pm.expect(ds.map(m => m.planType)).to.eql(['SPECIAL_PROJECT', 'CO_OP']);",
+              "  pm.expect(ds[0].minorId).to.eql(ds[1].minorId);",
+              "});",
+              "pm.test('CS440 อยู่เฉพาะรายการ CO_OP ของวิชาโทวิทยาการข้อมูล (วิชาโทขึ้นกับแผน)', () => {",
+              "  const ds = body.minors.filter(m => m.minorName === 'วิทยาการข้อมูล');",
+              "  const codes = t => ds.find(m => m.planType === t).courses.map(c => c.courseCode);",
+              "  pm.expect(codes('CO_OP')).to.include('CS440');",
+              "  pm.expect(codes('SPECIAL_PROJECT')).to.not.include('CS440');",
+              "  ds.forEach(m => pm.expect(m.totalCredits).to.eql(m.courses.reduce((s, c) => s + c.credits, 0)));",
+              "});",
+              "pm.collectionVariables.set('planY3S1SP', body.plans.find(p => p.planType === 'SPECIAL_PROJECT').planId);",
+              "pm.collectionVariables.set('planY3S1CO', body.plans.find(p => p.planType === 'CO_OP').planId);",
+              "pm.collectionVariables.set('minorDS', body.minors.find(m => m.minorName === 'วิทยาการข้อมูล').minorId);",
+              "pm.collectionVariables.set('minorAI', body.minors.find(m => m.minorName === 'ปัญญาประดิษฐ์').minorId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/study-plans?studyYear=3&semester=1"
+      }
+    },
+    {
+      "name": "06 [IT-US8-04] GET ชั้นปี 4 ภาค 1 → วิชาโทมีเฉพาะแผนหัวข้อพิเศษ",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('200 แผนสหกิจไม่มีวิชาโทในภาคนี้ จึงไม่มีรายการ CO_OP', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(body.minors.length).to.be.above(0);",
+              "  body.minors.forEach(m => pm.expect(m.planType).to.eql('SPECIAL_PROJECT'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/study-plans?studyYear=4&semester=1"
+      }
+    },
+    {
+      "name": "07 [IT-US8-03] GET ชั้นปี 4 ภาค 2 → plans ว่าง ไม่ใช่ error",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 plans: [] และ minors: []', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().plans).to.eql([]);",
+              "  pm.expect(pm.response.json().minors).to.eql([]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/study-plans?studyYear=4&semester=2"
+      }
+    },
+    {
+      "name": "08 [IT-US8-28] GET studyYear=5 → 400 ไม่ใช่ 500",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ProblemDetail (ห้ามใส่ @Validated ที่ controller)', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/problem+json');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/study-plans?studyYear=5&semester=1"
+      }
+    },
+    {
+      "name": "09 GET ไม่ส่ง studyYear → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 ไม่ส่ง param ที่บังคับ', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/study-plans?semester=1"
+      }
+    },
+    {
+      "name": "10 [IT-US8-06] POST dryRun แผนปี 2/1 ตารางว่าง → เพิ่มได้ทุกวิชา",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('200 dryRun: true, timetable: null, minorId: null (ส่ง null ใน JSON)', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(body.dryRun).to.eql(true);",
+              "  pm.expect(body.planId).to.eql(Number(pm.collectionVariables.get('planY2S1')));",
+              "  pm.expect(pm.response.text()).to.include('\"timetable\":null');",
+              "  pm.expect(pm.response.text()).to.include('\"minorId\":null');",
+              "});",
+              "pm.test('ทุกวิชาของแผนอยู่ใน added พร้อม section และ source PLAN, skipped ว่าง', () => {",
+              "  pm.expect(body.added).to.have.lengthOf(Number(pm.collectionVariables.get('planY2S1Count')));",
+              "  body.added.forEach(a => {",
+              "    pm.expect(a.source).to.eql('PLAN');",
+              "    pm.expect(a.sectionId).to.be.a('number');",
+              "    pm.expect(a.sectionNo).to.be.a('string');",
+              "  });",
+              "  pm.expect(body.skipped).to.eql([]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": {{planY2S1}},\n  \"academicYear\": {{academicYear}},\n  \"dryRun\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "11 [IT-US8-22] GET ตารางหลัง dryRun → ไม่เปลี่ยน (ไม่เขียน DB)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 entries ยังว่าง และ updatedAt เท่ากับหลัง setup (ไม่เขียน DB)', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().entries).to.have.lengthOf(0);",
+              "  pm.expect(String(pm.response.json().updatedAt)).to.eql(pm.collectionVariables.get('updatedAtBefore'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "12 [IT-US8-07] POST dryRun แผนสหกิจปี 3/1 + วิชาโทวิทยาการข้อมูล → ได้ CS440 (MINOR)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('200 minorId ส่งกลับตาม request', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(body.minorId).to.eql(Number(pm.collectionVariables.get('minorDS')));",
+              "});",
+              "pm.test('CS440 อยู่ใน added เป็น source MINOR และวิชาของแผนหลักมาก่อนวิชาโท', () => {",
+              "  const cs440 = body.added.find(a => a.courseCode === 'CS440');",
+              "  pm.expect(cs440, 'CS440').to.exist;",
+              "  pm.expect(cs440.source).to.eql('MINOR');",
+              "  const sources = body.added.map(a => a.source);",
+              "  pm.expect(sources.indexOf('MINOR')).to.be.above(sources.lastIndexOf('PLAN'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": {{planY3S1CO}},\n  \"minorId\": {{minorDS}},\n  \"academicYear\": {{academicYear}},\n  \"dryRun\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "13 POST dryRun แผนหัวข้อพิเศษปี 3/1 + วิชาโทเดียวกัน → ไม่มี CS440",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('200 วิชาโทใช้วิชาของ planType ของ preset เท่านั้น', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const codes = body.added.concat(body.skipped).map(c => c.courseCode);",
+              "  pm.expect(codes).to.not.include('CS440');",
+              "  pm.expect(body.added.filter(a => a.source === 'MINOR').length).to.be.above(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": {{planY3S1SP}},\n  \"minorId\": {{minorDS}},\n  \"academicYear\": {{academicYear}},\n  \"dryRun\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "14 [IT-US8-11] POST dryRun แผนสหกิจปี 3/1 + วิชาโทปัญญาประดิษฐ์ → CS371 ไม่เปิดสอน",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('200 CS371 เป็น NO_SECTION_AVAILABLE source MINOR ไม่มี field เสริม', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const s = body.skipped.find(x => x.courseCode === 'CS371');",
+              "  pm.expect(s, 'CS371').to.exist;",
+              "  pm.expect(s.reason).to.eql('NO_SECTION_AVAILABLE');",
+              "  pm.expect(s.source).to.eql('MINOR');",
+              "  pm.expect(s.message).to.eql('CS371 ไม่เปิดสอนในภาคเรียนนี้');",
+              "  pm.expect(s).to.not.have.any.keys('conflictWith', 'existingSectionNo', 'currentCredits', 'maxCredits');",
+              "});",
+              "pm.test('วิชาอื่นยังเพิ่มได้ตามปกติ (ไม่ fail ทั้งชุด)', () => pm.expect(body.added.length).to.be.above(0));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": {{planY3S1CO}},\n  \"minorId\": {{minorAI}},\n  \"academicYear\": {{academicYear}},\n  \"dryRun\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "15 [IT-US8-23] POST minorId กับแผนชั้นปี 2 (ยืนยัน) → 400 MINOR_NOT_ALLOWED",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 code MINOR_NOT_ALLOWED', () => {",
+              "  pm.response.to.have.status(400);",
+              "  pm.expect(pm.response.json().code).to.eql('MINOR_NOT_ALLOWED');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": {{planY2S1}},\n  \"minorId\": {{minorDS}},\n  \"academicYear\": {{academicYear}},\n  \"dryRun\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "16 GET ตารางหลัง 400 → ไม่เปลี่ยน (ไม่เขียน DB)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 entries ยังว่าง และ updatedAt เท่ากับหลัง setup (ไม่เขียน DB)', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().entries).to.have.lengthOf(0);",
+              "  pm.expect(String(pm.response.json().updatedAt)).to.eql(pm.collectionVariables.get('updatedAtBefore'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "17 [IT-US8-25] POST ไม่ส่ง planId และ academicYear → 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 errors ระบุ field ที่ขาด', () => {",
+              "  pm.response.to.have.status(400);",
+              "  const errors = pm.response.json().errors;",
+              "  pm.expect(errors).to.have.property('planId');",
+              "  pm.expect(errors).to.have.property('academicYear');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dryRun\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "18 [IT-US8-26] POST planId ไม่มีในระบบ → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 ProblemDetail', () => {",
+              "  pm.response.to.have.status(404);",
+              "  pm.expect(pm.response.json().detail).to.include('999999');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": 999999,\n  \"academicYear\": {{academicYear}},\n  \"dryRun\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "19 [IT-US8-26] POST minorId ไม่มีในระบบ → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 ProblemDetail', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": {{planY3S1SP}},\n  \"minorId\": 999999,\n  \"academicYear\": {{academicYear}},\n  \"dryRun\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "20 [IT-US8-16][IT-US8-20] POST ยืนยันแผนปี 2/1 (ไม่ส่ง dryRun) → สร้างตารางและบันทึก",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('200 ไม่ส่ง dryRun = false และคืน TimetableResponse ของ US1', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(body.dryRun).to.eql(false);",
+              "  pm.expect(body.timetable).to.be.an('object');",
+              "  pm.expect(body.timetable.academicYear).to.eql(Number(pm.collectionVariables.get('academicYear')));",
+              "  pm.expect(body.timetable.semester).to.eql(1);",
+              "  pm.expect(body.timetable.updatedAt).to.be.a('string');",
+              "});",
+              "pm.test('timetable มีทุกวิชาที่ added ตรง section และหน่วยกิตรวมถูกต้อง', () => {",
+              "  const entries = body.timetable.entries;",
+              "  pm.expect(entries).to.have.lengthOf(body.added.length);",
+              "  body.added.forEach(a => pm.expect(entries.map(e => e.sectionId)).to.include(a.sectionId));",
+              "  pm.expect(body.timetable.totalCredits).to.eql(Number(pm.collectionVariables.get('planY2S1Credits')));",
+              "  pm.expect(body.timetable.conflicts).to.eql([]);",
+              "});",
+              "pm.collectionVariables.set('updatedAtAfterConfirm', body.timetable.updatedAt);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": {{planY2S1}},\n  \"academicYear\": {{academicYear}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "21 [IT-US8-21][IT-US8-19][IT-US8-08] POST ยืนยันซ้ำ → ไม่เพิ่มซ้ำ และไม่เขียน DB",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "pm.test('200 added ว่าง ทุกวิชาเป็น COURSE_ALREADY_IN_TIMETABLE พร้อม existingSectionNo', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(body.added).to.eql([]);",
+              "  pm.expect(body.skipped).to.have.lengthOf(Number(pm.collectionVariables.get('planY2S1Count')));",
+              "  body.skipped.forEach(s => {",
+              "    pm.expect(s.reason).to.eql('COURSE_ALREADY_IN_TIMETABLE');",
+              "    pm.expect(s.message).to.eql(`${s.courseCode} อยู่ในตารางแล้ว (Sec ${s.existingSectionNo})`);",
+              "  });",
+              "});",
+              "pm.test('added ว่างจึงไม่เขียน DB: entries เท่าเดิม และ updatedAt ไม่เปลี่ยน', () => {",
+              "  pm.expect(body.timetable.entries).to.have.lengthOf(Number(pm.collectionVariables.get('planY2S1Count')));",
+              "  pm.expect(body.timetable.updatedAt).to.eql(pm.collectionVariables.get('updatedAtAfterConfirm'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": {{planY2S1}},\n  \"academicYear\": {{academicYear}},\n  \"dryRun\": false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "22 [IT-US8-09][IT-US8-10][IT-US8-17] POST dryRun แผนหัวข้อพิเศษปี 3/1 + วิชาโท ทับตารางปี 2 → ชน / หน่วยกิตเกิน",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const existing = Number(pm.collectionVariables.get('planY2S1Credits'));",
+              "pm.test('200 มีวิชาที่ข้ามเพราะเวลาชน พร้อม conflictWith และ message', () => {",
+              "  pm.response.to.have.status(200);",
+              "  const conflicts = body.skipped.filter(s => s.reason === 'TIME_CONFLICT');",
+              "  pm.expect(conflicts.length).to.be.above(0);",
+              "  conflicts.forEach(s => {",
+              "    pm.expect(s.conflictWith.length).to.be.above(0);",
+              "    pm.expect(s.message).to.eql(`${s.courseCode} ทุกกลุ่มเรียนเวลาชนกับ ${s.conflictWith.join(', ')}`);",
+              "    pm.expect(s).to.not.have.any.keys('existingSectionNo', 'currentCredits', 'maxCredits');",
+              "  });",
+              "});",
+              "pm.test('มีวิชาที่ข้ามเพราะหน่วยกิตเกิน 22 พร้อม currentCredits / maxCredits', () => {",
+              "  const added = body.added.reduce((s, a) => s + a.credits, 0);",
+              "  const over = body.skipped.filter(s => s.reason === 'CREDIT_LIMIT_EXCEEDED');",
+              "  pm.expect(over.length).to.be.above(0);",
+              "  over.forEach(s => {",
+              "    pm.expect(s.maxCredits).to.eql(22);",
+              "    pm.expect(s.currentCredits).to.eql(existing + added);",
+              "    pm.expect(s.currentCredits + s.credits).to.be.above(22);",
+              "    pm.expect(s).to.not.have.property('conflictWith');",
+              "  });",
+              "});",
+              "pm.test('วิชาที่เพิ่มไม่ทำให้หน่วยกิตรวมเกิน 22 และ timetable เป็น null', () => {",
+              "  pm.expect(existing + body.added.reduce((s, a) => s + a.credits, 0)).to.be.at.most(22);",
+              "  pm.expect(body.timetable).to.eql(null);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/apply-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"planId\": {{planY3S1SP}},\n  \"minorId\": {{minorDS}},\n  \"academicYear\": {{academicYear}},\n  \"dryRun\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "23 [cleanup] GET ตาราง 2568/1 เก็บ entryId",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 อ่านตาราง 2568/1 ของ {{csUser}}', () => pm.response.to.have.status(200));",
+              "const ids = pm.response.json().entries.map(e => e.entryId);",
+              "pm.collectionVariables.set('entryIds', ids.join(','));",
+              "pm.collectionVariables.set('updatedAtBefore', String(pm.response.json().updatedAt));",
+              "// ไม่มีวิชาในตาราง → ข้าม request ลบ",
+              "if (ids.length === 0) { postman.setNextRequest(null); }"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable?academicYear={{academicYear}}&semester=1"
+      }
+    },
+    {
+      "name": "24 [cleanup] DELETE วิชาที่ทดสอบ คืนตารางว่าง",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 ลบทุกวิชาแล้วตารางว่าง', () => {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().entries).to.have.lengthOf(0);",
+              "});",
+              "pm.collectionVariables.set('updatedAtBefore', String(pm.response.json().updatedAt));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/timetable/entries?entryIds={{entryIds}}"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "csUser",
+      "value": "6609000001"
+    },
+    {
+      "key": "password",
+      "value": "Passw0rd!"
+    },
+    {
+      "key": "academicYear",
+      "value": "2568"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "entryIds",
+      "value": ""
+    },
+    {
+      "key": "planY2S1",
+      "value": ""
+    },
+    {
+      "key": "planY2S1Count",
+      "value": ""
+    },
+    {
+      "key": "planY2S1Credits",
+      "value": ""
+    },
+    {
+      "key": "planY3S1SP",
+      "value": ""
+    },
+    {
+      "key": "planY3S1CO",
+      "value": ""
+    },
+    {
+      "key": "minorDS",
+      "value": ""
+    },
+    {
+      "key": "minorAI",
+      "value": ""
+    },
+    {
+      "key": "updatedAtAfterConfirm",
+      "value": ""
+    },
+    {
+      "key": "updatedAtBefore",
+      "value": ""
+    }
+  ]
+}

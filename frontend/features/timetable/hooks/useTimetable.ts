@@ -82,11 +82,12 @@ export const useTimetable = () => {
   const showWriteResult = (updated: Timetable) => {
     writeCountRef.current += 1;
     setTimetable(updated);
+    setLoadError(false);
     setConflictAlertDismissed(false);
   };
 
-  // เพิ่มกลุ่มเรียนที่เลือก แล้วใช้ตารางทั้งก้อนที่ backend ตอบกลับมา (รวมผลตรวจเวลาชน)
-  const addCourse = async (_course: Course, sectionId: number) => {
+  // ใช้ร่วมกันทั้งหน้าตารางและหน้าแนะนำวิชาเสรี โดยให้แต่ละหน้าจัดข้อความ error เอง
+  const addSection = async (sectionId: number): Promise<Timetable> => {
     setAddingSectionId(sectionId);
     setAddError(null);
 
@@ -94,9 +95,18 @@ export const useTimetable = () => {
       const updated = await addTimetableEntry({ sectionId });
       // ผู้ใช้เปลี่ยนภาคไปแล้วระหว่างรอ: วิชาถูกบันทึกในภาคเดิมแล้ว แต่ไม่เอาตารางภาคเดิมมาทับหน้าจอ
       const { academicYear: currentYear, semester: currentSemester } = selectedTermRef.current;
-      if (updated.academicYear !== currentYear || updated.semester !== currentSemester) return;
+      if (updated.academicYear === currentYear && updated.semester === currentSemester) {
+        showWriteResult(updated);
+      }
+      return updated;
+    } finally {
+      setAddingSectionId(null);
+    }
+  };
 
-      showWriteResult(updated);
+  const addCourse = async (_course: Course, sectionId: number) => {
+    try {
+      await addSection(sectionId);
     } catch (error) {
       // หน่วยกิตเกินหรือวิชาซ้ำ: ไม่แสดงข้อความตามที่ทีมตกลง แค่โหลดตารางล่าสุดให้ปุ่มกลับมาถูกสถานะ
       if (error instanceof ApiError && error.status === 409) {
@@ -104,8 +114,6 @@ export const useTimetable = () => {
       } else {
         setAddError("เพิ่มวิชาไม่สำเร็จ กรุณาลองใหม่");
       }
-    } finally {
-      setAddingSectionId(null);
     }
   };
 
@@ -171,8 +179,10 @@ export const useTimetable = () => {
     // ปุ่มลบปิดระหว่างรอผลเพิ่มวิชา ด้วยเหตุผลเดียวกัน
     deleteDisabled: addingSectionId !== null,
     addCourse,
+    addSection,
     removeCourse,
     removeCourses,
+    applyPlanTimetable: showWriteResult,
     dismissConflictAlert: () => setConflictAlertDismissed(true),
   };
 };

@@ -59,6 +59,7 @@ classDiagram
         MAJOR
         GENERAL_EDUCATION
         FREE_ELECTIVE
+        MINOR
     }
 
     CourseRepository ..> Course : คืน

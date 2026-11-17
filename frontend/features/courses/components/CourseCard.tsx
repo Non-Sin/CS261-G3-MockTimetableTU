@@ -41,7 +41,7 @@ const CourseCard = ({
               <p key={`${slot.dayOfWeek}-${index}`}>
                 {DAY_NAMES[slot.dayOfWeek]} {slot.startTime}-{slot.endTime}
                 {" · ห้อง"}
-                {slot.room}
+                {slot.room ?? "ไม่ระบุ"}
               </p>
             ))}
           </div>
