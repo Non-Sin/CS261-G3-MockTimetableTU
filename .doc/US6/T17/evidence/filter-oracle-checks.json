@@ -1,0 +1,516 @@
+[
+  {
+    "caseId": "01",
+    "evidence": "01-02-list.ax.txt",
+    "fixture": "empty",
+    "params": {},
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "actual": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "03",
+    "evidence": "03-code-prefix.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "q": "py2"
+    },
+    "expected": [
+      "PY200",
+      "PY250",
+      "PY252"
+    ],
+    "actual": [
+      "PY200",
+      "PY250",
+      "PY252"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "04",
+    "evidence": "04a-thai.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "q": "ฝรั่งเศส"
+    },
+    "expected": [
+      "FR205"
+    ],
+    "actual": [
+      "FR205"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "04",
+    "evidence": "04b-english.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "q": "everyday"
+    },
+    "expected": [
+      "FR205",
+      "FD216"
+    ],
+    "actual": [
+      "FR205",
+      "FD216"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "04",
+    "evidence": "04c-word-boundary.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "q": "DAY"
+    },
+    "expected": [],
+    "actual": [],
+    "pass": true
+  },
+  {
+    "caseId": "05",
+    "evidence": "05-empty.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "q": "SA240"
+    },
+    "expected": [],
+    "actual": [],
+    "pass": true
+  },
+  {
+    "caseId": "06",
+    "evidence": "06-reset-all.ax.txt",
+    "fixture": "empty",
+    "params": {},
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "actual": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "PC280",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "07",
+    "evidence": "07-group.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "group": "PSYCHOLOGY"
+    },
+    "expected": [
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320"
+    ],
+    "actual": [
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "08",
+    "evidence": "08-semester.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "semester": 2
+    },
+    "expected": [
+      "EG214",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "PB317",
+      "FD216",
+      "IS313",
+      "PC280"
+    ],
+    "actual": [
+      "EG214",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AN242",
+      "AN347",
+      "AS201",
+      "PB317",
+      "FD216",
+      "IS313",
+      "PC280"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "09",
+    "evidence": "09a-evening.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "day": "TUESDAY",
+      "timeSlot": "EVENING"
+    },
+    "expected": [
+      "FR205"
+    ],
+    "actual": [
+      "FR205"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "09",
+    "evidence": "09b-afternoon.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "day": "THURSDAY",
+      "timeSlot": "AFTERNOON"
+    },
+    "expected": [
+      "EG214",
+      "TH291",
+      "PB317"
+    ],
+    "actual": [
+      "EG214",
+      "TH291",
+      "PB317"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "10",
+    "evidence": "10a-same-section.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "day": "TUESDAY",
+      "timeSlot": "MORNING"
+    },
+    "expected": [
+      "EG214",
+      "PY250",
+      "AT326",
+      "IS313"
+    ],
+    "actual": [
+      "EG214",
+      "PY250",
+      "AT326",
+      "IS313"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "10",
+    "evidence": "10b-combined.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "day": "TUESDAY",
+      "timeSlot": "MORNING",
+      "semester": 1
+    },
+    "expected": [
+      "EG214",
+      "AT326",
+      "IS313"
+    ],
+    "actual": [
+      "EG214",
+      "AT326",
+      "IS313"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "11",
+    "evidence": "11-same-slot.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "day": "MONDAY",
+      "timeSlot": "MORNING"
+    },
+    "expected": [
+      "PY200",
+      "FD216",
+      "RE468"
+    ],
+    "actual": [
+      "PY200",
+      "FD216",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "12",
+    "evidence": "12-empty-timetable-filter.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "excludeConflicts": true
+    },
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "JC217",
+      "RE468"
+    ],
+    "actual": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "13",
+    "evidence": "13-other-term.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "excludeConflicts": true,
+      "semester": 2
+    },
+    "expected": [],
+    "actual": [],
+    "pass": true
+  },
+  {
+    "caseId": "14",
+    "evidence": "14-after-delayed-response.ax.txt",
+    "fixture": "empty",
+    "params": {
+      "q": "PY250",
+      "excludeConflicts": true
+    },
+    "expected": [
+      "PY250"
+    ],
+    "actual": [
+      "PY250"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "15",
+    "evidence": "15-tu100-conflict-filter.ax.txt",
+    "fixture": "TU100",
+    "params": {
+      "excludeConflicts": true
+    },
+    "expected": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "JC217",
+      "RE468"
+    ],
+    "actual": [
+      "EG214",
+      "FR205",
+      "TH291",
+      "PY200",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "16",
+    "evidence": "16-adjacent-slot-not-conflict.ax.txt",
+    "fixture": "CS213",
+    "params": {
+      "excludeConflicts": true
+    },
+    "expected": [
+      "EG214",
+      "FR205",
+      "PY200",
+      "PY250",
+      "PY252",
+      "AS201",
+      "GE225",
+      "AT326",
+      "FD216",
+      "IS313",
+      "RE468"
+    ],
+    "actual": [
+      "EG214",
+      "FR205",
+      "PY200",
+      "PY250",
+      "PY252",
+      "AS201",
+      "GE225",
+      "AT326",
+      "FD216",
+      "IS313",
+      "RE468"
+    ],
+    "pass": true
+  },
+  {
+    "caseId": "17",
+    "evidence": "17-existing-course-filter.ax.txt",
+    "fixture": "FR205",
+    "params": {
+      "excludeConflicts": true
+    },
+    "expected": [
+      "EG214",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "JC217",
+      "RE468"
+    ],
+    "actual": [
+      "EG214",
+      "TH291",
+      "PY200",
+      "PY250",
+      "PY252",
+      "PY320",
+      "AS201",
+      "GE225",
+      "PB317",
+      "AT326",
+      "FD216",
+      "IS313",
+      "JC217",
+      "RE468"
+    ],
+    "pass": true
+  }
+]
