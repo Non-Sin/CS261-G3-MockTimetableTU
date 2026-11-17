@@ -2,6 +2,7 @@
 
 import type { AppSection } from "../auth/components/AppNavigation";
 import ElectivesPage from "../electives/ElectivesPage";
+import QuotaSearchPage from "../quota/QuotaSearchPage";
 import { TimetableContent } from "./Timetable";
 import { useTimetable } from "./hooks/useTimetable";
 
@@ -33,6 +34,14 @@ export default function TimetableWorkspace({
           onAddSection={state.addSection}
           onTimetableChanged={state.reload}
           onOpenQuota={onOpenQuota}
+        />
+      )}
+
+      {activeSection === "quota" && (
+        <QuotaSearchPage
+          academicYear={state.selectedAcademicYear}
+          semester={state.selectedSemester}
+          myCourseCodes={state.entries.map((entry) => entry.courseCode)}
         />
       )}
     </>

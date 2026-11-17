@@ -1,25 +1,27 @@
+// ต้องตรงกับ quota.dto ฝั่ง backend (US7-DTO-API-Spec)
 import type { CourseCategory } from "@/features/courses/types";
 
 export type QuotaStatus = "REQUIRED" | "NOT_REQUIRED" | "NO_DATA" | "NOT_OFFERED";
+
 export type QuotaChannelType = "ONLINE_FORM" | "QUOTA_SYSTEM" | "FACULTY_OFFICE" | "INSTRUCTOR" | "OTHER";
 
 export type QuotaCondition = {
   text: string;
-  relatedCourseCode: string | null;
+  relatedCourseCode: string | null; // ชิปรหัสวิชาที่กดได้
 };
 
 export type QuotaRound = {
   roundNo: number;
-  label: string | null;
-  startDate: string | null;
-  endDate: string;
-  endTime: string | null;
+  label: string | null; // เช่น "คำร้องช่วงต้น"
+  startDate: string | null; // ISO yyyy-MM-dd (ค.ศ.) null = กำหนดส่งวันเดียว
+  endDate: string; // ISO yyyy-MM-dd (ค.ศ.)
+  endTime: string | null; // HH:mm
 };
 
 export type QuotaChannel = {
   channelType: QuotaChannelType;
   label: string;
-  url: string | null;
+  url: string | null; // null = ไม่มีลิงก์ (เช่น ยื่นที่คณะ)
   note: string | null;
 };
 
@@ -38,7 +40,7 @@ export type QuotaCourse = {
   inMyTimetable: boolean;
   quotaStatus: QuotaStatus;
   offeredSemesters: number[];
-  conditions: QuotaCondition[];
+  conditions: QuotaCondition[]; // [] เมื่อไม่ใช่ REQUIRED
   rounds: QuotaRound[];
   channels: QuotaChannel[];
   contacts: QuotaContact[];
@@ -54,5 +56,7 @@ export type QuotaSearchResponse = {
 };
 
 export type QuotaTerm = { academicYear: number; semester: 1 | 2 };
+
 export type QuotaSearchQuery = QuotaTerm & { q?: string; mine?: boolean };
+
 export type QuotaErrorCode = "QUOTA_SEARCH_QUERY_REQUIRED";
