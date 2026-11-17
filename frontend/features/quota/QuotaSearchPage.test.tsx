@@ -254,4 +254,20 @@ describe("QuotaSearchPage", () => {
     expect(screen.queryByRole("article")).not.toBeInTheDocument();
     expect(screen.getByText(GUIDE_TITLE)).toBeInTheDocument();
   });
+
+  it("ค้นหาด้วยรหัสวิชาและกดชิปวิชาที่อ้างถึงได้ปกติแม้ตารางเรียนว่าง (myCourseCodes ว่าง)", async () => {
+    searchMock.mockResolvedValue(searchResponse([COURSE_EL395], { query: "EL395" }));
+    courseMock.mockResolvedValue(COURSE_EL295);
+    render(<QuotaSearchPage academicYear={2568} semester={1} myCourseCodes={[]} />);
+
+    expect(screen.getByRole("checkbox", { name: /เฉพาะวิชาในแผนของฉัน/ })).toBeDisabled();
+
+    await searchFor("EL395");
+    expect(await screen.findByRole("article", { name: /EL395/ })).toBeInTheDocument();
+    expect(searchMock).toHaveBeenCalledWith(expect.objectContaining({ academicYear: 2568, semester: 1, q: "EL395", mine: false }));
+
+    await userEvent.click(screen.getByRole("button", { name: "EL295" }));
+    expect(await screen.findByRole("article", { name: /EL295/ })).toBeInTheDocument();
+    expect(courseMock).toHaveBeenCalledWith("EL295", { academicYear: 2568, semester: 1 });
+  });
 });
