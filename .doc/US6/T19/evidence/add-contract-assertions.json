@@ -1,0 +1,6 @@
+{
+  "08": "one POST, 201, 3 credits, 1 entry, no conflicts",
+  "09": "201, 6 credits, 2 entries, one conflict",
+  "12": "409 COURSE_ALREADY_IN_TIMETABLE, existingSectionNo 260002",
+  "13": "UI sends no POST; independent supplement returns backend 409"
+}

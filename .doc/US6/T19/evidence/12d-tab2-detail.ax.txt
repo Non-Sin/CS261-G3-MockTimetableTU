@@ -1,0 +1,47 @@
+Browser tab: 7, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/".
+0 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/
+	1 container รายละเอียดวิชาเสรี
+		2 container
+			3 heading รายละเอียดวิชาเสรี, Value: 2, ID: elective-detail-title
+				4 text รายละเอียดวิชาเสรี
+			5 button ปิดรายละเอียดวิชา
+		6 heading FR205, Value: 3
+			7 text FR205
+		8 text เลือกเสรี
+		9 text เปิดเฉพาะเทอม
+		10 text 1
+		11 text 3.0
+		12 text  หน่วยกิต
+		13 text FRENCH FOR EVERYDAY LIFE
+		14 text ภาษาฝรั่งเศสในชีวิตประจำวัน
+		15 text รายวิชาที่ต้องขอโควตา
+		16 text อาจารย์ใจดี
+		17 text ไม่มีพื้นฐานเรียนได้
+		18 button ค้นหาช่องทางขอโควตา →
+		19 container กลุ่มเรียนและตารางเรียน (Sections)
+			20 text กลุ่มเรียนและตารางเรียน (Sections)
+			21 container
+				22 radio button (settable, integer) Description: Sec 260001 ภาคเรียนที่ 1, Value: 1
+				23 text Sec  260001 ภาคเรียนที่  1 วัน อังคาร 16:30  - 18:00  น. ห้องเรียน:  SC3-M10 วัน พฤหัสบดี 16:30  - 18:00  น. ห้องเรียน:  SC3-M10 ผู้สอน:  ผศ.ธรณินทร์ มีเพียร
+			24 container
+				25 radio button (settable, integer) Description: Sec 260002 ภาคเรียนที่ 1, Value: 0
+				26 text Sec  260002 ภาคเรียนที่  1 วัน อังคาร 16:30  - 18:00  น. ห้องเรียน:  SC3-M11 วัน พฤหัสบดี 16:30  - 18:00  น. ห้องเรียน:  SC3-M11 ผู้สอน:  ผศ.นิธิ ศีลวัตกุล
+		27 container รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			28 heading รายละเอียดวิชา & รีวิวจากรุ่นพี่, Value: 3, ID: elective-reviews-title
+				29 text รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			30 content list
+				31 container
+					32 AXListMarker •
+					33 text เรียนภาษาฝรั่งเศสระดับ A2 ไม่มีพื้นฐานเรียนได้
+				34 container
+					35 AXListMarker •
+					36 text เรียนonsite ในคาบอาจารย์ชอบให้ฝึกพูดภาษาฝรั่งเศสกับเพื่อนในคลาส เป็นบทสนทนาในชีวิตประจำวัน
+				37 container
+					38 AXListMarker •
+					39 text มีงานกลุ่ม1งานเป็นงานนำเสนอเกี่ยวกับวัฒนธรรมฝรั่งเศส
+				40 container
+					41 AXListMarker •
+					42 text มีสอบ กลางภาค และ ปลายภาค
+		43 button + เพิ่มลงตาราง
+
+The focused UI element is 5 button ปิดรายละเอียดวิชา

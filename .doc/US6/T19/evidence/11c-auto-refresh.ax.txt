@@ -1,0 +1,228 @@
+Browser tab: 6, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/".
+1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/
+	2 text คำเตือนสำคัญ
+	3 text ระบบนี้เป็นเพียงระบบช่วยวางแผนตารางเรียนเท่านั้น
+	4 text ไม่สามารถใช้ลงทะเบียนเรียนจริงได้
+	5 link Description: ไปยัง REG-TU, Value: vnweb68.reg.tu.ac.th/registrar/home
+	6 container
+		7 text MockTimetable  TU ระบบช่วยวางแผนและจัดตารางเรียนจำลอง
+		8 container เมนูหลัก
+			9 button จัดตารางเรียนจำลอง
+			10 button ดูวิชาเสรีแนะนำ
+			11 button ค้นหาช่องทางขอโควตา
+		12 container ข้อมูลนักศึกษา
+			13 pop up button (collapsed) SJ Somchai Jaidee 6609000001, Secondary Actions: Expand
+				14 text SJ
+				15 text Somchai Jaidee
+				16 text 6609000001
+			17 container เมนูบัญชีผู้ใช้
+				18 text SJ
+				19 button ออกจากระบบ
+	20 container
+		21 text วางแผนวันนี้ เรียนอย่างมั่นใจ
+		22 heading ดูวิชาเสรีแนะนำ, Value: 1
+			23 text ดูวิชาเสรีแนะนำ
+		24 text ยินดีต้อนรับ  Somchai สำรวจวิชาเลือกเสรีสำหรับแผนการเรียนของคุณ ตารางปัจจุบัน: ภาคเรียนที่  1  ปีการศึกษา  2568 เพิ่ม FR205 Sec 260001 ลงตารางแล้ว
+		25 button ปิดข้อความเพิ่มวิชาสำเร็จ
+		26 container ค้นหาและกรองวิชาเสรี
+			27 container
+				28 text ค้นหาด้วยรหัสวิชา หรือชื่อวิชา
+				29 text field (settable) ค้นหาด้วยรหัสวิชา หรือชื่อวิชา
+				30 button ค้นหาวิชา
+			31 container
+				32 text กรองตามวันเรียน
+				33 pop up button (collapsed, settable) กรองตามวันเรียน, Value: ทุกวันเรียน, Secondary Actions: Expand
+					34 menu
+						35 (selected) ทุกวันเรียน
+						36 วันจันทร์
+						37 วันอังคาร
+						38 วันพุธ
+						39 วันพฤหัสบดี
+						40 วันศุกร์
+						41 วันเสาร์
+			42 container
+				43 text กรองตามช่วงเวลาเรียน
+				44 pop up button (collapsed, settable) กรองตามช่วงเวลาเรียน, Value: ทุกช่วงเวลา, Secondary Actions: Expand
+					45 menu
+						46 (selected) ทุกช่วงเวลา
+						47 เช้า (08:00 - 12:30)
+						48 บ่าย (13:30 - 16:30)
+						49 เย็น (16:30 - 19:30)
+			50 container
+				51 text หมวดหมู่วิชา
+				52 pop up button (collapsed, settable) หมวดหมู่วิชา, Value: ทั้งหมด (ทุกหมวดหมู่), Secondary Actions: Expand
+					53 menu
+						54 (selected) ทั้งหมด (ทุกหมวดหมู่)
+						55 หมวดภาษาและการสื่อสาร
+						56 หมวดจิตวิทยาและพฤติกรรมศาสตร์
+						57 หมวดสังคม วัฒนธรรม และสุขภาพ
+						58 หมวดวิทยาศาสตร์และเทคโนโลยี
+						59 หมวดสื่อ สารสนเทศ และภาพยนตร์
+			60 container
+				61 text ภาคเรียนที่ต้องการค้นหา
+				62 pop up button (collapsed, settable) ภาคเรียนที่ต้องการค้นหา, Value: ทุกภาคเรียน (ทั้งหมด), Secondary Actions: Expand
+					63 menu
+						64 (selected) ทุกภาคเรียน (ทั้งหมด)
+						65 ภาคเรียนที่ 1
+						66 ภาคเรียนที่ 2
+			67 checkbox (settable, integer) Description: แสดงเฉพาะวิชาที่ไม่ชนกับตารางปัจจุบัน, Value: 1
+			68 text แสดงทั้งหมด 11 วิชาแนะนำ
+		69 container หมวดภาษาและการสื่อสาร
+			70 heading หมวดภาษาและการสื่อสาร, Value: 2, ID: elective-group-LANGUAGE
+				71 text หมวดภาษาและการสื่อสาร
+			72 text 2  วิชา
+			73 button อ่านรีวิว EG214
+				74 heading EG214, Value: 3
+					75 text EG214
+				76 text เลือกเสรี
+				77 text 3.0
+				78 text  หน่วยกิต
+				79 text PRESENTATION SKILLS
+				80 text ทักษะการนำเสนอ
+				81 text รายวิชาที่ต้องขอโควตา
+				82 text ไม่มีสอบ
+				83 text อ่านรีวิว
+			84 button อ่านรีวิว TH291
+				85 heading TH291, Value: 3
+					86 text TH291
+				87 text เลือกเสรี
+				88 text 3.0
+				89 text  หน่วยกิต
+				90 text WRITING PROFICIENCY DEVELOPMENT
+				91 text การพัฒนาสมรรถภาพการเขียน
+				92 text รายวิชาที่ต้องขอโควตา
+				93 text ไม่มีสอบ
+				94 text อ่านรีวิว
+		95 container หมวดจิตวิทยาและพฤติกรรมศาสตร์
+			96 heading หมวดจิตวิทยาและพฤติกรรมศาสตร์, Value: 2, ID: elective-group-PSYCHOLOGY
+				97 text หมวดจิตวิทยาและพฤติกรรมศาสตร์
+			98 text 3  วิชา
+			99 button อ่านรีวิว PY250
+				100 heading PY250, Value: 3
+					101 text PY250
+				102 text เลือกเสรี
+				103 text 3.0
+				104 text  หน่วยกิต
+				105 text PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT
+				106 text จิตวิทยาบุคลิกภาพและการปรับตน
+				107 text ไม่เช็คชื่อ
+				108 text ไม่มีงานกลุ่ม
+				109 text อ่านรีวิว
+			110 button อ่านรีวิว PY252
+				111 heading PY252, Value: 3
+					112 text PY252
+				113 text เลือกเสรี
+				114 text 3.0
+				115 text  หน่วยกิต
+				116 text PSYCHOLOGY OF INTERPERSONAL RELATIONS
+				117 text จิตวิทยาความสัมพันธ์ระหว่างบุคคล
+				118 text ไม่เช็คชื่อ
+				119 text ไม่มีงานกลุ่ม
+				120 text อ่านรีวิว
+			121 button อ่านรีวิว PY320
+				122 heading PY320, Value: 3
+					123 text PY320
+				124 text เลือกเสรี
+				125 text 3.0
+				126 text  หน่วยกิต
+				127 text SOCIAL PSYCHOLOGY
+				128 text จิตวิทยาสังคม
+				129 text ไม่เช็คชื่อ
+				130 text ไม่มีงานกลุ่ม
+				131 text อ่านรีวิว
+		132 container หมวดสังคม วัฒนธรรม และสุขภาพ
+			133 heading หมวดสังคม วัฒนธรรม และสุขภาพ, Value: 2, ID: elective-group-SOCIETY
+				134 text หมวดสังคม วัฒนธรรม และสุขภาพ
+			135 text 3  วิชา
+			136 button อ่านรีวิว AS201
+				137 heading AS201, Value: 3
+					138 text AS201
+				139 text เลือกเสรี
+				140 text 3.0
+				141 text  หน่วยกิต
+				142 text KOREAN CULTURE AND INNOVATION
+				143 text วัฒนธรรมและนวัตกรรมเกาหลี
+				144 text รายวิชาที่ต้องขอโควตา
+				145 text ไม่เช็คชื่อ
+				146 text ไม่มีสอบ
+				147 text เก็บ A ง่าย
+				148 text อ่านรีวิว
+			149 button อ่านรีวิว GE225
+				150 heading GE225, Value: 3
+					151 text GE225
+				152 text เลือกเสรี
+				153 text 3.0
+				154 text  หน่วยกิต
+				155 text เปิดเฉพาะเทอม
+				156 text 1
+				157 text POPULATION GEOGRAPHY AND MIGRATION
+				158 text ภูมิศาสตร์ประชากรและการย้ายถิ่น
+				159 text อาจารย์ใจดี
+				160 text ไม่มีพื้นฐานเรียนได้
+				161 text อ่านรีวิว
+			162 button อ่านรีวิว PB317
+				163 heading PB317, Value: 3
+					164 text PB317
+				165 text เลือกเสรี
+				166 text 3.0
+				167 text  หน่วยกิต
+				168 text GENDER, SEXUALITY AND HEALTH
+				169 text เพศภาวะ เพศวิถี และสุขภาพ
+				170 text รายวิชาที่ต้องขอโควตา
+				171 text ไม่เช็คชื่อ
+				172 text ไม่มีงานกลุ่ม
+				173 text เก็บ A ง่าย
+				174 text อ่านรีวิว
+		175 container หมวดวิทยาศาสตร์และเทคโนโลยี
+			176 heading หมวดวิทยาศาสตร์และเทคโนโลยี, Value: 2, ID: elective-group-SCIENCE
+				177 text หมวดวิทยาศาสตร์และเทคโนโลยี
+			178 text 2  วิชา
+			179 button อ่านรีวิว AT326
+				180 heading AT326, Value: 3
+					181 text AT326
+				182 text เลือกเสรี
+				183 text 3.0
+				184 text  หน่วยกิต
+				185 text เปิดเฉพาะเทอม
+				186 text 1
+				187 text RICE AND PRODUCTION TECHNOLOGY
+				188 text ข้าวและเทคโนโลยีการผลิต
+				189 text ไม่มีงานกลุ่ม
+				190 text เก็บ A ง่าย
+				191 text อ่านรีวิว
+			192 button อ่านรีวิว IS313
+				193 heading IS313, Value: 3
+					194 text IS313
+				195 text เลือกเสรี
+				196 text 3.0
+				197 text  หน่วยกิต
+				198 text BUSINESS DATA COMMUNICATIONS ON CLOUD COMPUTING AND NETWORKING
+				199 text การสื่อสารข้อมูลทางธุรกิจบนเครือข่ายและการประมวลผลแบบคลาวด์
+				200 text รายวิชาที่ต้องขอโควตา
+				201 text อาจารย์ใจดี
+				202 text ไม่มีพื้นฐานเรียนได้
+				203 text อ่านรีวิว
+		204 container หมวดสื่อ สารสนเทศ และภาพยนตร์
+			205 heading หมวดสื่อ สารสนเทศ และภาพยนตร์, Value: 2, ID: elective-group-MEDIA
+				206 text หมวดสื่อ สารสนเทศ และภาพยนตร์
+			207 text 1  วิชา
+			208 button อ่านรีวิว JC217
+				209 heading JC217, Value: 3
+					210 text JC217
+				211 text เลือกเสรี
+				212 text 3.0
+				213 text  หน่วยกิต
+				214 text เปิดเฉพาะเทอม
+				215 text 1
+				216 text JOURNALISM AND SOCIAL CHANGE
+				217 text วารสารศาสตร์กับการเปลี่ยนแปลงของสังคม
+				218 text รายวิชาที่ต้องขอโควตา
+				219 text อาจารย์ใจดี
+				220 text อ่านรีวิว
+	221 container
+		222 text TU MockTimetableTU · ระบบช่วยจัดตารางเรียนสำหรับนักศึกษาวิทยาการคอมพิวเตอร์ ภาคปกติ มหาวิทยาลัยธรรมศาสตร์
+		223 container ลิงก์ช่วยเหลือ
+			224 link Description: REG-TU, Value: vnweb68.reg.tu.ac.th/registrar/home
+			225 link Description: แจ้งปัญหา, Value: github.com/Non-Sin/CS261-G3-MockTimetableTU/issues
+
+The focused UI element is 1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/

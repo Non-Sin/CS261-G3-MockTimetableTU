@@ -1,0 +1,162 @@
+{
+  "sourceCommit": "aea7b980e022e4fee4ffa04daea0499f26ff3821",
+  "summary": {
+    "PASS": 12,
+    "FAIL": 3,
+    "PARTIAL": 1
+  },
+  "cases": [
+    {
+      "id": "ST-US6-01",
+      "status": "PASS",
+      "actualAndExpected": "เปิดเมนูได้ 18 วิชา เรียงหมวด/รหัส ป้าย FR205/AN242/TH291 ถูกต้อง และ GET ไม่สร้าง timetable; ผลจริงตรง",
+      "evidence": [
+        "01-list.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-02",
+      "status": "PASS",
+      "actualAndExpected": "PY2 → PY200/PY250/PY252, ค้นไทย → FR205, SA240 → 200 []; ปุ่มดูทั้งหมดคืน 18 วิชาและล้างตัวกรอง; ผลจริงตรง",
+      "evidence": [
+        "02a-PY2.ax.txt",
+        "02b-thai.ax.txt",
+        "02c-empty.ax.txt",
+        "02d-reset.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-03",
+      "status": "PASS",
+      "actualAndExpected": "SCIENCE 4, ภาค 2 จำนวน 13; จันทร์เช้า 3 → ภาค 2 เหลือ PY200; ศุกร์เช้า 4 → ภาค 1 เหลือ PY252; อังคารเย็น FR205, พุธเย็นว่าง; ผลจริงตรงทุกขั้น",
+      "evidence": [
+        "03a-science.ax.txt",
+        "03d-mon-morning-term2.ax.txt",
+        "03f-fri-morning-term1.ax.txt",
+        "03g-tue-evening.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-04",
+      "status": "PASS",
+      "actualAndExpected": "ไม่ชน+ตารางว่างได้ 15; กรองภาคอื่นได้ 200 []; T-PY200 เหลือ 12 ตัด PY200/RE468/FD216 และสามวิชาเฉพาะภาค 2; DB ไม่เปลี่ยน",
+      "evidence": [
+        "04a-empty-no-conflict.ax.txt",
+        "04b-other-term-empty.ax.txt",
+        "04c-PY200-no-conflict.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-05",
+      "status": "PASS",
+      "actualAndExpected": "T-JC217 ได้ 13; FR205 เริ่ม 16:30 ต่อจาก JC217 พอดี ต้องไม่ชน; ค้น FR205 แล้วยังพบ; ผลจริงตรง",
+      "evidence": [
+        "05a-adjacent.ax.txt",
+        "05b-FR205-adjacent.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-06",
+      "status": "PASS",
+      "actualAndExpected": "PY250 มีรีวิว 4 ข้อ, Sec 820001 ภาค 1 ถูกเลือก ส่วน 230001 ภาค 2 disabled; ไม่มีปุ่มโควตา; AN242 ไม่มี selection/เพิ่มไม่ได้; DB ยังไม่มี timetable",
+      "evidence": [
+        "06b-PY250-detail.ax.txt",
+        "06c-AN242-no-selection.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-07",
+      "status": "PASS",
+      "actualAndExpected": "เปลี่ยนตารางปัจจุบันเป็นภาค 2: ไม่เปิด toggle ได้ 18 เปิดแล้วได้ 13; PY250 เลือก 230001 และ disable 820001; ผลจริงตรง",
+      "evidence": [
+        "07a-term2-all.ax.txt",
+        "07b-term2-no-conflict.ax.txt",
+        "07c-term2-detail.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-08",
+      "status": "PASS",
+      "actualAndExpected": "FR205 มีป้าย/ปุ่มโควตา เลือก 260001 ให้; POST ครั้งเดียวได้ 201, 1 entry, 3 หน่วยกิต, conflicts ว่าง; modal ปิด มีข้อความสำเร็จ และ DB สร้างตาราง/entry จริง",
+      "evidence": [
+        "08b-FR205-before-add.ax.txt",
+        "08c-add-success.ax.txt",
+        "08d-timetable.ax.txt",
+        "08-timetable.jpg"
+      ]
+    },
+    {
+      "id": "ST-US6-09",
+      "status": "PASS",
+      "actualAndExpected": "T-PY200 เปิด RE468 ได้ conflictWith=[PY200] แต่ยังเพิ่มได้; POST 201, 2 entries, 6 หน่วยกิต, ชนจันทร์ 09:30–12:30; DB ใช้ timetable_id เดิมและ updated_at เพิ่มขึ้น",
+      "evidence": [
+        "09b-conflict-before-add.ax.txt",
+        "09d-conflict-timetable.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-10",
+      "status": "FAIL",
+      "actualAndExpected": "T15 ต้องเลือก FR205 260002 ให้อัตโนมัติ โดยปุ่มเพิ่มยัง disabled; จริงไม่มี Sec ถูกเลือกและ radios ถูก disable ทั้งคู่ ส่วน inTimetable/conflictWith ถูกต้อง ไม่มี POST และ DB ไม่เปลี่ยน",
+      "evidence": [
+        "10b-already-added-detail.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-11",
+      "status": "PASS",
+      "actualAndExpected": "T-PY200 เปิดไม่ชนเห็น 12 เพิ่ม FR205 แล้ว GET ใหม่ด้วยตัวกรองเดิม เหลือ 11 และ DB มี 2 entries; ผลจริงตรง",
+      "evidence": [
+        "11a-before-add.ax.txt",
+        "11c-auto-refresh.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-12",
+      "status": "PASS",
+      "actualAndExpected": "สอง browser tabs บัญชีเดียวกัน: อีกแท็บเพิ่ม FR205 260002 ก่อน แท็บแรกส่ง 260001 ได้ 409 COURSE_ALREADY_IN_TIMETABLE; modal คงอยู่พร้อม detail และ DB มี FR205 เพียงแถวเดียว Sec 260002",
+      "evidence": [
+        "12e-tab2-added.ax.txt",
+        "12f-tab1-409.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-13",
+      "status": "FAIL",
+      "actualAndExpected": "T15 ต้องกดเพิ่ม FR205 จาก 21 หน่วยกิตได้ แล้วรับ 409 พร้อมคำอธิบายใน modal; จริงปุ่ม disabled ไม่มี POST/ข้อความหน่วยกิตเกิน DB ยังมี 7 entries และ updated_at เดิม",
+      "evidence": [
+        "13b-credit-limit-disabled.ax.txt",
+        "13-fixture-21-credits.jpg"
+      ]
+    },
+    {
+      "id": "ST-US6-14",
+      "status": "PASS",
+      "actualAndExpected": "พารามิเตอร์ผิด/ขาด 400, SUNDAY 200 [], PY250 ภาค 3 ได้ 400, CS111/SA240 ได้ 404, body ว่าง 400 errors.sectionId, ID ไม่มี 404; ผ่าน 14/14 subcases และไม่สร้าง timetable",
+      "evidence": [
+        "14-api-results.json"
+      ]
+    },
+    {
+      "id": "ST-US6-15",
+      "status": "PARTIAL",
+      "actualAndExpected": "ไม่มี token ทั้ง 3 endpoint ได้ 401; เพิ่มทดสอบ token ลงนามถูกแต่หมดอายุอีก 3 ครั้งได้ 401; UI กลับ Login เมื่อ backend ตอบ 401 สำหรับ GET/POST และไม่มีข้อมูลเพิ่ม แต่ยังไม่ได้ลบ sessionStorage ตามขั้นตอนตรงตัว",
+      "evidence": [
+        "15-api-results.json",
+        "15b-get-401-login.ax.txt",
+        "15e-post-401-login.ax.txt"
+      ]
+    },
+    {
+      "id": "ST-US6-16",
+      "status": "FAIL",
+      "actualAndExpected": "T15 กำหนดข้อความ “ไม่สามารถโหลดข้อมูลวิชาได้ กรุณาลองใหม่อีกครั้ง”; จริงรายการใช้ “โหลดวิชาเสรีแนะนำไม่สำเร็จ กรุณาลองใหม่” และ detail ใช้ “โหลดรายละเอียดวิชาไม่สำเร็จ กรุณาลองใหม่”; กู้คืนได้ 18 วิชา เปิด detail/ปิด modal ได้ DB ไม่เปลี่ยน",
+      "evidence": [
+        "16b-list-network-failure.ax.txt",
+        "16d-detail-network-failure.ax.txt",
+        "16c-list-recovered.ax.txt",
+        "16f-detail-recovered.ax.txt"
+      ]
+    }
+  ]
+}

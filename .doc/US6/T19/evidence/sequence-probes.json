@@ -1,0 +1,605 @@
+[
+  {
+    "probe": "search-no-toggle",
+    "path": "/api/electives?academicYear=2568&currentSemester=1",
+    "status": 200,
+    "body": [
+      {
+        "courseCode": "EG214",
+        "courseName": "PRESENTATION SKILLS",
+        "courseNameTh": "ทักษะการนำเสนอ",
+        "credits": 3,
+        "group": "LANGUAGE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_EXAM"
+        ]
+      },
+      {
+        "courseCode": "FR205",
+        "courseName": "FRENCH FOR EVERYDAY LIFE",
+        "courseNameTh": "ภาษาฝรั่งเศสในชีวิตประจำวัน",
+        "credits": 3,
+        "group": "LANGUAGE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR",
+          "NO_PREREQUISITE"
+        ]
+      },
+      {
+        "courseCode": "TH291",
+        "courseName": "WRITING PROFICIENCY DEVELOPMENT",
+        "courseNameTh": "การพัฒนาสมรรถภาพการเขียน",
+        "credits": 3,
+        "group": "LANGUAGE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_EXAM"
+        ]
+      },
+      {
+        "courseCode": "PY200",
+        "courseName": "GENERAL PSYCHOLOGY",
+        "courseNameTh": "จิตวิทยาทั่วไป",
+        "credits": 3,
+        "group": "PSYCHOLOGY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK"
+        ]
+      },
+      {
+        "courseCode": "PY250",
+        "courseName": "PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT",
+        "courseNameTh": "จิตวิทยาบุคลิกภาพและการปรับตน",
+        "credits": 3,
+        "group": "PSYCHOLOGY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK"
+        ]
+      },
+      {
+        "courseCode": "PY252",
+        "courseName": "PSYCHOLOGY OF INTERPERSONAL RELATIONS",
+        "courseNameTh": "จิตวิทยาความสัมพันธ์ระหว่างบุคคล",
+        "credits": 3,
+        "group": "PSYCHOLOGY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK"
+        ]
+      },
+      {
+        "courseCode": "PY320",
+        "courseName": "SOCIAL PSYCHOLOGY",
+        "courseNameTh": "จิตวิทยาสังคม",
+        "credits": 3,
+        "group": "PSYCHOLOGY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK"
+        ]
+      },
+      {
+        "courseCode": "AN242",
+        "courseName": "INTRODUCTION TO MUSEUM STUDIES",
+        "courseNameTh": "พิพิธภัณฑ์ศึกษาเบื้องต้น",
+        "credits": 3,
+        "group": "SOCIETY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          2
+        ],
+        "tags": [
+          "NO_EXAM",
+          "KIND_INSTRUCTOR",
+          "NO_PREREQUISITE"
+        ]
+      },
+      {
+        "courseCode": "AN347",
+        "courseName": "ARCHAEOLOGY OF DEATH",
+        "courseNameTh": "โบราณคดีความตาย",
+        "credits": 3,
+        "group": "SOCIETY",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          2
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR",
+          "NO_PREREQUISITE"
+        ]
+      },
+      {
+        "courseCode": "AS201",
+        "courseName": "KOREAN CULTURE AND INNOVATION",
+        "courseNameTh": "วัฒนธรรมและนวัตกรรมเกาหลี",
+        "credits": 3,
+        "group": "SOCIETY",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_EXAM",
+          "EASY_GRADE"
+        ]
+      },
+      {
+        "courseCode": "GE225",
+        "courseName": "POPULATION GEOGRAPHY AND MIGRATION",
+        "courseNameTh": "ภูมิศาสตร์ประชากรและการย้ายถิ่น",
+        "credits": 3,
+        "group": "SOCIETY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR",
+          "NO_PREREQUISITE"
+        ]
+      },
+      {
+        "courseCode": "PB317",
+        "courseName": "GENDER, SEXUALITY AND HEALTH",
+        "courseNameTh": "เพศภาวะ เพศวิถี และสุขภาพ",
+        "credits": 3,
+        "group": "SOCIETY",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK",
+          "EASY_GRADE"
+        ]
+      },
+      {
+        "courseCode": "AT326",
+        "courseName": "RICE AND PRODUCTION TECHNOLOGY",
+        "courseNameTh": "ข้าวและเทคโนโลยีการผลิต",
+        "credits": 3,
+        "group": "SCIENCE",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "NO_GROUP_WORK",
+          "EASY_GRADE"
+        ]
+      },
+      {
+        "courseCode": "FD216",
+        "courseName": "FOOD TECHNOLOGY IN EVERYDAY LIFE",
+        "courseNameTh": "เทคโนโลยีการอาหารในชีวิตประจำวัน",
+        "credits": 3,
+        "group": "SCIENCE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "EASY_GRADE"
+        ]
+      },
+      {
+        "courseCode": "IS313",
+        "courseName": "BUSINESS DATA COMMUNICATIONS ON CLOUD COMPUTING AND NETWORKING",
+        "courseNameTh": "การสื่อสารข้อมูลทางธุรกิจบนเครือข่ายและการประมวลผลแบบคลาวด์",
+        "credits": 3,
+        "group": "SCIENCE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR",
+          "NO_PREREQUISITE"
+        ]
+      },
+      {
+        "courseCode": "PC280",
+        "courseName": "INTRODUCTION TO ASTRONOMY",
+        "courseNameTh": "ดาราศาสตร์เบื้องต้น",
+        "credits": 3,
+        "group": "SCIENCE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          2
+        ],
+        "tags": [
+          "NO_GROUP_WORK",
+          "EASY_GRADE"
+        ]
+      },
+      {
+        "courseCode": "JC217",
+        "courseName": "JOURNALISM AND SOCIAL CHANGE",
+        "courseNameTh": "วารสารศาสตร์กับการเปลี่ยนแปลงของสังคม",
+        "credits": 3,
+        "group": "MEDIA",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR"
+        ]
+      },
+      {
+        "courseCode": "RE468",
+        "courseName": "RELIGION AND FILM",
+        "courseNameTh": "ศาสนากับภาพยนตร์",
+        "credits": 3,
+        "group": "MEDIA",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR"
+        ]
+      }
+    ],
+    "sqlQueryOrder": [
+      "metadata",
+      "sections"
+    ],
+    "sql": [
+      "    select\n        distinct ei1_0.course_code,\n        c1_0.course_code,\n        c1_0.category,\n        c1_0.course_name,\n        c1_0.course_name_th,\n        c1_0.credits,\n        ei1_0.course_name_th,\n        ei1_0.interest_group,\n        ei1_0.requires_quota,\n        t1_0.course_code,\n        t1_0.tag \n    from\n        elective_info ei1_0 \n    join\n        course c1_0 \n            on c1_0.course_code=ei1_0.course_code \n    left join\n        elective_tag t1_0 \n            on ei1_0.course_code=t1_0.course_code \n    where\n        c1_0.category=N'FREE_ELECTIVE' \n        and exists(select\n            1 from elective_review_point d1_0 \n        where\n            ei1_0.course_code=d1_0.course_code) \n        and exists(select\n            1 from section s1_0 \n        where\n            s1_0.course_code=c1_0.course_code \n            and s1_0.academic_year=?) \n        and (\n            ? is null \n            or ei1_0.interest_group=?\n        ) \n        and (\n            upper(c1_0.course_code) like (?+'%') escape '!' \n            or upper(c1_0.course_name) like (?+'%') escape '!' \n            or upper(c1_0.course_name) like ('% '+?+'%') escape '!' \n            or upper(c1_0.course_name) like ('%-'+?+'%') escape '!' \n            or upper(ei1_0.course_name_th) like ('%'+?+'%') escape '!'\n        )\n",
+      "    select\n        s1_0.section_id,\n        s1_0.academic_year,\n        s1_0.course_code,\n        c1_0.course_code,\n        c1_0.category,\n        c1_0.course_name,\n        c1_0.course_name_th,\n        c1_0.credits,\n        s1_0.instructor,\n        s1_0.section_no,\n        s1_0.semester,\n        s2_0.section_id,\n        s2_0.slot_id,\n        s2_0.day_of_week,\n        s2_0.end_time,\n        s2_0.room,\n        s2_0.start_time \n    from\n        section s1_0 \n    join\n        course c1_0 \n            on c1_0.course_code=s1_0.course_code \n    left join\n        schedule_slot s2_0 \n            on s1_0.section_id=s2_0.section_id \n    where\n        c1_0.course_code in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) \n        and s1_0.academic_year=? \n    order by\n        c1_0.course_code,\n        s1_0.semester,\n        s1_0.section_no\n"
+    ],
+    "pass": true
+  },
+  {
+    "probe": "search-empty-metadata",
+    "path": "/api/electives?academicYear=2568&currentSemester=1&q=SA240",
+    "status": 200,
+    "body": [],
+    "sqlQueryOrder": [
+      "metadata"
+    ],
+    "sql": [
+      "    select\n        distinct ei1_0.course_code,\n        c1_0.course_code,\n        c1_0.category,\n        c1_0.course_name,\n        c1_0.course_name_th,\n        c1_0.credits,\n        ei1_0.course_name_th,\n        ei1_0.interest_group,\n        ei1_0.requires_quota,\n        t1_0.course_code,\n        t1_0.tag \n    from\n        elective_info ei1_0 \n    join\n        course c1_0 \n            on c1_0.course_code=ei1_0.course_code \n    left join\n        elective_tag t1_0 \n            on ei1_0.course_code=t1_0.course_code \n    where\n        c1_0.category=N'FREE_ELECTIVE' \n        and exists(select\n            1 from elective_review_point d1_0 \n        where\n            ei1_0.course_code=d1_0.course_code) \n        and exists(select\n            1 from section s1_0 \n        where\n            s1_0.course_code=c1_0.course_code \n            and s1_0.academic_year=?) \n        and (\n            ? is null \n            or ei1_0.interest_group=?\n        ) \n        and (\n            upper(c1_0.course_code) like (?+'%') escape '!' \n            or upper(c1_0.course_name) like (?+'%') escape '!' \n            or upper(c1_0.course_name) like ('% '+?+'%') escape '!' \n            or upper(c1_0.course_name) like ('%-'+?+'%') escape '!' \n            or upper(ei1_0.course_name_th) like ('%'+?+'%') escape '!'\n        )\n"
+    ],
+    "pass": true
+  },
+  {
+    "probe": "search-toggle-empty-table",
+    "path": "/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true",
+    "status": 200,
+    "body": [
+      {
+        "courseCode": "EG214",
+        "courseName": "PRESENTATION SKILLS",
+        "courseNameTh": "ทักษะการนำเสนอ",
+        "credits": 3,
+        "group": "LANGUAGE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_EXAM"
+        ]
+      },
+      {
+        "courseCode": "FR205",
+        "courseName": "FRENCH FOR EVERYDAY LIFE",
+        "courseNameTh": "ภาษาฝรั่งเศสในชีวิตประจำวัน",
+        "credits": 3,
+        "group": "LANGUAGE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR",
+          "NO_PREREQUISITE"
+        ]
+      },
+      {
+        "courseCode": "TH291",
+        "courseName": "WRITING PROFICIENCY DEVELOPMENT",
+        "courseNameTh": "การพัฒนาสมรรถภาพการเขียน",
+        "credits": 3,
+        "group": "LANGUAGE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_EXAM"
+        ]
+      },
+      {
+        "courseCode": "PY200",
+        "courseName": "GENERAL PSYCHOLOGY",
+        "courseNameTh": "จิตวิทยาทั่วไป",
+        "credits": 3,
+        "group": "PSYCHOLOGY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK"
+        ]
+      },
+      {
+        "courseCode": "PY250",
+        "courseName": "PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT",
+        "courseNameTh": "จิตวิทยาบุคลิกภาพและการปรับตน",
+        "credits": 3,
+        "group": "PSYCHOLOGY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK"
+        ]
+      },
+      {
+        "courseCode": "PY252",
+        "courseName": "PSYCHOLOGY OF INTERPERSONAL RELATIONS",
+        "courseNameTh": "จิตวิทยาความสัมพันธ์ระหว่างบุคคล",
+        "credits": 3,
+        "group": "PSYCHOLOGY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK"
+        ]
+      },
+      {
+        "courseCode": "PY320",
+        "courseName": "SOCIAL PSYCHOLOGY",
+        "courseNameTh": "จิตวิทยาสังคม",
+        "credits": 3,
+        "group": "PSYCHOLOGY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK"
+        ]
+      },
+      {
+        "courseCode": "AS201",
+        "courseName": "KOREAN CULTURE AND INNOVATION",
+        "courseNameTh": "วัฒนธรรมและนวัตกรรมเกาหลี",
+        "credits": 3,
+        "group": "SOCIETY",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_EXAM",
+          "EASY_GRADE"
+        ]
+      },
+      {
+        "courseCode": "GE225",
+        "courseName": "POPULATION GEOGRAPHY AND MIGRATION",
+        "courseNameTh": "ภูมิศาสตร์ประชากรและการย้ายถิ่น",
+        "credits": 3,
+        "group": "SOCIETY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR",
+          "NO_PREREQUISITE"
+        ]
+      },
+      {
+        "courseCode": "PB317",
+        "courseName": "GENDER, SEXUALITY AND HEALTH",
+        "courseNameTh": "เพศภาวะ เพศวิถี และสุขภาพ",
+        "credits": 3,
+        "group": "SOCIETY",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK",
+          "EASY_GRADE"
+        ]
+      },
+      {
+        "courseCode": "AT326",
+        "courseName": "RICE AND PRODUCTION TECHNOLOGY",
+        "courseNameTh": "ข้าวและเทคโนโลยีการผลิต",
+        "credits": 3,
+        "group": "SCIENCE",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "NO_GROUP_WORK",
+          "EASY_GRADE"
+        ]
+      },
+      {
+        "courseCode": "FD216",
+        "courseName": "FOOD TECHNOLOGY IN EVERYDAY LIFE",
+        "courseNameTh": "เทคโนโลยีการอาหารในชีวิตประจำวัน",
+        "credits": 3,
+        "group": "SCIENCE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "EASY_GRADE"
+        ]
+      },
+      {
+        "courseCode": "IS313",
+        "courseName": "BUSINESS DATA COMMUNICATIONS ON CLOUD COMPUTING AND NETWORKING",
+        "courseNameTh": "การสื่อสารข้อมูลทางธุรกิจบนเครือข่ายและการประมวลผลแบบคลาวด์",
+        "credits": 3,
+        "group": "SCIENCE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR",
+          "NO_PREREQUISITE"
+        ]
+      },
+      {
+        "courseCode": "JC217",
+        "courseName": "JOURNALISM AND SOCIAL CHANGE",
+        "courseNameTh": "วารสารศาสตร์กับการเปลี่ยนแปลงของสังคม",
+        "credits": 3,
+        "group": "MEDIA",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR"
+        ]
+      },
+      {
+        "courseCode": "RE468",
+        "courseName": "RELIGION AND FILM",
+        "courseNameTh": "ศาสนากับภาพยนตร์",
+        "credits": 3,
+        "group": "MEDIA",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR"
+        ]
+      }
+    ],
+    "sqlQueryOrder": [
+      "timetable",
+      "metadata",
+      "sections"
+    ],
+    "sql": [
+      "    select\n        t1_0.timetable_id,\n        t1_0.academic_year,\n        t1_0.semester,\n        t1_0.student_id,\n        t1_0.updated_at \n    from\n        timetable t1_0 \n    where\n        t1_0.student_id=? \n        and t1_0.academic_year=? \n        and t1_0.semester=?\n",
+      "    select\n        distinct ei1_0.course_code,\n        c1_0.course_code,\n        c1_0.category,\n        c1_0.course_name,\n        c1_0.course_name_th,\n        c1_0.credits,\n        ei1_0.course_name_th,\n        ei1_0.interest_group,\n        ei1_0.requires_quota,\n        t1_0.course_code,\n        t1_0.tag \n    from\n        elective_info ei1_0 \n    join\n        course c1_0 \n            on c1_0.course_code=ei1_0.course_code \n    left join\n        elective_tag t1_0 \n            on ei1_0.course_code=t1_0.course_code \n    where\n        c1_0.category=N'FREE_ELECTIVE' \n        and exists(select\n            1 from elective_review_point d1_0 \n        where\n            ei1_0.course_code=d1_0.course_code) \n        and exists(select\n            1 from section s1_0 \n        where\n            s1_0.course_code=c1_0.course_code \n            and s1_0.academic_year=?) \n        and (\n            ? is null \n            or ei1_0.interest_group=?\n        ) \n        and (\n            upper(c1_0.course_code) like (?+'%') escape '!' \n            or upper(c1_0.course_name) like (?+'%') escape '!' \n            or upper(c1_0.course_name) like ('% '+?+'%') escape '!' \n            or upper(c1_0.course_name) like ('%-'+?+'%') escape '!' \n            or upper(ei1_0.course_name_th) like ('%'+?+'%') escape '!'\n        )\n",
+      "    select\n        s1_0.section_id,\n        s1_0.academic_year,\n        s1_0.course_code,\n        c1_0.course_code,\n        c1_0.category,\n        c1_0.course_name,\n        c1_0.course_name_th,\n        c1_0.credits,\n        s1_0.instructor,\n        s1_0.section_no,\n        s1_0.semester,\n        s2_0.section_id,\n        s2_0.slot_id,\n        s2_0.day_of_week,\n        s2_0.end_time,\n        s2_0.room,\n        s2_0.start_time \n    from\n        section s1_0 \n    join\n        course c1_0 \n            on c1_0.course_code=s1_0.course_code \n    left join\n        schedule_slot s2_0 \n            on s1_0.section_id=s2_0.section_id \n    where\n        c1_0.course_code in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) \n        and s1_0.academic_year=? \n    order by\n        c1_0.course_code,\n        s1_0.semester,\n        s1_0.section_no\n"
+    ],
+    "pass": true
+  },
+  {
+    "probe": "search-invalid-term",
+    "path": "/api/electives?academicYear=2568&currentSemester=3",
+    "status": 400,
+    "body": {
+      "detail": "currentSemester ต้องเป็น 1 หรือ 2",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request"
+    },
+    "sqlQueryOrder": [],
+    "sql": [],
+    "pass": true
+  },
+  {
+    "probe": "detail-not-recommended",
+    "path": "/api/electives/SA240?academicYear=2568&currentSemester=1",
+    "status": 404,
+    "body": {
+      "detail": "ไม่พบวิชาเสรีแนะนำ: SA240",
+      "instance": "/api/electives/SA240",
+      "status": 404,
+      "title": "Not Found"
+    },
+    "sqlQueryOrder": [
+      "metadata"
+    ],
+    "sql": [
+      "    select\n        distinct ei1_0.course_code,\n        c1_0.course_code,\n        c1_0.category,\n        c1_0.course_name,\n        c1_0.course_name_th,\n        c1_0.credits,\n        ei1_0.course_name_th,\n        ei1_0.interest_group,\n        ei1_0.requires_quota,\n        t1_0.course_code,\n        t1_0.tag \n    from\n        elective_info ei1_0 \n    join\n        course c1_0 \n            on c1_0.course_code=ei1_0.course_code \n    left join\n        elective_tag t1_0 \n            on ei1_0.course_code=t1_0.course_code \n    where\n        c1_0.course_code=? \n        and c1_0.category=N'FREE_ELECTIVE' \n        and exists(select\n            1 from elective_review_point d1_0 \n        where\n            ei1_0.course_code=d1_0.course_code) \n        and exists(select\n            1 from section s1_0 \n        where\n            s1_0.course_code=c1_0.course_code \n            and s1_0.academic_year=?)\n"
+    ],
+    "pass": true
+  },
+  {
+    "probe": "search-unauthorized",
+    "path": "/api/electives?academicYear=2568&currentSemester=1",
+    "status": 401,
+    "body": {
+      "type": "about:blank",
+      "title": "Unauthorized",
+      "status": 401,
+      "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+    },
+    "sqlQueryOrder": [],
+    "sql": [],
+    "pass": true
+  }
+]

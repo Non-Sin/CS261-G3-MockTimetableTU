@@ -1,0 +1,13 @@
+Browser tab: 6, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/".
+1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/
+	2 container รายละเอียดวิชาเสรี
+		3 container
+			4 heading รายละเอียดวิชาเสรี, Value: 2, ID: elective-detail-title
+				5 text รายละเอียดวิชาเสรี
+			6 button ปิดรายละเอียดวิชา
+		7 container
+			8 text โหลดรายละเอียดวิชาไม่สำเร็จ กรุณาลองใหม่
+			9 button ลองใหม่
+		10 button (disabled) + เพิ่มลงตาราง
+
+The focused UI element is 6 button ปิดรายละเอียดวิชา

@@ -1,0 +1,43 @@
+Browser tab: 6, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/".
+1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/
+	2 container รายละเอียดวิชาเสรี
+		3 container
+			4 heading รายละเอียดวิชาเสรี, Value: 2, ID: elective-detail-title
+				5 text รายละเอียดวิชาเสรี
+			6 button ปิดรายละเอียดวิชา
+		7 heading PY250, Value: 3
+			8 text PY250
+		9 text เลือกเสรี
+		10 text 3.0
+		11 text  หน่วยกิต
+		12 text PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT
+		13 text จิตวิทยาบุคลิกภาพและการปรับตน
+		14 text ไม่เช็คชื่อ
+		15 text ไม่มีงานกลุ่ม
+		16 container กลุ่มเรียนและตารางเรียน (Sections)
+			17 text กลุ่มเรียนและตารางเรียน (Sections)
+			18 container
+				19 radio button (disabled, settable, integer) Description: Sec 820001 ภาคเรียนที่ 1, Value: 0
+				20 text Sec  820001 ภาคเรียนที่  1 (ตารางเรียนปัจจุบันคือภาคเรียนที่  2 ) วัน จันทร์ 13:30  - 16:30  น. ห้องเรียน:  LC1-201 ผู้สอน:  อ.วรรณปรัชญ์ พิทักษ์ไพบูลย์กิจ
+			21 container
+				22 radio button (settable, integer) Description: Sec 230001 ภาคเรียนที่ 2, Value: 1
+				23 text Sec  230001 ภาคเรียนที่  2 วัน อังคาร 09:30  - 12:30  น. ห้องเรียน:  ไม่ระบุ ผู้สอน:  อ.วรรณปรัชญ์ พิทักษ์ไพบูลย์กิจ
+		24 container รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			25 heading รายละเอียดวิชา & รีวิวจากรุ่นพี่, Value: 3, ID: elective-reviews-title
+				26 text รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			27 content list
+				28 container
+					29 AXListMarker •
+					30 text เรียนจิตวิทยาเกี่ยวกับบุคลิกภาพการรู้จักเข้าใจตัวเองและผู้อื่น เพื่อสร้างความสัมพันธ์และการใช้ชีวิตประจำอย่างมีความสุข
+				31 container
+					32 AXListMarker •
+					33 text เรียนบรรยายในห้อง อาจารย์สอนสนุก สไลด์เป็นภาษาอังกฤษ
+				34 container
+					35 AXListMarker •
+					36 text ไม่มีงานกลุ่ม
+				37 container
+					38 AXListMarker •
+					39 text มีสอบ กลางภาค และ ปลายภาค
+		40 button + เพิ่มลงตาราง
+
+The focused UI element is 6 button ปิดรายละเอียดวิชา

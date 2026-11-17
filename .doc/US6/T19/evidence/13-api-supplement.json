@@ -1,0 +1,65 @@
+{
+  "status": 409,
+  "body": {
+    "detail": "เพิ่ม FR205 (3 หน่วยกิต) แล้วจะเป็น 24 หน่วยกิต เกินกำหนด 22 หน่วยกิต",
+    "instance": "/api/timetable/entries",
+    "status": 409,
+    "title": "Conflict",
+    "code": "CREDIT_LIMIT_EXCEEDED",
+    "currentCredits": 21,
+    "courseCredits": 3,
+    "maxCredits": 22
+  },
+  "dbAfter": [
+    {
+      "academic_year": 2568,
+      "semester": 1,
+      "timetable_id": 8,
+      "updated_at": "2026-11-17T23:13:42+07:00",
+      "entries": [
+        {
+          "entry_id": 10,
+          "course_code": "PY200",
+          "section_no": "810001",
+          "section_id": 116
+        },
+        {
+          "entry_id": 11,
+          "course_code": "PY250",
+          "section_no": "820001",
+          "section_id": 118
+        },
+        {
+          "entry_id": 12,
+          "course_code": "AT326",
+          "section_no": "230001",
+          "section_id": 72
+        },
+        {
+          "entry_id": 13,
+          "course_code": "JC217",
+          "section_no": "450001",
+          "section_id": 112
+        },
+        {
+          "entry_id": 14,
+          "course_code": "AS201",
+          "section_no": "900001",
+          "section_id": 70
+        },
+        {
+          "entry_id": 15,
+          "course_code": "GE225",
+          "section_no": "320001",
+          "section_id": 109
+        },
+        {
+          "entry_id": 16,
+          "course_code": "PB317",
+          "section_no": "540001",
+          "section_id": 113
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,331 @@
+Browser tab: 6, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/".
+1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/
+	2 text คำเตือนสำคัญ
+	3 text ระบบนี้เป็นเพียงระบบช่วยวางแผนตารางเรียนเท่านั้น
+	4 text ไม่สามารถใช้ลงทะเบียนเรียนจริงได้
+	5 link Description: ไปยัง REG-TU, Value: vnweb68.reg.tu.ac.th/registrar/home
+	6 container
+		7 text MockTimetable  TU ระบบช่วยวางแผนและจัดตารางเรียนจำลอง
+		8 container เมนูหลัก
+			9 button จัดตารางเรียนจำลอง
+			10 button ดูวิชาเสรีแนะนำ
+			11 button ค้นหาช่องทางขอโควตา
+		12 container ข้อมูลนักศึกษา
+			13 pop up button (collapsed) SJ Somchai Jaidee 6609000001, Secondary Actions: Expand
+				14 text SJ
+				15 text Somchai Jaidee
+				16 text 6609000001
+			17 container เมนูบัญชีผู้ใช้
+				18 text SJ
+				19 button ออกจากระบบ
+	20 container
+		21 text วางแผนวันนี้ เรียนอย่างมั่นใจ
+		22 heading จัดตารางเรียนจำลอง, Value: 1
+			23 text จัดตารางเรียนจำลอง
+		24 text ยินดีต้อนรับ  Somchai เพิ่มและลบวิชาเพื่อวางแผนตารางเรียนของคุณ
+		317 heading ตรวจพบเวลาเรียนซ้อนทับกัน, Value: 3
+			318 text ตรวจพบเวลาเรียนซ้อนทับกัน
+		319 text ต้องจัดใหม่
+		320 text เวลาเรียนชนกัน
+		321 container
+			322 text PY200 และ RE468  ·  จันทร์ 09:30 - 12:30
+		323 text กรุณาสลับกลุ่มเรียนหรือเลือกรายวิชาอื่น
+		324 button ปิดคำเตือนเวลาเรียนชน
+		325 heading ตารางเรียนจำลอง, Value: 2
+			326 text ตารางเรียนจำลอง
+		327 container
+			328 text หน่วยกิต  6  /  22
+		329 button (disabled) PNG, Help: แก้เวลาเรียนชนก่อนบันทึกเป็นภาพ
+		330 text PY200 RE468 ⚠ ชนกัน:  PY200 และ RE468
+		331 text วัน \ เวลา
+		332 container
+			333 text 08 :00
+		334 container
+			335 text 09 :00
+		336 container
+			337 text 10 :00
+		338 container
+			339 text 11 :00
+		340 container
+			341 text 12 :00
+		342 container
+			343 text 13 :00
+		344 container
+			345 text 14 :00
+		346 container
+			347 text 15 :00
+		348 container
+			349 text 16 :00
+		350 container
+			351 text 17 :00
+		352 container
+			353 text 18 :00
+		354 container
+			355 text 19 :00
+		356 container
+			357 text 20 :00
+		358 text จันทร์ MON
+		359 container
+			360 text PY200
+			361 text Sec  810001
+			362 container
+				363 text 09:30 - 12:30
+			364 text LC1-201,202
+			365 text RE468
+			366 text Sec  810001
+			367 container
+				368 text 09:30 - 12:30
+			369 text SC2-201
+			370 container
+				371 text เวลาชนกัน  09:30 - 12:30  ·  2  วิชา
+			372 text PY200
+			373 text Sec  810001
+			374 container
+				375 text 09:30 - 12:30
+			376 text LC1-201,202
+			377 text RE468
+			378 text Sec  810001
+			379 container
+				380 text 09:30 - 12:30
+			381 text SC2-201
+		382 text อังคาร TUE
+		383 text พุธ WED
+		384 text พฤหัสบดี THU
+		385 text ศุกร์ FRI
+		386 text เสาร์ SAT
+		387 container
+			388 text วิชาในตารางเรียน:  2  วิชา ( 6.0  หน่วยกิต)
+		389 heading จัดตารางเรียนตามเล่มหลักสูตร, Value: 2
+			390 text จัดตารางเรียนตามเล่มหลักสูตร
+		391 text ★ ฟีเจอร์แนะนำ
+		392 text จำลองตารางเรียนตามแผนการศึกษาแนะนำของแต่ละชั้นปีและภาคเรียน ช่วยให้วางแผนลงทะเบียนได้สะดวกและรวดเร็วยิ่งขึ้น
+		393 button จัดตามแผนหลักสูตร
+		394 heading วิชาที่เพิ่มแล้ว, Value: 2
+			395 text วิชาที่เพิ่มแล้ว
+		396 button (disabled) ลบที่เลือก
+		397 button ลบทั้งหมด
+		398 container
+			399 checkbox (settable, integer) Description: เลือกวิชา PY200, Value: 0
+			400 text PY200 GENERAL PSYCHOLOGY Sec  810001  ·  3  หน่วยกิต จันทร์ 09:30 - 12:30  · ห้อง LC1-201,202
+			401 button ลบวิชา
+		402 container
+			403 checkbox (settable, integer) Description: เลือกวิชา RE468, Value: 0
+			404 text RE468 RELIGION AND FILM Sec  810001  ·  3  หน่วยกิต จันทร์ 09:30 - 12:30  · ห้อง SC2-201
+			405 button ลบวิชา
+		406 heading ค้นหารายวิชา, Value: 2
+			407 text ค้นหารายวิชา
+		408 pop up button (collapsed, settable) Description: ภาคเรียน, Value: ภาคเรียน 1, Secondary Actions: Expand
+			409 menu
+				410 (selected) ภาคเรียน 1
+				411 ภาคเรียน 2
+		412 pop up button (collapsed, settable) Description: ปีการศึกษา, Value: ปีการศึกษา 2568, Secondary Actions: Expand
+			413 menu
+				414 (selected) ปีการศึกษา 2568
+		415 container
+			416 text field (settable)
+			417 button ค้นหา
+		418 pop up button (collapsed, settable) Description: กรองตามหมวดวิชา, Value: ทุกหมวดวิชา, Secondary Actions: Expand
+			419 menu
+				420 (selected) ทุกหมวดวิชา
+				421 วิชาเฉพาะ
+				422 ศึกษาทั่วไป
+				423 วิชาเลือกเสรี
+				424 วิชาโท
+		425 container
+			426 text พบ  54  รายวิชา
+		427 container
+			428 text AS201 KOREAN CULTURE AND INNOVATION 3  หน่วยกิต ผู้สอน:  ผศ.ดร.ถาปกรณ์ กำเนิดศิริ พุธ 13:30 - 16:30  · ห้อง LC4-231 Sec  900001
+			429 button + เพิ่มวิชา
+		430 container
+			431 text AT326 RICE AND PRODUCTION TECHNOLOGY 3  หน่วยกิต ผู้สอน:  ผศ.ดร.พรชัย หาระโคตร อังคาร 09:30 - 12:30  · ห้อง ไม่ระบุ Sec  230001
+			432 button + เพิ่มวิชา
+		433 container
+			434 text CS100 Basic Web Development 3  หน่วยกิต ผู้สอน: อังคาร 08:00 - 09:30  · ห้อง ไม่ระบุ พฤหัสบดี 08:00 - 09:30  · ห้อง ไม่ระบุ Sec  010001
+			435 button + เพิ่มวิชา
+		436 container
+			437 text CS101 Discrete Structures 3  หน่วยกิต ผู้สอน: อังคาร 09:30 - 11:00  · ห้อง ไม่ระบุ พฤหัสบดี 09:30 - 11:00  · ห้อง ไม่ระบุ Sec  020001
+			438 button + เพิ่มวิชา
+		439 container
+			440 text CS102 Problem Solving Basics and Computer Programming 3  หน่วยกิต ผู้สอน: อังคาร 11:00 - 12:30  · ห้อง ไม่ระบุ พฤหัสบดี 11:00 - 12:30  · ห้อง ไม่ระบุ Sec  030001
+			441 button + เพิ่มวิชา
+		442 container
+			443 text CS111 Object-Oriented Concepts 3  หน่วยกิต ผู้สอน:  ผศ.ดร.สมชาย ใจดี อังคาร 11:00 - 12:30  · ห้อง LC3-121 พฤหัสบดี 11:00 - 12:30  · ห้อง LC3-121
+			444 pop up button (collapsed, settable) Description: เลือกกลุ่มเรียน CS111, Value: Sec 030001, Secondary Actions: Expand
+				445 menu
+					446 (selected) Sec 030001
+					447 Sec 030002
+			448 button + เพิ่มวิชา
+		449 container
+			450 text CS180 Introduction to User Interface and User Experience 3  หน่วยกิต ผู้สอน:  อ.ดร.ปวีณา เลิศวิไล จันทร์ 13:30 - 16:30  · ห้อง LC5-S202 Sec  820001
+			451 button + เพิ่มวิชา
+		452 container
+			453 text CS213 Data Structures 3  หน่วยกิต ผู้สอน: อังคาร 15:00 - 16:30  · ห้อง ไม่ระบุ พฤหัสบดี 15:00 - 16:30  · ห้อง ไม่ระบุ Sec  050001
+			454 button + เพิ่มวิชา
+		455 container
+			456 text CS221 Introduction to Computer System and Organization 3  หน่วยกิต ผู้สอน: อังคาร 13:30 - 15:00  · ห้อง ไม่ระบุ พฤหัสบดี 13:30 - 15:00  · ห้อง ไม่ระบุ Sec  040001
+			457 button + เพิ่มวิชา
+		458 container
+			459 text CS223 Virtualization Technology 3  หน่วยกิต ผู้สอน: อังคาร 13:30 - 15:00  · ห้อง ไม่ระบุ พฤหัสบดี 13:30 - 15:00  · ห้อง ไม่ระบุ Sec  040001
+			460 button + เพิ่มวิชา
+		461 container
+			462 text CS224 Linux Administration and Performance Monitoring 3  หน่วยกิต ผู้สอน: อังคาร 11:00 - 12:30  · ห้อง ไม่ระบุ พฤหัสบดี 11:00 - 12:30  · ห้อง ไม่ระบุ Sec  030001
+			463 button + เพิ่มวิชา
+		464 container
+			465 text CS232 Introduction to Cloud Computing Technology 3  หน่วยกิต ผู้สอน: Sec  Q70001
+			466 button + เพิ่มวิชา
+		467 container
+			468 text CS240 Principles of Data Science 3  หน่วยกิต ผู้สอน: ศุกร์ 09:30 - 12:30  · ห้อง ไม่ระบุ Sec  870001
+			469 button + เพิ่มวิชา
+		470 container
+			471 text CS241 Programming Languages and Paradigms 3  หน่วยกิต ผู้สอน: อังคาร 15:00 - 16:30  · ห้อง ไม่ระบุ พฤหัสบดี 15:00 - 16:30  · ห้อง ไม่ระบุ Sec  050001
+			472 button + เพิ่มวิชา
+		473 container
+			474 text CS261 Introduction to Software Engineering 3  หน่วยกิต ผู้สอน: พุธ 15:00 - 16:30  · ห้อง ไม่ระบุ ศุกร์ 15:00 - 16:30  · ห้อง ไม่ระบุ Sec  100001
+			475 button + เพิ่มวิชา
+		476 container
+			477 text CS301 Preparation for Senior Projects and Co-operative Education 3  หน่วยกิต ผู้สอน: จันทร์ 09:30 - 12:30  · ห้อง ไม่ระบุ Sec  810001
+			478 button + เพิ่มวิชา
+		479 container
+			480 text CS331 Net-Centric Computing 3  หน่วยกิต ผู้สอน: พุธ 09:30 - 11:00  · ห้อง ไม่ระบุ ศุกร์ 09:30 - 11:00  · ห้อง ไม่ระบุ Sec  070001
+			481 button + เพิ่มวิชา
+		482 container
+			483 text CS341 Big Data Engineering 3  หน่วยกิต ผู้สอน: พุธ 08:00 - 09:30  · ห้อง ไม่ระบุ ศุกร์ 08:00 - 09:30  · ห้อง ไม่ระบุ Sec  060001
+			484 button + เพิ่มวิชา
+		485 container
+			486 text CS345 Practical Machine Learning 3  หน่วยกิต ผู้สอน: อังคาร 11:00 - 12:30  · ห้อง ไม่ระบุ พฤหัสบดี 11:00 - 12:30  · ห้อง ไม่ระบุ Sec  030001
+			487 button + เพิ่มวิชา
+		488 container
+			489 text CS346 Big Data Applications and Analytics 3  หน่วยกิต ผู้สอน: พุธ 11:00 - 12:30  · ห้อง ไม่ระบุ ศุกร์ 11:00 - 12:30  · ห้อง ไม่ระบุ Sec  080001
+			490 button + เพิ่มวิชา
+		491 container
+			492 text CS361 Cloud-Based Software Architecting 3  หน่วยกิต ผู้สอน: พุธ 13:30 - 16:30  · ห้อง ไม่ระบุ Sec  900001
+			493 button + เพิ่มวิชา
+		494 container
+			495 text CS373 Advanced Search Strategies 3  หน่วยกิต ผู้สอน: พุธ 08:00 - 09:30  · ห้อง ไม่ระบุ ศุกร์ 08:00 - 09:30  · ห้อง ไม่ระบุ Sec  060001
+			496 button + เพิ่มวิชา
+		497 container
+			498 text CS374 Natural Language Processing 3  หน่วยกิต ผู้สอน: อังคาร 11:00 - 12:30  · ห้อง ไม่ระบุ พฤหัสบดี 11:00 - 12:30  · ห้อง ไม่ระบุ Sec  030001
+			499 button + เพิ่มวิชา
+		500 container
+			501 text CS384 Human - Computer Interaction 3  หน่วยกิต ผู้สอน: พุธ 11:00 - 12:30  · ห้อง ไม่ระบุ ศุกร์ 11:00 - 12:30  · ห้อง ไม่ระบุ Sec  080001
+			502 button + เพิ่มวิชา
+		503 container
+			504 text CS403 Special Projects 2 4  หน่วยกิต ผู้สอน: Sec  000001
+			505 button + เพิ่มวิชา
+		506 container
+			507 text CS404 Co-operative Education 2 4  หน่วยกิต ผู้สอน: Sec  000001
+			508 button + เพิ่มวิชา
+		509 container
+			510 text CS440 Selected Topics in Data Science 3  หน่วยกิต ผู้สอน: จันทร์ 09:30 - 12:30  · ห้อง ไม่ระบุ Sec  810001
+			511 button + เพิ่มวิชา
+		512 container
+			513 text EG214 PRESENTATION SKILLS 3  หน่วยกิต ผู้สอน:  อ.ดร.ณัฐพล ตรีพรชัยศักดิ์ อังคาร 09:30 - 12:30  · ห้อง SC2-204
+			514 pop up button (collapsed, settable) Description: เลือกกลุ่มเรียน EG214, Value: Sec 230001, Secondary Actions: Expand
+				515 menu
+					516 (selected) Sec 230001
+					517 Sec 320001
+					518 Sec 320002
+					519 Sec 320003
+					520 Sec 320004
+					521 Sec 540001
+					522 Sec 540002
+					523 Sec 540003
+					524 Sec 540004
+					525 Sec 780001
+					526 Sec 900001
+					527 Sec 900002
+					528 Sec 900003
+			529 button + เพิ่มวิชา
+		530 container
+			531 text EL105 English Communication Skills 3  หน่วยกิต ผู้สอน: พุธ 09:30 - 12:30  · ห้อง ไม่ระบุ Sec  780001
+			532 button + เพิ่มวิชา
+		533 container
+			534 text EL295 Academic English and Study Skills 1 3  หน่วยกิต ผู้สอน: พุธ 09:30 - 12:30  · ห้อง ไม่ระบุ Sec  780001
+			535 button + เพิ่มวิชา
+		536 container
+			537 text EL395 Academic English and Study Skills 2 3  หน่วยกิต ผู้สอน: Sec  Q70001
+			538 button + เพิ่มวิชา
+		539 container
+			540 text FD216 FOOD TECHNOLOGY IN EVERYDAY LIFE 3  หน่วยกิต ผู้สอน:  รศ.ดร.ประภาศรี เทพรักษา, รศ.ดร.สุพัตรา สุภาวงศ์, ผศ.ดร.สุธีรา วัฒนกุล จันทร์ 09:30 - 12:30  · ห้อง SC3-413 Sec  810002
+			541 button + เพิ่มวิชา
+		542 container
+			543 text FR205 FRENCH FOR EVERYDAY LIFE 3  หน่วยกิต ผู้สอน:  ผศ.ธรณินทร์ มีเพียร อังคาร 16:30 - 18:00  · ห้อง SC3-M10 พฤหัสบดี 16:30 - 18:00  · ห้อง SC3-M10
+			544 pop up button (collapsed, settable) Description: เลือกกลุ่มเรียน FR205, Value: Sec 260001, Secondary Actions: Expand
+				545 menu
+					546 (selected) Sec 260001
+					547 Sec 260002
+			548 button + เพิ่มวิชา
+		549 container
+			550 text GE225 POPULATION GEOGRAPHY AND MIGRATION 3  หน่วยกิต ผู้สอน:  รศ.ดร.ทรงชัย ทองปาน พฤหัสบดี 09:30 - 12:30  · ห้อง SC-2031 Sec  320001
+			551 button + เพิ่มวิชา
+		552 container
+			553 text IS313 BUSINESS DATA COMMUNICATIONS ON CLOUD COMPUTING AND NETWORKING 3  หน่วยกิต ผู้สอน:  อ.ดร.พิริยะ อุตมฉันท์ อังคาร 09:30 - 12:30  · ห้อง พบ.313 Sec  230001
+			554 button + เพิ่มวิชา
+		555 container
+			556 text JC217 JOURNALISM AND SOCIAL CHANGE 3  หน่วยกิต ผู้สอน:  รศ.ดร.นิธิดา แสงสิงแก้ว อังคาร 13:30 - 16:30  · ห้อง SC3-221 Sec  450001
+			557 button + เพิ่มวิชา
+		558 container
+			559 text JP171 Japanese 1 3  หน่วยกิต ผู้สอน:  อ.ยูกิ ทานากะ ศุกร์ 13:30 - 16:30  · ห้อง LC2-204 Sec  920001
+			560 button + เพิ่มวิชา
+		561 container
+			562 text LAS101 Critical Thinking, Reading, and Writing 3  หน่วยกิต ผู้สอน:  อ.พิมพ์ชนก บุญมา พุธ 09:30 - 12:30  · ห้อง SC-1026 Sec  780004
+			563 button + เพิ่มวิชา
+		564 container
+			565 text MA211 Calculus 1 3  หน่วยกิต ผู้สอน:  รศ.ดร.ประเสริฐ มั่นคง อังคาร 09:30 - 11:00  · ห้อง SC-3015 พฤหัสบดี 09:30 - 11:00  · ห้อง SC-3015 Sec  020001
+			566 button + เพิ่มวิชา
+		567 container
+			568 text PB317 GENDER, SEXUALITY AND HEALTH 3  หน่วยกิต ผู้สอน:  ผศ.รณภูมิ สามัคคีคารมย์ พฤหัสบดี 13:30 - 16:30  · ห้อง ไม่ระบุ Sec  540001
+			569 button + เพิ่มวิชา
+		570 container
+			571 text PY200 GENERAL PSYCHOLOGY 3  หน่วยกิต ผู้สอน:  ผศ.ทระวิณ ชาลีรักษ์ตระกูล และคณะ จันทร์ 09:30 - 12:30  · ห้อง LC1-201,202 Sec  810001
+			572 button (disabled) เพิ่มแล้ว
+		573 container
+			574 text PY250 PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT 3  หน่วยกิต ผู้สอน:  อ.วรรณปรัชญ์ พิทักษ์ไพบูลย์กิจ จันทร์ 13:30 - 16:30  · ห้อง LC1-201 Sec  820001
+			575 button + เพิ่มวิชา
+		576 container
+			577 text PY252 PSYCHOLOGY OF INTERPERSONAL RELATIONS 3  หน่วยกิต ผู้สอน:  รศ.ดร.โมนิล เตชะวชิรกุล พุธ 08:00 - 09:30  · ห้อง SC-1058 ศุกร์ 08:00 - 09:30  · ห้อง SC-1058 Sec  060001
+			578 button + เพิ่มวิชา
+		579 container
+			580 text PY320 SOCIAL PSYCHOLOGY 3  หน่วยกิต ผู้สอน:  ผศ.ดร.พัฒนกิจ ชอบทำกิจ อังคาร 13:30 - 16:30  · ห้อง SC-4001 Sec  450001
+			581 button + เพิ่มวิชา
+		582 container
+			583 text RE468 RELIGION AND FILM 3  หน่วยกิต ผู้สอน:  ผศ.ดร.เดโชพล เหมนาไลย จันทร์ 09:30 - 12:30  · ห้อง SC2-201 Sec  810001
+			584 button (disabled) เพิ่มแล้ว
+		585 container
+			586 text ST216 Statistics for Social Science 1 3  หน่วยกิต ผู้สอน:  ผศ.ณัฐธิดา พรหมวงศ์ อังคาร 13:30 - 15:00  · ห้อง ไม่ระบุ พฤหัสบดี 13:30 - 15:00  · ห้อง ไม่ระบุ Sec  040001
+			587 button + เพิ่มวิชา
+		588 container
+			589 text ST329 Applied Probability and Statistical Models 3  หน่วยกิต ผู้สอน: พุธ 13:30 - 15:00  · ห้อง ไม่ระบุ ศุกร์ 13:30 - 15:00  · ห้อง ไม่ระบุ Sec  090001
+			590 button + เพิ่มวิชา
+		591 container
+			592 text TH291 WRITING PROFICIENCY DEVELOPMENT 3  หน่วยกิต ผู้สอน:  ผศ.พรทิพย์ เฉิดฉินนภา พฤหัสบดี 13:30 - 16:30  · ห้อง SC-1026 Sec  540001
+			593 button + เพิ่มวิชา
+		594 container
+			595 text TU100 Civic Engagement 3  หน่วยกิต ผู้สอน: จันทร์ 13:30 - 16:30  · ห้อง ไม่ระบุ Sec  820001
+			596 button + เพิ่มวิชา
+		597 container
+			598 text TU101 Thailand, ASEAN, and the World 3  หน่วยกิต ผู้สอน:  อ.สุภาพร ทองดี พุธ 13:30 - 16:30  · ห้อง SC-1058 Sec  900001
+			599 button + เพิ่มวิชา
+		600 container
+			601 text TU106 Creativity and Communication 3  หน่วยกิต ผู้สอน:  อ.ดร.กมลชนก ศิลปชัย พฤหัสบดี 13:30 - 16:30  · ห้อง LC2-203 Sec  540001
+			602 button + เพิ่มวิชา
+		603 container
+			604 text TU107 Digital Skill and Problem Solving 3  หน่วยกิต ผู้สอน: Sec  000002
+			605 button + เพิ่มวิชา
+		606 container
+			607 text TU108 Self-Development and Management 3  หน่วยกิต ผู้สอน: อังคาร 09:30 - 12:30  · ห้อง ไม่ระบุ
+			608 pop up button (collapsed, settable) Description: เลือกกลุ่มเรียน TU108, Value: Sec 230001, Secondary Actions: Expand
+				609 menu
+					610 (selected) Sec 230001
+					611 Sec 910001
+			612 button + เพิ่มวิชา
+		613 container
+			614 text TU109 Innovation and Entrepreneurial Mindset 3  หน่วยกิต ผู้สอน:  อ.ดร.ธนวัฒน์ รุ่งเรือง พุธ 09:30 - 12:30  · ห้อง SC3-413 Sec  780001
+			615 button + เพิ่มวิชา
+	312 container
+		313 text TU MockTimetableTU · ระบบช่วยจัดตารางเรียนสำหรับนักศึกษาวิทยาการคอมพิวเตอร์ ภาคปกติ มหาวิทยาลัยธรรมศาสตร์
+		314 container ลิงก์ช่วยเหลือ
+			315 link Description: REG-TU, Value: vnweb68.reg.tu.ac.th/registrar/home
+			316 link Description: แจ้งปัญหา, Value: github.com/Non-Sin/CS261-G3-MockTimetableTU/issues
+
+The focused UI element is 9 button จัดตารางเรียนจำลอง

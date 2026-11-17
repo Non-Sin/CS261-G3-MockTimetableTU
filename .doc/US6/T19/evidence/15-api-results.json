@@ -1,0 +1,74 @@
+[
+  {
+    "kind": "missing",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568&currentSemester=1",
+    "status": 401,
+    "body": {
+      "type": "about:blank",
+      "title": "Unauthorized",
+      "status": 401,
+      "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+    }
+  },
+  {
+    "kind": "missing",
+    "method": "GET",
+    "path": "/api/electives/FR205?academicYear=2568&currentSemester=1",
+    "status": 401,
+    "body": {
+      "type": "about:blank",
+      "title": "Unauthorized",
+      "status": 401,
+      "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+    }
+  },
+  {
+    "kind": "missing",
+    "method": "POST",
+    "path": "/api/timetable/entries",
+    "status": 401,
+    "body": {
+      "type": "about:blank",
+      "title": "Unauthorized",
+      "status": 401,
+      "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+    }
+  },
+  {
+    "kind": "expired-signed-token",
+    "method": "GET",
+    "path": "/api/electives?academicYear=2568&currentSemester=1",
+    "status": 401,
+    "body": {
+      "type": "about:blank",
+      "title": "Unauthorized",
+      "status": 401,
+      "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+    }
+  },
+  {
+    "kind": "expired-signed-token",
+    "method": "GET",
+    "path": "/api/electives/FR205?academicYear=2568&currentSemester=1",
+    "status": 401,
+    "body": {
+      "type": "about:blank",
+      "title": "Unauthorized",
+      "status": 401,
+      "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+    }
+  },
+  {
+    "kind": "expired-signed-token",
+    "method": "POST",
+    "path": "/api/timetable/entries",
+    "status": 401,
+    "body": {
+      "type": "about:blank",
+      "title": "Unauthorized",
+      "status": 401,
+      "detail": "กรุณาเข้าสู่ระบบก่อนใช้งาน"
+    }
+  }
+]

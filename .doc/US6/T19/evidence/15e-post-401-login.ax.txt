@@ -1,0 +1,28 @@
+Browser tab: 6, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/login".
+1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/login
+	2 container
+		3 text คำเตือนสำคัญ ระบบนี้เป็นเพียงระบบช่วยวางแผนตารางเรียนเท่านั้น ไม่สามารถใช้ลงทะเบียนเรียนจริงได้
+		4 link Description: ไปยัง REG-TU, Value: vnweb68.reg.tu.ac.th/registrar/home
+		5 container
+			6 text MockTimetable  TU
+		7 text ระบบช่วยวางแผนและจัดตารางเรียนจำลอง
+		8 container Login
+			9 heading Login, Value: 1, ID: login-title
+				10 text Login
+			11 text เข้าใช้งานระบบช่วยจัดตารางเรียน
+			12 container
+				13 text คำแนะนำ:  ใช้  Username  และ  Password  เดียวกับที่เข้าใช้งานระบบ  REG-TU  ได้เลย
+			14 container
+				15 text เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง
+				16 text ชื่อผู้ใช้งาน (Username)
+				17 text field (settable) ชื่อผู้ใช้งาน (Username)
+				18 text รหัสผ่าน (Password)
+				19 text field (settable) รหัสผ่าน (Password)
+				20 checkbox Description: แสดงรหัสผ่าน, Value: 0
+				21 button เข้าสู่ระบบ (Login)
+		22 text TU MockTimetableTU · ระบบช่วยจัดตารางเรียนสำหรับนักศึกษาวิทยาการคอมพิวเตอร์ ภาคปกติ มหาวิทยาลัยธรรมศาสตร์
+		23 container ลิงก์ช่วยเหลือ
+			24 link Description: REG-TU, Value: vnweb68.reg.tu.ac.th/registrar/home
+			25 link Description: แจ้งปัญหา, Value: github.com/Non-Sin/CS261-G3-MockTimetableTU/issues
+
+The focused UI element is 1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/login

@@ -1,0 +1,81 @@
+Browser tab: 6, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/".
+0 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/
+	1 container
+		2 text คำเตือนสำคัญ ระบบนี้เป็นเพียงระบบช่วยวางแผนตารางเรียนเท่านั้น ไม่สามารถใช้ลงทะเบียนเรียนจริงได้
+		3 link Description: ไปยัง REG-TU, Value: vnweb68.reg.tu.ac.th/registrar/home
+		4 container
+			5 text MockTimetable  TU
+		6 text ระบบช่วยวางแผนและจัดตารางเรียนจำลอง
+		7 container เมนูหลัก
+			8 button จัดตารางเรียนจำลอง
+			9 button ดูวิชาเสรีแนะนำ
+			10 button ค้นหาช่องทางขอโควตา
+		11 container ข้อมูลนักศึกษา
+			12 pop up button (collapsed) SJ Somchai Jaidee 6609000001, Secondary Actions: Expand
+				13 text SJ
+				14 text Somchai Jaidee
+				15 text 6609000001
+			16 container เมนูบัญชีผู้ใช้
+				17 text SJ
+				18 button ออกจากระบบ
+		19 text วางแผนวันนี้ เรียนอย่างมั่นใจ
+		20 heading ดูวิชาเสรีแนะนำ, Value: 1
+			21 text ดูวิชาเสรีแนะนำ
+		22 container
+			23 text ยินดีต้อนรับ  Somchai สำรวจวิชาเลือกเสรีสำหรับแผนการเรียนของคุณ
+		71 container
+			72 text ตารางปัจจุบัน: ภาคเรียนที่  1  ปีการศึกษา  2568
+		73 container ค้นหาและกรองวิชาเสรี
+			74 container
+				75 text ค้นหาด้วยรหัสวิชา หรือชื่อวิชา
+				76 text field (settable) ค้นหาด้วยรหัสวิชา หรือชื่อวิชา
+				77 button ค้นหาวิชา
+			78 container
+				79 text กรองตามวันเรียน
+				80 pop up button (collapsed, settable) กรองตามวันเรียน, Value: ทุกวันเรียน, Secondary Actions: Expand
+					81 menu
+						82 (selected) ทุกวันเรียน
+						83 วันจันทร์
+						84 วันอังคาร
+						85 วันพุธ
+						86 วันพฤหัสบดี
+						87 วันศุกร์
+						88 วันเสาร์
+			89 container
+				90 text กรองตามช่วงเวลาเรียน
+				91 pop up button (collapsed, settable) กรองตามช่วงเวลาเรียน, Value: ทุกช่วงเวลา, Secondary Actions: Expand
+					92 menu
+						93 (selected) ทุกช่วงเวลา
+						94 เช้า (08:00 - 12:30)
+						95 บ่าย (13:30 - 16:30)
+						96 เย็น (16:30 - 19:30)
+			97 container
+				98 text หมวดหมู่วิชา
+				99 pop up button (collapsed, settable) หมวดหมู่วิชา, Value: ทั้งหมด (ทุกหมวดหมู่), Secondary Actions: Expand
+					100 menu
+						101 (selected) ทั้งหมด (ทุกหมวดหมู่)
+						102 หมวดภาษาและการสื่อสาร
+						103 หมวดจิตวิทยาและพฤติกรรมศาสตร์
+						104 หมวดสังคม วัฒนธรรม และสุขภาพ
+						105 หมวดวิทยาศาสตร์และเทคโนโลยี
+						106 หมวดสื่อ สารสนเทศ และภาพยนตร์
+			107 container
+				108 text ภาคเรียนที่ต้องการค้นหา
+				109 pop up button (collapsed, settable) ภาคเรียนที่ต้องการค้นหา, Value: ภาคเรียนที่ 2, Secondary Actions: Expand
+					110 menu
+						111 ทุกภาคเรียน (ทั้งหมด)
+						112 ภาคเรียนที่ 1
+						113 (selected) ภาคเรียนที่ 2
+			114 checkbox (settable, integer) Description: แสดงเฉพาะวิชาที่ไม่ชนกับตารางปัจจุบัน, Value: 1
+			115 text แสดงทั้งหมด 0 วิชาแนะนำ
+		116 container
+			117 heading ไม่พบรีวิววิชานี้, Value: 2
+				118 text ไม่พบรีวิววิชานี้
+			119 text ไม่พบวิชาเสรีที่ตรงกับเงื่อนไขนี้
+			120 button ดูวิชาเสรีแนะนำทั้งหมด
+		67 text TU MockTimetableTU · ระบบช่วยจัดตารางเรียนสำหรับนักศึกษาวิทยาการคอมพิวเตอร์ ภาคปกติ มหาวิทยาลัยธรรมศาสตร์
+		68 container ลิงก์ช่วยเหลือ
+			69 link Description: REG-TU, Value: vnweb68.reg.tu.ac.th/registrar/home
+			70 link Description: แจ้งปัญหา, Value: github.com/Non-Sin/CS261-G3-MockTimetableTU/issues
+
+The focused UI element is 114 checkbox (settable, integer) Description: แสดงเฉพาะวิชาที่ไม่ชนกับตารางปัจจุบัน, Value: 1

@@ -1,0 +1,41 @@
+Browser tab: 6, Title: "CS261 Group 3", URL: "http://127.0.0.1:13019/".
+1 AXWebArea CS261 Group 3, URL: 127.0.0.1:13019/
+	2 container รายละเอียดวิชาเสรี
+		3 container
+			4 heading รายละเอียดวิชาเสรี, Value: 2, ID: elective-detail-title
+				5 text รายละเอียดวิชาเสรี
+			6 button ปิดรายละเอียดวิชา
+		7 heading RE468, Value: 3
+			8 text RE468
+		9 text เลือกเสรี
+		10 text เปิดเฉพาะเทอม
+		11 text 1
+		12 text 3.0
+		13 text  หน่วยกิต
+		14 text RELIGION AND FILM
+		15 text ศาสนากับภาพยนตร์
+		16 text อาจารย์ใจดี
+		17 container กลุ่มเรียนและตารางเรียน (Sections)
+			18 text กลุ่มเรียนและตารางเรียน (Sections)
+			19 container
+				20 radio button (settable, integer) Description: Sec 810001 ภาคเรียนที่ 1, Value: 1
+				21 text Sec  810001 ภาคเรียนที่  1 วัน จันทร์ 09:30  - 12:30  น. ห้องเรียน:  SC2-201 ผู้สอน:  ผศ.ดร.เดโชพล เหมนาไลย เวลาเรียนชนกับ  PY200 (ยังเพิ่มลงตารางได้)
+		22 container รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			23 heading รายละเอียดวิชา & รีวิวจากรุ่นพี่, Value: 3, ID: elective-reviews-title
+				24 text รายละเอียดวิชา & รีวิวจากรุ่นพี่
+			25 content list
+				26 container
+					27 AXListMarker •
+					28 text เรียนเกี่ยวกับการวิเคราะห์ วิพากษ์ ภาพยนตร์ที่มีเนื้อหาเกี่ยวกับศาสนา
+				29 container
+					30 AXListMarker •
+					31 text เราจะได้ดูหนังและวิเคราะห์ในชั้นเรียนร่วมกับอาจารย์และเพื่อนๆ
+				32 container
+					33 AXListMarker •
+					34 text มีงานนำเสนอภาพยนตร์ 1เรื่องที่เราสนใจ ผ่านเลนส์ของศาสนา
+				35 container
+					36 AXListMarker •
+					37 text มีสอบปากเปล่ากับอาจารย์ บรรยายกาศชิลๆ เหมือนนั่งเล่างานให้อจ.ฟัง
+		38 button + เพิ่มลงตาราง
+
+The focused UI element is 6 button ปิดรายละเอียดวิชา
