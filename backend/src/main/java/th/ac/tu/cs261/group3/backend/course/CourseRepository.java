@@ -4,10 +4,36 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
 public interface CourseRepository extends JpaRepository<Course, String> {
+
+    /** US7 ค้นทุกวิชา รวมวิชาที่ยังไม่เปิดสอน; null codes = ไม่กรอง, ชุดว่าง = ไม่พบ */
+    default List<Course> searchAllCourses(String q, Collection<String> courseCodes) {
+        if (courseCodes != null && courseCodes.isEmpty()) {
+            return List.of();
+        }
+        String prefix = q == null ? "" : escapeLike(q.toUpperCase(Locale.ROOT));
+        // ไม่ bind null หรือ IN () เพื่อให้ SQL Server รู้ชนิด parameter แน่นอน
+        return searchQuotaCourses(prefix, courseCodes != null,
+                courseCodes == null ? List.of("") : courseCodes);
+    }
+
+    /** เรียกผ่าน searchAllCourses ซึ่ง escape LIKE และจัดการชุดรหัสว่างแล้ว */
+    @Query("""
+            select c from Course c
+            where (:filterCodes = false or c.courseCode in :courseCodes)
+              and (upper(c.courseCode) like concat(:prefix, '%') escape '!'
+                   or upper(c.courseName) like concat(:prefix, '%') escape '!'
+                   or upper(c.courseName) like concat('% ', :prefix, '%') escape '!'
+                   or upper(c.courseName) like concat('%-', :prefix, '%') escape '!'
+                   or upper(c.courseNameTh) like concat('%', :prefix, '%') escape '!')
+            order by c.courseCode""")
+    List<Course> searchQuotaCourses(@Param("prefix") String prefix,
+                                   @Param("filterCodes") boolean filterCodes,
+                                   @Param("courseCodes") Collection<String> courseCodes);
 
     /**
      * วิชาที่มีกลุ่มเรียนเปิดในปี/ภาคที่เลือก เรียงตามรหัสวิชา (GET /api/courses)
