@@ -2,7 +2,7 @@
 
 | รายการ | รายละเอียด |
 |---|---|
-| User Story | **US7: ค้นหาช่องทางขอโควตา** (Priority: High) |
+| User Story | **US7: ค้นหาช่องทางขอโควตา** (Priority: Medium) |
 | Task | US7-T16 Design User Acceptance Test ตาม user story details |
 | ขอบเขต | UAT ครอบคลุม Conditions of Satisfaction ของ US7 และเคสการแสดงผลสถานะรายวิชาต่างๆ (ช่องทางขอโควตา, ไม่ต้องขอโควตา, เปิดแค่เทอม 1, ยังไม่มีข้อมูลโควตา, และไม่พบข้อมูล) |
 | ใช้ใน | US7-T20 รัน User Acceptance Test |
