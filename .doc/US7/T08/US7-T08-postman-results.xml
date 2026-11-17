@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="US7-T08 Quota API (test fixtures before T09)" tests="35" time="0.374">
+  <testsuite name="01 REQUIRED - EL395" id="fc18d815-0683-4514-b8fd-9472a4e70b2f" timestamp="2026-11-17T10:36:43.601Z" tests="5" failures="0" errors="0" time="0.183">
+    <testcase name="HTTP 200" time="0.183" classname="01RequiredEl395"/>
+    <testcase name="Course and status" time="0.183" classname="01RequiredEl395"/>
+    <testcase name="Related course" time="0.183" classname="01RequiredEl395"/>
+    <testcase name="Multiple channels and explicit nulls" time="0.183" classname="01RequiredEl395"/>
+    <testcase name="ISO date and HH:mm" time="0.183" classname="01RequiredEl395"/>
+  </testsuite>
+  <testsuite name="02 Code prefix and case-insensitive" id="87b5ad2a-bd38-4c62-b7d5-0a36c70f7141" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="HTTP 200" time="0.007" classname="02CodePrefixAndCaseInsensitive"/>
+    <testcase name="Only EL395" time="0.007" classname="02CodePrefixAndCaseInsensitive"/>
+  </testsuite>
+  <testsuite name="03 English word prefix" id="2110eddb-a1cf-4659-9ec8-dacfacc900bf" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="03EnglishWordPrefix"/>
+    <testcase name="MA211" time="0.005" classname="03EnglishWordPrefix"/>
+  </testsuite>
+  <testsuite name="04 Thai substring" id="f6e77a01-b0f1-422d-a7c3-bc0912213e72" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.011">
+    <testcase name="HTTP 200" time="0.011" classname="04ThaiSubstring"/>
+    <testcase name="MA211 Thai name" time="0.011" classname="04ThaiSubstring"/>
+  </testsuite>
+  <testsuite name="05 Trim query" id="5d164971-a5bd-4d37-92ed-32b0e0b77240" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="05TrimQuery"/>
+    <testcase name="Normalized query" time="0.005" classname="05TrimQuery"/>
+  </testsuite>
+  <testsuite name="06 Search unknown is 200 empty" id="73860ef6-c330-47dc-af92-fccea2af5510" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="06SearchUnknownIs200Empty"/>
+    <testcase name="Empty" time="0.005" classname="06SearchUnknownIs200Empty"/>
+  </testsuite>
+  <testsuite name="07 Detail unknown is 404" id="e235f6a7-f6a6-44de-baab-32048be1b596" timestamp="2026-11-17T10:36:43.601Z" tests="4" failures="0" errors="0" time="0.012">
+    <testcase name="HTTP 404" time="0.012" classname="07DetailUnknownIs404"/>
+    <testcase name="ProblemDetail status" time="0.012" classname="07DetailUnknownIs404"/>
+    <testcase name="ProblemDetail content type" time="0.012" classname="07DetailUnknownIs404"/>
+    <testcase name="404 detail" time="0.012" classname="07DetailUnknownIs404"/>
+  </testsuite>
+  <testsuite name="08 Detail lower-case" id="638a8221-d77a-4de7-b471-f53ba2cdca2e" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 200" time="0.004" classname="08DetailLowerCase"/>
+    <testcase name="Normalized code" time="0.004" classname="08DetailLowerCase"/>
+  </testsuite>
+  <testsuite name="09 Existing course NO_DATA" id="56f13bfb-3776-40e1-959e-f226ef61d328" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="09ExistingCourseNoData"/>
+    <testcase name="NO_DATA and null name" time="0.005" classname="09ExistingCourseNoData"/>
+  </testsuite>
+  <testsuite name="10 NOT_REQUIRED" id="5914a3a6-23ed-4c0e-860f-dc17c5438b15" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="10NotRequired"/>
+    <testcase name="Empty details" time="0.005" classname="10NotRequired"/>
+  </testsuite>
+  <testsuite name="11 NOT_OFFERED before REQUIRED" id="f3a4cad2-5567-4762-9e2f-917581dbaf39" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 200" time="0.004" classname="11NotOfferedBeforeRequired"/>
+    <testcase name="Not offered" time="0.004" classname="11NotOfferedBeforeRequired"/>
+  </testsuite>
+  <testsuite name="12 No sections anywhere in year" id="1fb6c4c4-1488-4f15-939b-7bc61c55091f" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="HTTP 200" time="0.007" classname="12NoSectionsAnywhereInYear"/>
+    <testcase name="Empty offeredSemesters" time="0.007" classname="12NoSectionsAnywhereInYear"/>
+  </testsuite>
+  <testsuite name="13 REQUIRED with no rounds" id="d5685b83-05c7-4066-9272-1e4f2de87b59" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 200" time="0.003" classname="13RequiredWithNoRounds"/>
+    <testcase name="Still required" time="0.003" classname="13RequiredWithNoRounds"/>
+  </testsuite>
+  <testsuite name="14 My timetable, null query" id="e7aac4f7-33cd-4aa5-b019-cea1602c08d5" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 200" time="0.004" classname="14MyTimetableNullQuery"/>
+    <testcase name="Only my courses" time="0.004" classname="14MyTimetableNullQuery"/>
+  </testsuite>
+  <testsuite name="15 Mine plus query AND" id="a7a3d032-7b8a-4256-b51a-0d5c01f40255" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 200" time="0.003" classname="15MinePlusQueryAnd"/>
+    <testcase name="Only MA211" time="0.003" classname="15MinePlusQueryAnd"/>
+  </testsuite>
+  <testsuite name="16 Mine false still marks membership" id="277081e9-033f-4c75-8be2-bc14bd210133" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 200" time="0.003" classname="16MineFalseStillMarksMembership"/>
+    <testcase name="Membership" time="0.003" classname="16MineFalseStillMarksMembership"/>
+  </testsuite>
+  <testsuite name="17 Empty timetable for another term" id="b0cdcdfa-fbf8-4cbd-ac8f-13b09381b7bd" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 200" time="0.003" classname="17EmptyTimetableForAnotherTerm"/>
+    <testcase name="Empty" time="0.003" classname="17EmptyTimetableForAnotherTerm"/>
+  </testsuite>
+  <testsuite name="18 Authenticated student isolation" id="c464eec2-3a4a-467f-a8e9-ed779c220c5c" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 200" time="0.003" classname="18AuthenticatedStudentIsolation"/>
+    <testcase name="Other student has only TU101" time="0.003" classname="18AuthenticatedStudentIsolation"/>
+  </testsuite>
+  <testsuite name="19 Max results 50, total 55" id="94ea66f2-7060-4a8c-bda6-a148e845cd4f" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 200" time="0.004" classname="19MaxResults50Total55"/>
+    <testcase name="Limit and total" time="0.004" classname="19MaxResults50Total55"/>
+  </testsuite>
+  <testsuite name="20 No search condition" id="c3210c25-3440-4ff7-b4a5-9cc982331ee5" timestamp="2026-11-17T10:36:43.601Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 400" time="0.004" classname="20NoSearchCondition"/>
+    <testcase name="ProblemDetail status" time="0.004" classname="20NoSearchCondition"/>
+    <testcase name="ProblemDetail content type" time="0.004" classname="20NoSearchCondition"/>
+    <testcase name="Business code" time="0.004" classname="20NoSearchCondition"/>
+  </testsuite>
+  <testsuite name="21 Blank query" id="64729bd2-9f11-4df8-ba99-d089d2acc4d1" timestamp="2026-11-17T10:36:43.601Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 400" time="0.004" classname="21BlankQuery"/>
+    <testcase name="ProblemDetail status" time="0.004" classname="21BlankQuery"/>
+    <testcase name="ProblemDetail content type" time="0.004" classname="21BlankQuery"/>
+    <testcase name="Business code" time="0.004" classname="21BlankQuery"/>
+  </testsuite>
+  <testsuite name="22 Query 51 characters" id="8a497792-b7ea-45de-8144-25248c4d6cf9" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.026">
+    <testcase name="HTTP 400" time="0.026" classname="22Query51Characters"/>
+    <testcase name="ProblemDetail status" time="0.026" classname="22Query51Characters"/>
+    <testcase name="ProblemDetail content type" time="0.026" classname="22Query51Characters"/>
+  </testsuite>
+  <testsuite name="23 Query 50 characters" id="be23db5f-08c3-4c68-b3a9-7384725ca707" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 200" time="0.004" classname="23Query50Characters"/>
+    <testcase name="Empty valid search" time="0.004" classname="23Query50Characters"/>
+  </testsuite>
+  <testsuite name="24 Invalid query parameters" id="9fcb329f-2fd2-4950-b800-173efe4c11c7" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 400" time="0.003" classname="24InvalidQueryParameters"/>
+    <testcase name="ProblemDetail status" time="0.003" classname="24InvalidQueryParameters"/>
+    <testcase name="ProblemDetail content type" time="0.003" classname="24InvalidQueryParameters"/>
+  </testsuite>
+  <testsuite name="25 Invalid query parameters" id="596bd2cd-cfab-40e5-935d-a57abbf42ab5" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 400" time="0.003" classname="25InvalidQueryParameters"/>
+    <testcase name="ProblemDetail status" time="0.003" classname="25InvalidQueryParameters"/>
+    <testcase name="ProblemDetail content type" time="0.003" classname="25InvalidQueryParameters"/>
+  </testsuite>
+  <testsuite name="26 Invalid query parameters" id="a6b68e90-7d44-4de4-8e0d-85da2f328fb4" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.006">
+    <testcase name="HTTP 400" time="0.006" classname="26InvalidQueryParameters"/>
+    <testcase name="ProblemDetail status" time="0.006" classname="26InvalidQueryParameters"/>
+    <testcase name="ProblemDetail content type" time="0.006" classname="26InvalidQueryParameters"/>
+  </testsuite>
+  <testsuite name="27 Invalid query parameters" id="a9c665de-37f0-4640-9880-927e3ee35186" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.012">
+    <testcase name="HTTP 400" time="0.012" classname="27InvalidQueryParameters"/>
+    <testcase name="ProblemDetail status" time="0.012" classname="27InvalidQueryParameters"/>
+    <testcase name="ProblemDetail content type" time="0.012" classname="27InvalidQueryParameters"/>
+  </testsuite>
+  <testsuite name="28 Invalid query parameters" id="28b85b71-f015-4fac-955a-32a33e4ef676" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 400" time="0.003" classname="28InvalidQueryParameters"/>
+    <testcase name="ProblemDetail status" time="0.003" classname="28InvalidQueryParameters"/>
+    <testcase name="ProblemDetail content type" time="0.003" classname="28InvalidQueryParameters"/>
+  </testsuite>
+  <testsuite name="29 Invalid query parameters" id="22d3191a-52f0-4db3-b03f-07d5f569163b" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 400" time="0.005" classname="29InvalidQueryParameters"/>
+    <testcase name="ProblemDetail status" time="0.005" classname="29InvalidQueryParameters"/>
+    <testcase name="ProblemDetail content type" time="0.005" classname="29InvalidQueryParameters"/>
+  </testsuite>
+  <testsuite name="30 Invalid detail semester" id="ed27c96d-239a-4f84-8247-7ef8ffb1acfa" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.009">
+    <testcase name="HTTP 400" time="0.009" classname="30InvalidDetailSemester"/>
+    <testcase name="ProblemDetail status" time="0.009" classname="30InvalidDetailSemester"/>
+    <testcase name="ProblemDetail content type" time="0.009" classname="30InvalidDetailSemester"/>
+  </testsuite>
+  <testsuite name="31 Missing JWT" id="09e24f6e-157f-410a-a9f6-b92572b2f5b8" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 401" time="0.004" classname="31MissingJwt"/>
+    <testcase name="ProblemDetail status" time="0.004" classname="31MissingJwt"/>
+    <testcase name="ProblemDetail content type" time="0.004" classname="31MissingJwt"/>
+  </testsuite>
+  <testsuite name="32 Invalid JWT" id="4a76f373-9e83-4fd4-a7b0-802e5c235b68" timestamp="2026-11-17T10:36:43.601Z" tests="3" failures="0" errors="0" time="0.004">
+    <testcase name="HTTP 401" time="0.004" classname="32InvalidJwt"/>
+    <testcase name="ProblemDetail status" time="0.004" classname="32InvalidJwt"/>
+    <testcase name="ProblemDetail content type" time="0.004" classname="32InvalidJwt"/>
+  </testsuite>
+  <testsuite name="33 Literal percent is not wildcard" id="173f2d11-1ca7-4602-afc4-19b2fad55f3e" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 200" time="0.003" classname="33LiteralPercentIsNotWildcard"/>
+    <testcase name="Only literal fixture" time="0.003" classname="33LiteralPercentIsNotWildcard"/>
+  </testsuite>
+  <testsuite name="34 Literal underscore is not wildcard" id="d552e00e-f20d-4bd5-be72-fe63195f9083" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="HTTP 200" time="0.005" classname="34LiteralUnderscoreIsNotWildcard"/>
+    <testcase name="Only literal fixture" time="0.005" classname="34LiteralUnderscoreIsNotWildcard"/>
+  </testsuite>
+  <testsuite name="35 Literal bracket is not wildcard" id="7f07cdfd-6e32-4a8b-ac83-45b181c86686" timestamp="2026-11-17T10:36:43.601Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="HTTP 200" time="0.003" classname="35LiteralBracketIsNotWildcard"/>
+    <testcase name="Only literal fixture" time="0.003" classname="35LiteralBracketIsNotWildcard"/>
+  </testsuite>
+</testsuites>
