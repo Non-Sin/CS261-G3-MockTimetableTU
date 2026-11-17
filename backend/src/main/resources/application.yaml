@@ -45,6 +45,10 @@ app:
   timetable:
     max-credits: 22                    # หน่วยกิตสูงสุดต่อภาคเรียน (CREDIT_LIMIT_EXCEEDED)
 
+  # --- Quota (US7) ---
+  quota:
+    max-results: 50
+
   # --- Study plan (US8) ---
   study-plan:
     max-search-nodes: 50000            # เพดาน node ของ backtracking ใน PlanScheduler (ถึงแล้วคืนคำตอบดีที่สุดที่เจอ)
