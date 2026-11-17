@@ -29,11 +29,13 @@ export function useQuotaSearch({ academicYear, semester, myCourseCodes }: UseQuo
   // นับลำดับคำขอ เพื่อไม่ใช้ผลของคำขอเก่าที่ตอบกลับมาช้ากว่าคำขอใหม่
   const latestRequestId = useRef(0);
 
-  // เมื่อแผนการเรียนกลายเป็นว่าง ให้แสดงผลเสมือน mine=false และ state=idle
-  // โดยใช้ derived value แทนการ setState ระหว่าง render (ซึ่งละเมิด React Hooks rules)
+  // เมื่อแผนการเรียนกลายเป็นว่าง ให้รีเซ็ตเฉพาะสถานะ/คำขอที่ผูกกับ checkbox "เฉพาะวิชาในแผนของฉัน"
+  // โดยใช้ derived value แทนการ setState ระหว่าง render (ส่วนการค้นด้วยคำค้นปกติยังคงใช้งานได้เมื่อแผนว่าง)
   const hasPlan = (myCourseCodes?.length ?? 0) > 0;
   const effectiveMine = hasPlan ? mine : false;
-  const effectiveState: QuotaSearchState = hasPlan ? state : { status: "idle" };
+  const isStaleMineSearch =
+    !hasPlan && state.status !== "idle" && state.request.kind === "search" && state.request.mine;
+  const effectiveState: QuotaSearchState = isStaleMineSearch ? { status: "idle" } : state;
 
   const run = useCallback(
     (request: QuotaRequest) => {
@@ -85,7 +87,7 @@ export function useQuotaSearch({ academicYear, semester, myCourseCodes }: UseQuo
 
   const clear = () => {
     setInput("");
-    search({ q: "", mine });
+    search({ q: "", mine: effectiveMine });
   };
 
   // กดชิปรหัสวิชา: ใส่รหัสลงช่องค้นหาและแทนผลเดิมด้วยการ์ดของวิชานั้น
@@ -97,7 +99,7 @@ export function useQuotaSearch({ academicYear, semester, myCourseCodes }: UseQuo
   };
 
   const retry = () => {
-    if (state.status === "error") run(state.request);
+    if (effectiveState.status === "error") run(effectiveState.request);
   };
 
   return { input, setInput, mine: effectiveMine, changeMine, state: effectiveState, search, clear, selectCourse, retry };
