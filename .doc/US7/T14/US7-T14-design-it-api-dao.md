@@ -2,7 +2,7 @@
 
 | รายการ | รายละเอียด |
 | --- | --- |
-| User Story | US7: ค้นหาช่องทางและรอบเวลายื่นคำร้องขอโควตาในแต่ละรายวิชา (Priority: Medium, Estimate: 5 points) |
+| User Story | US7: ค้นหาช่องทางและรอบเวลายื่นคำร้องขอโควตาในแต่ละรายวิชา (Priority: Medium, Estimate: 1 points) |
 | Task | US7-T14 Design Integration Test ระหว่าง API กับ DAO |
 | Branch | `docs/US7-T14-design-it-api-dao` |
 | ขอบเขต | ทุก Endpoint ของ US7 ที่แตะฐานข้อมูล ได้แก่ `GET /api/quota/courses` และ `GET /api/quota/courses/{courseCode}` ตรวจความถูกต้องของการ Query ข้อมูลจาก SQL Server ผ่าน Spring Data JPA / Hibernate ไปจนถึง Response ที่ API ตอบกลับ |
