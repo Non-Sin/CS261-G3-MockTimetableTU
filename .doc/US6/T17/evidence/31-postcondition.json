@@ -1,0 +1,12 @@
+{
+  "status": 200,
+  "table": {
+    "academicYear": 2568,
+    "semester": 1,
+    "entries": [],
+    "totalCredits": 0,
+    "maxCredits": 22,
+    "conflicts": [],
+    "updatedAt": null
+  }
+}

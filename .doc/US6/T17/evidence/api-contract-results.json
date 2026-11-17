@@ -1,0 +1,193 @@
+[
+  {
+    "case": "32",
+    "path": "EL105",
+    "status": 404,
+    "expected": 404,
+    "pass": true,
+    "body": {
+      "detail": "ไม่พบวิชาเสรีแนะนำ: EL105",
+      "instance": "/api/electives/EL105",
+      "status": 404,
+      "title": "Not Found"
+    }
+  },
+  {
+    "case": "32",
+    "path": "CS100",
+    "status": 404,
+    "expected": 404,
+    "pass": true,
+    "body": {
+      "detail": "ไม่พบวิชาเสรีแนะนำ: CS100",
+      "instance": "/api/electives/CS100",
+      "status": 404,
+      "title": "Not Found"
+    }
+  },
+  {
+    "case": "32",
+    "path": "SA240",
+    "status": 404,
+    "expected": 404,
+    "pass": true,
+    "body": {
+      "detail": "ไม่พบวิชาเสรีแนะนำ: SA240",
+      "instance": "/api/electives/SA240",
+      "status": 404,
+      "title": "Not Found"
+    }
+  },
+  {
+    "case": "34",
+    "path": "currentSemester=1",
+    "status": 400,
+    "expected": 400,
+    "pass": true,
+    "body": {
+      "detail": "Required parameter 'academicYear' is not present.",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "case": "34",
+    "path": "academicYear=2568",
+    "status": 400,
+    "expected": 400,
+    "pass": true,
+    "body": {
+      "detail": "Required parameter 'currentSemester' is not present.",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "case": "34",
+    "path": "academicYear=2568&currentSemester=3",
+    "status": 400,
+    "expected": 400,
+    "pass": true,
+    "body": {
+      "detail": "currentSemester ต้องเป็น 1 หรือ 2",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "case": "34",
+    "path": "academicYear=2568&currentSemester=1&semester=3",
+    "status": 400,
+    "expected": 400,
+    "pass": true,
+    "body": {
+      "detail": "semester ต้องเป็น 1 หรือ 2",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "case": "34",
+    "path": "academicYear=2568&currentSemester=1&day=FUNDAY",
+    "status": 400,
+    "expected": 400,
+    "pass": true,
+    "body": {
+      "detail": "Validation failed",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request",
+      "errors": {
+        "day": "Failed to convert value of type 'java.lang.String' to required type 'java.time.DayOfWeek'; Failed to convert from type [java.lang.String] to type [java.time.DayOfWeek] for value [FUNDAY]"
+      }
+    }
+  },
+  {
+    "case": "34",
+    "path": "academicYear=2568&currentSemester=1&timeSlot=NIGHT",
+    "status": 400,
+    "expected": 400,
+    "pass": true,
+    "body": {
+      "detail": "Validation failed",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request",
+      "errors": {
+        "timeSlot": "Failed to convert value of type 'java.lang.String' to required type 'th.ac.tu.cs261.group3.backend.elective.dto.TimeSlot'; Failed to convert from type [java.lang.String] to type [th.ac.tu.cs261.group3.backend.elective.dto.TimeSlot] for value [NIGHT]"
+      }
+    }
+  },
+  {
+    "case": "34",
+    "path": "academicYear=2568&currentSemester=1&group=SPORT",
+    "status": 400,
+    "expected": 400,
+    "pass": true,
+    "body": {
+      "detail": "Validation failed",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request",
+      "errors": {
+        "group": "Failed to convert value of type 'java.lang.String' to required type 'th.ac.tu.cs261.group3.backend.elective.InterestGroup'; Failed to convert from type [java.lang.String] to type [th.ac.tu.cs261.group3.backend.elective.InterestGroup] for value [SPORT]"
+      }
+    }
+  },
+  {
+    "case": "34",
+    "path": "academicYear=2568&currentSemester=1&excludeConflicts=maybe",
+    "status": 400,
+    "expected": 400,
+    "pass": true,
+    "body": {
+      "detail": "Validation failed",
+      "instance": "/api/electives",
+      "status": 400,
+      "title": "Bad Request",
+      "errors": {
+        "excludeConflicts": "Failed to convert value of type 'java.lang.String' to required type 'java.lang.Boolean'; Invalid boolean value [maybe]"
+      }
+    }
+  },
+  {
+    "case": "35",
+    "path": "/api/electives?academicYear=2568&currentSemester=1&day=SUNDAY",
+    "status": 200,
+    "expected": 200,
+    "pass": true,
+    "body": []
+  },
+  {
+    "case": "35",
+    "path": "/api/electives/PY250?academicYear=2568&currentSemester=3",
+    "status": 400,
+    "expected": 400,
+    "pass": true,
+    "body": {
+      "detail": "currentSemester ต้องเป็น 1 หรือ 2",
+      "instance": "/api/electives/PY250",
+      "status": 400,
+      "title": "Bad Request"
+    }
+  },
+  {
+    "case": "29",
+    "path": "timetable-semester2",
+    "status": 200,
+    "pass": true,
+    "body": {
+      "academicYear": 2568,
+      "semester": 2,
+      "entries": [],
+      "totalCredits": 0,
+      "maxCredits": 22,
+      "conflicts": [],
+      "updatedAt": null
+    }
+  }
+]

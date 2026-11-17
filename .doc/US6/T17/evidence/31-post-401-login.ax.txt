@@ -1,0 +1,40 @@
+- alert
+- text: คำเตือนสำคัญ
+- generic: ระบบนี้เป็นเพียงระบบช่วยวางแผนตารางเรียนเท่านั้น
+- strong: ไม่สามารถใช้ลงทะเบียนเรียนจริงได้
+- link "ไปยัง REG-TU":
+  - /url: https://vnweb68.reg.tu.ac.th/registrar/home
+  - text: ไปยัง REG-TU
+- banner:
+  - paragraph: MockTimetable TU
+  - paragraph: ระบบช่วยวางแผนและจัดตารางเรียนจำลอง
+- main:
+  - region "Login":
+    - heading "Login" [level=1]
+    - paragraph: เข้าใช้งานระบบช่วยจัดตารางเรียน
+    - strong: "คำแนะนำ:"
+    - text: ใช้ Username และ Password เดียวกับที่เข้าใช้งานระบบ
+    - strong: REG-TU
+    - text: ได้เลย
+    - alert:
+      - paragraph: เซสชันของคุณหมดอายุแล้ว กรุณาเข้าสู่ระบบใหม่อีกครั้ง
+    - generic: ชื่อผู้ใช้งาน (Username)
+    - textbox "ชื่อผู้ใช้งาน (Username)":
+      - /placeholder: เช่น 6809610000
+    - generic: รหัสผ่าน (Password)
+    - textbox "รหัสผ่าน (Password)":
+      - /placeholder: กรอกรหัสผ่านของคุณ
+    - button "แสดงรหัสผ่าน":
+    - button "เข้าสู่ระบบ (Login)":
+      - text: เข้าสู่ระบบ (Login)
+- contentinfo:
+  - paragraph:
+    - generic: TU
+    - text: MockTimetableTU
+    - generic: · ระบบช่วยจัดตารางเรียนสำหรับนักศึกษาวิทยาการคอมพิวเตอร์ ภาคปกติ มหาวิทยาลัยธรรมศาสตร์
+  - navigation "ลิงก์ช่วยเหลือ":
+    - link "REG-TU":
+      - /url: https://vnweb68.reg.tu.ac.th/registrar/home
+      - text: REG-TU
+    - link "แจ้งปัญหา":
+      - /url: https://github.com/Non-Sin/CS261-G3-MockTimetableTU/issues

@@ -1,0 +1,607 @@
+- text: คำเตือนสำคัญ
+- generic: ระบบนี้เป็นเพียงระบบช่วยวางแผนตารางเรียนเท่านั้น
+- strong: ไม่สามารถใช้ลงทะเบียนเรียนจริงได้
+- link "ไปยัง REG-TU":
+  - /url: https://vnweb68.reg.tu.ac.th/registrar/home
+  - text: ไปยัง REG-TU
+- banner:
+  - paragraph: MockTimetable TU
+  - paragraph: ระบบช่วยวางแผนและจัดตารางเรียนจำลอง
+  - navigation "เมนูหลัก":
+    - button "จัดตารางเรียนจำลอง" [active]:
+      - text: จัดตารางเรียนจำลอง
+    - button "ดูวิชาเสรีแนะนำ":
+      - text: ดูวิชาเสรีแนะนำ
+    - button "ค้นหาช่องทางขอโควตา":
+      - text: ค้นหาช่องทางขอโควตา
+  - generic "ข้อมูลนักศึกษา":
+    - button "SJ Somchai Jaidee 6609000001":
+      - generic: SJ
+      - paragraph: Somchai Jaidee
+      - paragraph: "6609000001"
+    - dialog "เมนูบัญชีผู้ใช้":
+      - generic: SJ
+      - separator
+      - button "ออกจากระบบ":
+        - text: ออกจากระบบ
+- main:
+  - paragraph: วางแผนวันนี้ เรียนอย่างมั่นใจ
+  - heading "จัดตารางเรียนจำลอง" [level=1]
+  - paragraph: ยินดีต้อนรับ Somchai เพิ่มและลบวิชาเพื่อวางแผนตารางเรียนของคุณ
+  - alert:
+    - generic: "!"
+    - heading "ตรวจพบเวลาเรียนซ้อนทับกัน" [level=3]
+    - generic: ต้องจัดใหม่
+    - paragraph: เวลาเรียนชนกัน
+    - paragraph: TU100 และ PY250 · จันทร์ 13:30-16:30
+    - paragraph: กรุณาสลับกลุ่มเรียนหรือเลือกรายวิชาอื่น
+    - button "ปิดคำเตือนเวลาเรียนชน": ×
+  - heading "ตารางเรียนจำลอง" [level=2]
+  - paragraph: หน่วยกิต 6 / 22
+  - button "PNG" [disabled]:
+    - text: PNG
+  - generic: TU100
+  - generic: PY250
+  - generic: "⚠ ชนกัน: TU100 และ PY250"
+  - generic: วัน \ เวลา
+  - generic: 08:00
+  - generic: 09:00
+  - generic: 10:00
+  - generic: 11:00
+  - generic: 12:00
+  - generic: 13:00
+  - generic: 14:00
+  - generic: 15:00
+  - generic: 16:00
+  - generic: 17:00
+  - generic: 18:00
+  - generic: 19:00
+  - generic: 20:00
+  - text: จันทร์
+  - generic: MON
+  - strong: TU100
+  - generic: Sec 820001
+  - generic: 13:30-16:30
+  - generic: ไม่ระบุ
+  - strong: PY250
+  - generic: Sec 820001
+  - generic: 13:30-16:30
+  - generic: LC1-201
+  - generic: เวลาชนกัน 13:30-16:30 · 2 วิชา
+  - strong: TU100
+  - generic: Sec 820001
+  - generic: 13:30-16:30
+  - generic: ไม่ระบุ
+  - strong: PY250
+  - generic: Sec 820001
+  - generic: 13:30-16:30
+  - generic: LC1-201
+  - text: อังคาร
+  - generic: TUE
+  - text: พุธ
+  - generic: WED
+  - text: พฤหัสบดี
+  - generic: THU
+  - text: ศุกร์
+  - generic: FRI
+  - text: เสาร์
+  - generic: SAT
+  - paragraph: "วิชาในตารางเรียน: 2 วิชา (6.0 หน่วยกิต)"
+  - heading "จัดตารางเรียนตามเล่มหลักสูตร" [level=2]
+  - generic: ★ ฟีเจอร์แนะนำ
+  - paragraph: จำลองตารางเรียนตามแผนการศึกษาแนะนำของแต่ละชั้นปีและภาคเรียน ช่วยให้วางแผนลงทะเบียนได้สะดวกและรวดเร็วยิ่งขึ้น
+  - button "จัดตามแผนหลักสูตร":
+    - generic: จัดตามแผนหลักสูตร
+    - generic: →
+  - heading "วิชาที่เพิ่มแล้ว" [level=2]
+  - button "ลบที่เลือก" [disabled]
+  - button "ลบทั้งหมด"
+  - article:
+    - checkbox "เลือกวิชา TU100"
+    - paragraph: TU100
+    - paragraph: Civic Engagement
+    - paragraph: Sec 820001 · 3 หน่วยกิต
+    - paragraph: จันทร์ 13:30-16:30 · ห้อง
+    - button "ลบวิชา"
+  - article:
+    - checkbox "เลือกวิชา PY250"
+    - paragraph: PY250
+    - paragraph: PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT
+    - paragraph: Sec 820001 · 3 หน่วยกิต
+    - paragraph: จันทร์ 13:30-16:30 · ห้องLC1-201
+    - button "ลบวิชา"
+  - heading "ค้นหารายวิชา" [level=2]
+  - combobox "ภาคเรียน":
+    - option "ภาคเรียน 1" [selected]
+    - option "ภาคเรียน 2"
+  - combobox "ปีการศึกษา":
+    - option "ปีการศึกษา 2568" [selected]
+  - textbox "ค้นหารหัสหรือชื่อวิชา"
+  - button "ค้นหา"
+  - combobox "กรองตามหมวดวิชา":
+    - option "ทุกหมวดวิชา" [selected]
+    - option "วิชาเฉพาะ"
+    - option "ศึกษาทั่วไป"
+    - option "วิชาเลือกเสรี"
+    - option "วิชาโท"
+  - paragraph: พบ 54 รายวิชา
+  - article:
+    - paragraph: AS201
+    - paragraph: KOREAN CULTURE AND INNOVATION
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.ดร.ถาปกรณ์ กำเนิดศิริ"
+    - paragraph: พุธ 13:30-16:30 · ห้องLC4-231
+    - generic: Sec 900001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: AT326
+    - paragraph: RICE AND PRODUCTION TECHNOLOGY
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.ดร.พรชัย หาระโคตร"
+    - paragraph: อังคาร 09:30-12:30 · ห้องไม่ระบุ
+    - generic: Sec 230001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS100
+    - paragraph: Basic Web Development
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 08:00-09:30 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 08:00-09:30 · ห้องไม่ระบุ
+    - generic: Sec 010001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS101
+    - paragraph: Discrete Structures
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 09:30-11:00 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 09:30-11:00 · ห้องไม่ระบุ
+    - generic: Sec 020001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS102
+    - paragraph: Problem Solving Basics and Computer Programming
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 11:00-12:30 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 11:00-12:30 · ห้องไม่ระบุ
+    - generic: Sec 030001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS111
+    - paragraph: Object-Oriented Concepts
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.ดร.สมชาย ใจดี"
+    - paragraph: อังคาร 11:00-12:30 · ห้องLC3-121
+    - paragraph: พฤหัสบดี 11:00-12:30 · ห้องLC3-121
+    - combobox "เลือกกลุ่มเรียน CS111":
+      - option "Sec 030001" [selected]
+      - option "Sec 030002"
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS180
+    - paragraph: Introduction to User Interface and User Experience
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: อ.ดร.ปวีณา เลิศวิไล"
+    - paragraph: จันทร์ 13:30-16:30 · ห้องLC5-S202
+    - generic: Sec 820001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS213
+    - paragraph: Data Structures
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 15:00-16:30 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 15:00-16:30 · ห้องไม่ระบุ
+    - generic: Sec 050001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS221
+    - paragraph: Introduction to Computer System and Organization
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 13:30-15:00 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 13:30-15:00 · ห้องไม่ระบุ
+    - generic: Sec 040001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS223
+    - paragraph: Virtualization Technology
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 13:30-15:00 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 13:30-15:00 · ห้องไม่ระบุ
+    - generic: Sec 040001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS224
+    - paragraph: Linux Administration and Performance Monitoring
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 11:00-12:30 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 11:00-12:30 · ห้องไม่ระบุ
+    - generic: Sec 030001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS232
+    - paragraph: Introduction to Cloud Computing Technology
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - generic: Sec Q70001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS240
+    - paragraph: Principles of Data Science
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: ศุกร์ 09:30-12:30 · ห้องไม่ระบุ
+    - generic: Sec 870001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS241
+    - paragraph: Programming Languages and Paradigms
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 15:00-16:30 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 15:00-16:30 · ห้องไม่ระบุ
+    - generic: Sec 050001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS261
+    - paragraph: Introduction to Software Engineering
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 15:00-16:30 · ห้องไม่ระบุ
+    - paragraph: ศุกร์ 15:00-16:30 · ห้องไม่ระบุ
+    - generic: Sec 100001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS301
+    - paragraph: Preparation for Senior Projects and Co-operative Education
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: จันทร์ 09:30-12:30 · ห้องไม่ระบุ
+    - generic: Sec 810001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS331
+    - paragraph: Net-Centric Computing
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 09:30-11:00 · ห้องไม่ระบุ
+    - paragraph: ศุกร์ 09:30-11:00 · ห้องไม่ระบุ
+    - generic: Sec 070001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS341
+    - paragraph: Big Data Engineering
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 08:00-09:30 · ห้องไม่ระบุ
+    - paragraph: ศุกร์ 08:00-09:30 · ห้องไม่ระบุ
+    - generic: Sec 060001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS345
+    - paragraph: Practical Machine Learning
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 11:00-12:30 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 11:00-12:30 · ห้องไม่ระบุ
+    - generic: Sec 030001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS346
+    - paragraph: Big Data Applications and Analytics
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 11:00-12:30 · ห้องไม่ระบุ
+    - paragraph: ศุกร์ 11:00-12:30 · ห้องไม่ระบุ
+    - generic: Sec 080001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS361
+    - paragraph: Cloud-Based Software Architecting
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 13:30-16:30 · ห้องไม่ระบุ
+    - generic: Sec 900001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS373
+    - paragraph: Advanced Search Strategies
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 08:00-09:30 · ห้องไม่ระบุ
+    - paragraph: ศุกร์ 08:00-09:30 · ห้องไม่ระบุ
+    - generic: Sec 060001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS374
+    - paragraph: Natural Language Processing
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 11:00-12:30 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 11:00-12:30 · ห้องไม่ระบุ
+    - generic: Sec 030001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS384
+    - paragraph: Human - Computer Interaction
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 11:00-12:30 · ห้องไม่ระบุ
+    - paragraph: ศุกร์ 11:00-12:30 · ห้องไม่ระบุ
+    - generic: Sec 080001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS403
+    - paragraph: Special Projects 2
+    - paragraph: 4 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - generic: Sec 000001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS404
+    - paragraph: Co-operative Education 2
+    - paragraph: 4 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - generic: Sec 000001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: CS440
+    - paragraph: Selected Topics in Data Science
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: จันทร์ 09:30-12:30 · ห้องไม่ระบุ
+    - generic: Sec 810001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: EG214
+    - paragraph: PRESENTATION SKILLS
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: อ.ดร.ณัฐพล ตรีพรชัยศักดิ์"
+    - paragraph: อังคาร 09:30-12:30 · ห้องSC2-204
+    - combobox "เลือกกลุ่มเรียน EG214":
+      - option "Sec 230001" [selected]
+      - option "Sec 320001"
+      - option "Sec 320002"
+      - option "Sec 320003"
+      - option "Sec 320004"
+      - option "Sec 540001"
+      - option "Sec 540002"
+      - option "Sec 540003"
+      - option "Sec 540004"
+      - option "Sec 780001"
+      - option "Sec 900001"
+      - option "Sec 900002"
+      - option "Sec 900003"
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: EL105
+    - paragraph: English Communication Skills
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 09:30-12:30 · ห้องไม่ระบุ
+    - generic: Sec 780001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: EL295
+    - paragraph: Academic English and Study Skills 1
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 09:30-12:30 · ห้องไม่ระบุ
+    - generic: Sec 780001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: EL395
+    - paragraph: Academic English and Study Skills 2
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - generic: Sec Q70001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: FD216
+    - paragraph: FOOD TECHNOLOGY IN EVERYDAY LIFE
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: รศ.ดร.ประภาศรี เทพรักษา, รศ.ดร.สุพัตรา สุภาวงศ์, ผศ.ดร.สุธีรา วัฒนกุล"
+    - paragraph: จันทร์ 09:30-12:30 · ห้องSC3-413
+    - generic: Sec 810002
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: FR205
+    - paragraph: FRENCH FOR EVERYDAY LIFE
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.ธรณินทร์ มีเพียร"
+    - paragraph: อังคาร 16:30-18:00 · ห้องSC3-M10
+    - paragraph: พฤหัสบดี 16:30-18:00 · ห้องSC3-M10
+    - combobox "เลือกกลุ่มเรียน FR205":
+      - option "Sec 260001" [selected]
+      - option "Sec 260002"
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: GE225
+    - paragraph: POPULATION GEOGRAPHY AND MIGRATION
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: รศ.ดร.ทรงชัย ทองปาน"
+    - paragraph: พฤหัสบดี 09:30-12:30 · ห้องSC-2031
+    - generic: Sec 320001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: IS313
+    - paragraph: BUSINESS DATA COMMUNICATIONS ON CLOUD COMPUTING AND NETWORKING
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: อ.ดร.พิริยะ อุตมฉันท์"
+    - paragraph: อังคาร 09:30-12:30 · ห้องพบ.313
+    - generic: Sec 230001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: JC217
+    - paragraph: JOURNALISM AND SOCIAL CHANGE
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: รศ.ดร.นิธิดา แสงสิงแก้ว"
+    - paragraph: อังคาร 13:30-16:30 · ห้องSC3-221
+    - generic: Sec 450001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: JP171
+    - paragraph: Japanese 1
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: อ.ยูกิ ทานากะ"
+    - paragraph: ศุกร์ 13:30-16:30 · ห้องLC2-204
+    - generic: Sec 920001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: LAS101
+    - paragraph: Critical Thinking, Reading, and Writing
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: อ.พิมพ์ชนก บุญมา"
+    - paragraph: พุธ 09:30-12:30 · ห้องSC-1026
+    - generic: Sec 780004
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: MA211
+    - paragraph: Calculus 1
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: รศ.ดร.ประเสริฐ มั่นคง"
+    - paragraph: อังคาร 09:30-11:00 · ห้องSC-3015
+    - paragraph: พฤหัสบดี 09:30-11:00 · ห้องSC-3015
+    - generic: Sec 020001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: PB317
+    - paragraph: GENDER, SEXUALITY AND HEALTH
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.รณภูมิ สามัคคีคารมย์"
+    - paragraph: พฤหัสบดี 13:30-16:30 · ห้องไม่ระบุ
+    - generic: Sec 540001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: PY200
+    - paragraph: GENERAL PSYCHOLOGY
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.ทระวิณ ชาลีรักษ์ตระกูล และคณะ"
+    - paragraph: จันทร์ 09:30-12:30 · ห้องLC1-201,202
+    - generic: Sec 810001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: PY250
+    - paragraph: PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: อ.วรรณปรัชญ์ พิทักษ์ไพบูลย์กิจ"
+    - paragraph: จันทร์ 13:30-16:30 · ห้องLC1-201
+    - generic: Sec 820001
+    - button "เพิ่มแล้ว" [disabled]
+  - article:
+    - paragraph: PY252
+    - paragraph: PSYCHOLOGY OF INTERPERSONAL RELATIONS
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: รศ.ดร.โมนิล เตชะวชิรกุล"
+    - paragraph: พุธ 08:00-09:30 · ห้องSC-1058
+    - paragraph: ศุกร์ 08:00-09:30 · ห้องSC-1058
+    - generic: Sec 060001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: PY320
+    - paragraph: SOCIAL PSYCHOLOGY
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.ดร.พัฒนกิจ ชอบทำกิจ"
+    - paragraph: อังคาร 13:30-16:30 · ห้องSC-4001
+    - generic: Sec 450001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: RE468
+    - paragraph: RELIGION AND FILM
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.ดร.เดโชพล เหมนาไลย"
+    - paragraph: จันทร์ 09:30-12:30 · ห้องSC2-201
+    - generic: Sec 810001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: ST216
+    - paragraph: Statistics for Social Science 1
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.ณัฐธิดา พรหมวงศ์"
+    - paragraph: อังคาร 13:30-15:00 · ห้องไม่ระบุ
+    - paragraph: พฤหัสบดี 13:30-15:00 · ห้องไม่ระบุ
+    - generic: Sec 040001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: ST329
+    - paragraph: Applied Probability and Statistical Models
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: พุธ 13:30-15:00 · ห้องไม่ระบุ
+    - paragraph: ศุกร์ 13:30-15:00 · ห้องไม่ระบุ
+    - generic: Sec 090001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: TH291
+    - paragraph: WRITING PROFICIENCY DEVELOPMENT
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: ผศ.พรทิพย์ เฉิดฉินนภา"
+    - paragraph: พฤหัสบดี 13:30-16:30 · ห้องSC-1026
+    - generic: Sec 540001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: TU100
+    - paragraph: Civic Engagement
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: จันทร์ 13:30-16:30 · ห้องไม่ระบุ
+    - generic: Sec 820001
+    - button "เพิ่มแล้ว" [disabled]
+  - article:
+    - paragraph: TU101
+    - paragraph: Thailand, ASEAN, and the World
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: อ.สุภาพร ทองดี"
+    - paragraph: พุธ 13:30-16:30 · ห้องSC-1058
+    - generic: Sec 900001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: TU106
+    - paragraph: Creativity and Communication
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: อ.ดร.กมลชนก ศิลปชัย"
+    - paragraph: พฤหัสบดี 13:30-16:30 · ห้องLC2-203
+    - generic: Sec 540001
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: TU107
+    - paragraph: Digital Skill and Problem Solving
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - generic: Sec 000002
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: TU108
+    - paragraph: Self-Development and Management
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน:"
+    - paragraph: อังคาร 09:30-12:30 · ห้องไม่ระบุ
+    - combobox "เลือกกลุ่มเรียน TU108":
+      - option "Sec 230001" [selected]
+      - option "Sec 910001"
+    - button "+ เพิ่มวิชา"
+  - article:
+    - paragraph: TU109
+    - paragraph: Innovation and Entrepreneurial Mindset
+    - paragraph: 3 หน่วยกิต
+    - paragraph: "ผู้สอน: อ.ดร.ธนวัฒน์ รุ่งเรือง"
+    - paragraph: พุธ 09:30-12:30 · ห้องSC3-413
+    - generic: Sec 780001
+    - button "+ เพิ่มวิชา"
+- contentinfo:
+  - paragraph:
+    - generic: TU
+    - text: MockTimetableTU
+    - generic: · ระบบช่วยจัดตารางเรียนสำหรับนักศึกษาวิทยาการคอมพิวเตอร์ ภาคปกติ มหาวิทยาลัยธรรมศาสตร์
+  - navigation "ลิงก์ช่วยเหลือ":
+    - link "REG-TU":
+      - /url: https://vnweb68.reg.tu.ac.th/registrar/home
+      - text: REG-TU
+    - link "แจ้งปัญหา":
+      - /url: https://github.com/Non-Sin/CS261-G3-MockTimetableTU/issues
+- alert

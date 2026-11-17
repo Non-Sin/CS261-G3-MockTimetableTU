@@ -1,0 +1,73 @@
+{
+  "note": "Separate API readback with T-FR205 fixture after browser run.",
+  "status": 200,
+  "body": {
+    "courseCode": "FR205",
+    "courseName": "FRENCH FOR EVERYDAY LIFE",
+    "courseNameTh": "ภาษาฝรั่งเศสในชีวิตประจำวัน",
+    "credits": 3,
+    "group": "LANGUAGE",
+    "requiresQuota": true,
+    "offeredSemesters": [
+      1
+    ],
+    "tags": [
+      "KIND_INSTRUCTOR",
+      "NO_PREREQUISITE"
+    ],
+    "description": [
+      "เรียนภาษาฝรั่งเศสระดับ A2 ไม่มีพื้นฐานเรียนได้",
+      "เรียนonsite ในคาบอาจารย์ชอบให้ฝึกพูดภาษาฝรั่งเศสกับเพื่อนในคลาส เป็นบทสนทนาในชีวิตประจำวัน",
+      "มีงานกลุ่ม1งานเป็นงานนำเสนอเกี่ยวกับวัฒนธรรมฝรั่งเศส",
+      "มีสอบ กลางภาค และ ปลายภาค"
+    ],
+    "sections": [
+      {
+        "sectionId": 107,
+        "sectionNo": "260001",
+        "semester": 1,
+        "instructor": "ผศ.ธรณินทร์ มีเพียร",
+        "schedules": [
+          {
+            "dayOfWeek": "TUESDAY",
+            "startTime": "16:30",
+            "endTime": "18:00",
+            "room": "SC3-M10"
+          },
+          {
+            "dayOfWeek": "THURSDAY",
+            "startTime": "16:30",
+            "endTime": "18:00",
+            "room": "SC3-M10"
+          }
+        ],
+        "selectable": true,
+        "inTimetable": true,
+        "conflictWith": []
+      },
+      {
+        "sectionId": 108,
+        "sectionNo": "260002",
+        "semester": 1,
+        "instructor": "ผศ.นิธิ ศีลวัตกุล",
+        "schedules": [
+          {
+            "dayOfWeek": "TUESDAY",
+            "startTime": "16:30",
+            "endTime": "18:00",
+            "room": "SC3-M11"
+          },
+          {
+            "dayOfWeek": "THURSDAY",
+            "startTime": "16:30",
+            "endTime": "18:00",
+            "room": "SC3-M11"
+          }
+        ],
+        "selectable": true,
+        "inTimetable": false,
+        "conflictWith": []
+      }
+    ]
+  }
+}

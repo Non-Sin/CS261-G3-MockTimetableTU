@@ -1,0 +1,690 @@
+{
+  "note": "Separate real-API readback after browser runs, using the same isolated DB fixtures; not a replayed UI interaction.",
+  "search": [
+    {
+      "caseId": "01",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "FR205",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AN242",
+        "AN347",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "PC280",
+        "JC217",
+        "RE468"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "FR205",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AN242",
+        "AN347",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "PC280",
+        "JC217",
+        "RE468"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "03",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&q=py2",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "PY200",
+        "PY250",
+        "PY252"
+      ],
+      "actualCourseCodes": [
+        "PY200",
+        "PY250",
+        "PY252"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "04",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&q=%E0%B8%9D%E0%B8%A3%E0%B8%B1%E0%B9%88%E0%B8%87%E0%B9%80%E0%B8%A8%E0%B8%AA",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "FR205"
+      ],
+      "actualCourseCodes": [
+        "FR205"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "04",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&q=everyday",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "FR205",
+        "FD216"
+      ],
+      "actualCourseCodes": [
+        "FR205",
+        "FD216"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "04",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&q=DAY",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [],
+      "actualCourseCodes": [],
+      "pass": true
+    },
+    {
+      "caseId": "05",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&q=SA240",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [],
+      "actualCourseCodes": [],
+      "pass": true
+    },
+    {
+      "caseId": "06",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "FR205",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AN242",
+        "AN347",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "PC280",
+        "JC217",
+        "RE468"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "FR205",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AN242",
+        "AN347",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "PC280",
+        "JC217",
+        "RE468"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "07",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&group=PSYCHOLOGY",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320"
+      ],
+      "actualCourseCodes": [
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "08",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&semester=2",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AN242",
+        "AN347",
+        "AS201",
+        "PB317",
+        "FD216",
+        "IS313",
+        "PC280"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AN242",
+        "AN347",
+        "AS201",
+        "PB317",
+        "FD216",
+        "IS313",
+        "PC280"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "09",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&day=TUESDAY&timeSlot=EVENING",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "FR205"
+      ],
+      "actualCourseCodes": [
+        "FR205"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "09",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&day=THURSDAY&timeSlot=AFTERNOON",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "TH291",
+        "PB317"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "TH291",
+        "PB317"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "10",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&day=TUESDAY&timeSlot=MORNING",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "PY250",
+        "AT326",
+        "IS313"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "PY250",
+        "AT326",
+        "IS313"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "10",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&day=TUESDAY&timeSlot=MORNING&semester=1",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "AT326",
+        "IS313"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "AT326",
+        "IS313"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "11",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&day=MONDAY&timeSlot=MORNING",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "PY200",
+        "FD216",
+        "RE468"
+      ],
+      "actualCourseCodes": [
+        "PY200",
+        "FD216",
+        "RE468"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "12",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "FR205",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "JC217",
+        "RE468"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "FR205",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "JC217",
+        "RE468"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "13",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true&semester=2",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [],
+      "actualCourseCodes": [],
+      "pass": true
+    },
+    {
+      "caseId": "14",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&q=PY250&excludeConflicts=true",
+      "fixture": "empty",
+      "status": 200,
+      "expectedCourseCodes": [
+        "PY250"
+      ],
+      "actualCourseCodes": [
+        "PY250"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "15",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true",
+      "fixture": "TU100",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "FR205",
+        "TH291",
+        "PY200",
+        "PY252",
+        "PY320",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "JC217",
+        "RE468"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "FR205",
+        "TH291",
+        "PY200",
+        "PY252",
+        "PY320",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "JC217",
+        "RE468"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "16",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true",
+      "fixture": "CS213",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "FR205",
+        "PY200",
+        "PY250",
+        "PY252",
+        "AS201",
+        "GE225",
+        "AT326",
+        "FD216",
+        "IS313",
+        "RE468"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "FR205",
+        "PY200",
+        "PY250",
+        "PY252",
+        "AS201",
+        "GE225",
+        "AT326",
+        "FD216",
+        "IS313",
+        "RE468"
+      ],
+      "pass": true
+    },
+    {
+      "caseId": "17",
+      "method": "GET",
+      "path": "/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true",
+      "fixture": "FR205",
+      "status": 200,
+      "expectedCourseCodes": [
+        "EG214",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "JC217",
+        "RE468"
+      ],
+      "actualCourseCodes": [
+        "EG214",
+        "TH291",
+        "PY200",
+        "PY250",
+        "PY252",
+        "PY320",
+        "AS201",
+        "GE225",
+        "PB317",
+        "AT326",
+        "FD216",
+        "IS313",
+        "JC217",
+        "RE468"
+      ],
+      "pass": true
+    }
+  ],
+  "details": [
+    {
+      "status": 200,
+      "body": {
+        "courseCode": "FR205",
+        "courseName": "FRENCH FOR EVERYDAY LIFE",
+        "courseNameTh": "ภาษาฝรั่งเศสในชีวิตประจำวัน",
+        "credits": 3,
+        "group": "LANGUAGE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1
+        ],
+        "tags": [
+          "KIND_INSTRUCTOR",
+          "NO_PREREQUISITE"
+        ],
+        "description": [
+          "เรียนภาษาฝรั่งเศสระดับ A2 ไม่มีพื้นฐานเรียนได้",
+          "เรียนonsite ในคาบอาจารย์ชอบให้ฝึกพูดภาษาฝรั่งเศสกับเพื่อนในคลาส เป็นบทสนทนาในชีวิตประจำวัน",
+          "มีงานกลุ่ม1งานเป็นงานนำเสนอเกี่ยวกับวัฒนธรรมฝรั่งเศส",
+          "มีสอบ กลางภาค และ ปลายภาค"
+        ],
+        "sections": [
+          {
+            "sectionId": 107,
+            "sectionNo": "260001",
+            "semester": 1,
+            "instructor": "ผศ.ธรณินทร์ มีเพียร",
+            "schedules": [
+              {
+                "dayOfWeek": "TUESDAY",
+                "startTime": "16:30",
+                "endTime": "18:00",
+                "room": "SC3-M10"
+              },
+              {
+                "dayOfWeek": "THURSDAY",
+                "startTime": "16:30",
+                "endTime": "18:00",
+                "room": "SC3-M10"
+              }
+            ],
+            "selectable": true,
+            "inTimetable": false,
+            "conflictWith": []
+          },
+          {
+            "sectionId": 108,
+            "sectionNo": "260002",
+            "semester": 1,
+            "instructor": "ผศ.นิธิ ศีลวัตกุล",
+            "schedules": [
+              {
+                "dayOfWeek": "TUESDAY",
+                "startTime": "16:30",
+                "endTime": "18:00",
+                "room": "SC3-M11"
+              },
+              {
+                "dayOfWeek": "THURSDAY",
+                "startTime": "16:30",
+                "endTime": "18:00",
+                "room": "SC3-M11"
+              }
+            ],
+            "selectable": true,
+            "inTimetable": false,
+            "conflictWith": []
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "courseCode": "PY250",
+        "courseName": "PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT",
+        "courseNameTh": "จิตวิทยาบุคลิกภาพและการปรับตน",
+        "credits": 3,
+        "group": "PSYCHOLOGY",
+        "requiresQuota": false,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_ATTENDANCE",
+          "NO_GROUP_WORK"
+        ],
+        "description": [
+          "เรียนจิตวิทยาเกี่ยวกับบุคลิกภาพการรู้จักเข้าใจตัวเองและผู้อื่น เพื่อสร้างความสัมพันธ์และการใช้ชีวิตประจำอย่างมีความสุข",
+          "เรียนบรรยายในห้อง อาจารย์สอนสนุก สไลด์เป็นภาษาอังกฤษ",
+          "ไม่มีงานกลุ่ม",
+          "มีสอบ กลางภาค และ ปลายภาค"
+        ],
+        "sections": [
+          {
+            "sectionId": 118,
+            "sectionNo": "820001",
+            "semester": 1,
+            "instructor": "อ.วรรณปรัชญ์ พิทักษ์ไพบูลย์กิจ",
+            "schedules": [
+              {
+                "dayOfWeek": "MONDAY",
+                "startTime": "13:30",
+                "endTime": "16:30",
+                "room": "LC1-201"
+              }
+            ],
+            "selectable": true,
+            "inTimetable": false,
+            "conflictWith": []
+          },
+          {
+            "sectionId": 119,
+            "sectionNo": "230001",
+            "semester": 2,
+            "instructor": "อ.วรรณปรัชญ์ พิทักษ์ไพบูลย์กิจ",
+            "schedules": [
+              {
+                "dayOfWeek": "TUESDAY",
+                "startTime": "09:30",
+                "endTime": "12:30",
+                "room": null
+              }
+            ],
+            "selectable": false,
+            "inTimetable": false,
+            "conflictWith": []
+          }
+        ]
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "courseCode": "TH291",
+        "courseName": "WRITING PROFICIENCY DEVELOPMENT",
+        "courseNameTh": "การพัฒนาสมรรถภาพการเขียน",
+        "credits": 3,
+        "group": "LANGUAGE",
+        "requiresQuota": true,
+        "offeredSemesters": [
+          1,
+          2
+        ],
+        "tags": [
+          "NO_EXAM"
+        ],
+        "description": [
+          "สอนเขียนงานความเรียงเชิงวิชาการ เขียนบรรณานุกรม อ้างอิงในเนื้อหา สอนตั้งแต่เขียนโครงเรื่อง วิธีการเก็บข้อมูลเพื่อทํางานเขียน และการปรับระดับภาษา",
+          "มีควิซในคาบบ้าง เป็นแบบฝึกหัดให้เขียนโครงเรื่อง และลองปรับระดับภาษางานเขียน",
+          "อาจมีการจับกลุ่มสั้น ๆ ในห้องเรียนเพื่อทำกิจกรรม",
+          "ไม่มีสอบกลางภาคและปลายภาค ปลายภาคให้ส่งงานเขียนประมาณ 8-10 หน้า"
+        ],
+        "sections": [
+          {
+            "sectionId": 125,
+            "sectionNo": "540001",
+            "semester": 1,
+            "instructor": "ผศ.พรทิพย์ เฉิดฉินนภา",
+            "schedules": [
+              {
+                "dayOfWeek": "THURSDAY",
+                "startTime": "13:30",
+                "endTime": "16:30",
+                "room": "SC-1026"
+              }
+            ],
+            "selectable": true,
+            "inTimetable": false,
+            "conflictWith": []
+          },
+          {
+            "sectionId": 126,
+            "sectionNo": "540001",
+            "semester": 2,
+            "instructor": "ผศ.พรทิพย์ เฉิดฉินนภา",
+            "schedules": [
+              {
+                "dayOfWeek": "THURSDAY",
+                "startTime": "13:30",
+                "endTime": "16:30",
+                "room": "SC-1026"
+              }
+            ],
+            "selectable": false,
+            "inTimetable": false,
+            "conflictWith": []
+          }
+        ]
+      }
+    }
+  ]
+}

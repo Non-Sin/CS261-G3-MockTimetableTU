@@ -1,0 +1,13 @@
+# backend-tests.log
+[INFO] Tests run: 535, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+# frontend-unit.log
+ Test Files  19 passed (19)
+      Tests  203 passed (203)
+
+# frontend-lint.log
+> eslint
+
+# frontend-types.log
+✓ Types generated successfully

@@ -1,0 +1,987 @@
+[
+  {
+    "code": "AN242",
+    "name": "INTRODUCTION TO MUSEUM STUDIES",
+    "thai": "พิพิธภัณฑ์ศึกษาเบื้องต้น",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "SOCIETY",
+    "requiresQuota": false,
+    "sections": [
+      {
+        "id": 68,
+        "number": "870001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "FRIDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "AN347",
+    "name": "ARCHAEOLOGY OF DEATH",
+    "thai": "โบราณคดีความตาย",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "SOCIETY",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 69,
+        "number": "870001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "FRIDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "AS201",
+    "name": "KOREAN CULTURE AND INNOVATION",
+    "thai": "วัฒนธรรมและนวัตกรรมเกาหลี",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "SOCIETY",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 70,
+        "number": "900001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 71,
+        "number": "900001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "AT326",
+    "name": "RICE AND PRODUCTION TECHNOLOGY",
+    "thai": "ข้าวและเทคโนโลยีการผลิต",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "SCIENCE",
+    "requiresQuota": false,
+    "sections": [
+      {
+        "id": 72,
+        "number": "230001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "EG214",
+    "name": "PRESENTATION SKILLS",
+    "thai": "ทักษะการนำเสนอ",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "LANGUAGE",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 73,
+        "number": "230001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 74,
+        "number": "320001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 75,
+        "number": "320002",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 76,
+        "number": "320003",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 77,
+        "number": "320004",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 78,
+        "number": "540001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 79,
+        "number": "540002",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 80,
+        "number": "540003",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 81,
+        "number": "540004",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 82,
+        "number": "780001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 83,
+        "number": "900001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 84,
+        "number": "900002",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 85,
+        "number": "900003",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 86,
+        "number": "230001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 87,
+        "number": "230002",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 88,
+        "number": "320001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 89,
+        "number": "450001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 90,
+        "number": "450002",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 91,
+        "number": "450003",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 92,
+        "number": "540001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 93,
+        "number": "540002",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 94,
+        "number": "540003",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 95,
+        "number": "540004",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 96,
+        "number": "540005",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 97,
+        "number": "540006",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 98,
+        "number": "780001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 99,
+        "number": "780002",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 100,
+        "number": "780003",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 101,
+        "number": "780004",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 102,
+        "number": "780005",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 103,
+        "number": "900001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 104,
+        "number": "900002",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "FD216",
+    "name": "FOOD TECHNOLOGY IN EVERYDAY LIFE",
+    "thai": "เทคโนโลยีการอาหารในชีวิตประจำวัน",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "SCIENCE",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 105,
+        "number": "810002",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "MONDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 106,
+        "number": "870001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "FRIDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "FR205",
+    "name": "FRENCH FOR EVERYDAY LIFE",
+    "thai": "ภาษาฝรั่งเศสในชีวิตประจำวัน",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "LANGUAGE",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 107,
+        "number": "260001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "16:30",
+            "end": "18:00"
+          },
+          {
+            "day": "THURSDAY",
+            "start": "16:30",
+            "end": "18:00"
+          }
+        ]
+      },
+      {
+        "id": 108,
+        "number": "260002",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "16:30",
+            "end": "18:00"
+          },
+          {
+            "day": "THURSDAY",
+            "start": "16:30",
+            "end": "18:00"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "GE225",
+    "name": "POPULATION GEOGRAPHY AND MIGRATION",
+    "thai": "ภูมิศาสตร์ประชากรและการย้ายถิ่น",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "SOCIETY",
+    "requiresQuota": false,
+    "sections": [
+      {
+        "id": 109,
+        "number": "320001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "IS313",
+    "name": "BUSINESS DATA COMMUNICATIONS ON CLOUD COMPUTING AND NETWORKING",
+    "thai": "การสื่อสารข้อมูลทางธุรกิจบนเครือข่ายและการประมวลผลแบบคลาวด์",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "SCIENCE",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 110,
+        "number": "230001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 111,
+        "number": "230001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "JC217",
+    "name": "JOURNALISM AND SOCIAL CHANGE",
+    "thai": "วารสารศาสตร์กับการเปลี่ยนแปลงของสังคม",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "MEDIA",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 112,
+        "number": "450001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "PB317",
+    "name": "GENDER, SEXUALITY AND HEALTH",
+    "thai": "เพศภาวะ เพศวิถี และสุขภาพ",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "SOCIETY",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 113,
+        "number": "540001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 114,
+        "number": "540001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "PC280",
+    "name": "INTRODUCTION TO ASTRONOMY",
+    "thai": "ดาราศาสตร์เบื้องต้น",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "SCIENCE",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 115,
+        "number": "900001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "PY200",
+    "name": "GENERAL PSYCHOLOGY",
+    "thai": "จิตวิทยาทั่วไป",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "PSYCHOLOGY",
+    "requiresQuota": false,
+    "sections": [
+      {
+        "id": 116,
+        "number": "810001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "MONDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      },
+      {
+        "id": 117,
+        "number": "810001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "MONDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "PY250",
+    "name": "PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT",
+    "thai": "จิตวิทยาบุคลิกภาพและการปรับตน",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "PSYCHOLOGY",
+    "requiresQuota": false,
+    "sections": [
+      {
+        "id": 118,
+        "number": "820001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "MONDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 119,
+        "number": "230001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "PY252",
+    "name": "PSYCHOLOGY OF INTERPERSONAL RELATIONS",
+    "thai": "จิตวิทยาความสัมพันธ์ระหว่างบุคคล",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "PSYCHOLOGY",
+    "requiresQuota": false,
+    "sections": [
+      {
+        "id": 120,
+        "number": "060001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "08:00",
+            "end": "09:30"
+          },
+          {
+            "day": "FRIDAY",
+            "start": "08:00",
+            "end": "09:30"
+          }
+        ]
+      },
+      {
+        "id": 121,
+        "number": "060001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "WEDNESDAY",
+            "start": "08:00",
+            "end": "09:30"
+          },
+          {
+            "day": "FRIDAY",
+            "start": "08:00",
+            "end": "09:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "PY320",
+    "name": "SOCIAL PSYCHOLOGY",
+    "thai": "จิตวิทยาสังคม",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "PSYCHOLOGY",
+    "requiresQuota": false,
+    "sections": [
+      {
+        "id": 122,
+        "number": "450001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 123,
+        "number": "450001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "TUESDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "RE468",
+    "name": "RELIGION AND FILM",
+    "thai": "ศาสนากับภาพยนตร์",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "MEDIA",
+    "requiresQuota": false,
+    "sections": [
+      {
+        "id": 124,
+        "number": "810001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "MONDAY",
+            "start": "09:30",
+            "end": "12:30"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "TH291",
+    "name": "WRITING PROFICIENCY DEVELOPMENT",
+    "thai": "การพัฒนาสมรรถภาพการเขียน",
+    "category": "FREE_ELECTIVE",
+    "credits": 3,
+    "interestGroup": "LANGUAGE",
+    "requiresQuota": true,
+    "sections": [
+      {
+        "id": 125,
+        "number": "540001",
+        "year": 2568,
+        "semester": 1,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      },
+      {
+        "id": 126,
+        "number": "540001",
+        "year": 2568,
+        "semester": 2,
+        "slots": [
+          {
+            "day": "THURSDAY",
+            "start": "13:30",
+            "end": "16:30"
+          }
+        ]
+      }
+    ]
+  }
+]

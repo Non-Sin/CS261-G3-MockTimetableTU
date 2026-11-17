@@ -1,0 +1,329 @@
+- text: คำเตือนสำคัญ
+- generic: ระบบนี้เป็นเพียงระบบช่วยวางแผนตารางเรียนเท่านั้น
+- strong: ไม่สามารถใช้ลงทะเบียนเรียนจริงได้
+- link "ไปยัง REG-TU":
+  - /url: https://vnweb68.reg.tu.ac.th/registrar/home
+  - text: ไปยัง REG-TU
+- banner:
+  - paragraph: MockTimetable TU
+  - paragraph: ระบบช่วยวางแผนและจัดตารางเรียนจำลอง
+  - navigation "เมนูหลัก":
+    - button "จัดตารางเรียนจำลอง":
+      - text: จัดตารางเรียนจำลอง
+    - button "ดูวิชาเสรีแนะนำ":
+      - text: ดูวิชาเสรีแนะนำ
+    - button "ค้นหาช่องทางขอโควตา":
+      - text: ค้นหาช่องทางขอโควตา
+  - generic "ข้อมูลนักศึกษา":
+    - button "SJ Somchai Jaidee 6609000001":
+      - generic: SJ
+      - paragraph: Somchai Jaidee
+      - paragraph: "6609000001"
+    - dialog "เมนูบัญชีผู้ใช้":
+      - generic: SJ
+      - separator
+      - button "ออกจากระบบ":
+        - text: ออกจากระบบ
+- main:
+  - paragraph: วางแผนวันนี้ เรียนอย่างมั่นใจ
+  - heading "ดูวิชาเสรีแนะนำ" [level=1]
+  - paragraph: ยินดีต้อนรับ Somchai สำรวจวิชาเลือกเสรีสำหรับแผนการเรียนของคุณ
+  - paragraph: "ตารางปัจจุบัน: ภาคเรียนที่ 2 ปีการศึกษา 2568"
+  - region "ค้นหาและกรองวิชาเสรี":
+    - generic: ค้นหาด้วยรหัสวิชา หรือชื่อวิชา
+    - textbox "ค้นหาด้วยรหัสวิชา หรือชื่อวิชา":
+      - /placeholder: ค้นหาด้วยรหัสวิชา หรือชื่อวิชา เช่น PY200
+    - button "ค้นหาวิชา":
+      - text: ค้นหาวิชา
+    - text: กรองตามวันเรียน
+    - combobox "กรองตามวันเรียน":
+      - option "ทุกวันเรียน" [selected]
+      - option "วันจันทร์"
+      - option "วันอังคาร"
+      - option "วันพุธ"
+      - option "วันพฤหัสบดี"
+      - option "วันศุกร์"
+      - option "วันเสาร์"
+    - text: กรองตามช่วงเวลาเรียน
+    - combobox "กรองตามช่วงเวลาเรียน":
+      - option "ทุกช่วงเวลา" [selected]
+      - option "เช้า (08:00 - 12:30)"
+      - option "บ่าย (13:30 - 16:30)"
+      - option "เย็น (16:30 - 19:30)"
+    - text: หมวดหมู่วิชา
+    - combobox "หมวดหมู่วิชา":
+      - option "ทั้งหมด (ทุกหมวดหมู่)" [selected]
+      - option "หมวดภาษาและการสื่อสาร"
+      - option "หมวดจิตวิทยาและพฤติกรรมศาสตร์"
+      - option "หมวดสังคม วัฒนธรรม และสุขภาพ"
+      - option "หมวดวิทยาศาสตร์และเทคโนโลยี"
+      - option "หมวดสื่อ สารสนเทศ และภาพยนตร์"
+    - text: ภาคเรียนที่ต้องการค้นหา
+    - combobox "ภาคเรียนที่ต้องการค้นหา":
+      - option "ทุกภาคเรียน (ทั้งหมด)" [selected]
+      - option "ภาคเรียนที่ 1"
+      - option "ภาคเรียนที่ 2"
+    - checkbox "แสดงเฉพาะวิชาที่ไม่ชนกับตารางปัจจุบัน"
+    - text: แสดงเฉพาะวิชาที่ไม่ชนกับตารางปัจจุบัน
+    - paragraph: แสดงทั้งหมด 18 วิชาแนะนำ
+  - region "หมวดภาษาและการสื่อสาร":
+    - heading "หมวดภาษาและการสื่อสาร" [level=2]:
+      - text: หมวดภาษาและการสื่อสาร
+    - generic: 3 วิชา
+    - article:
+      - button "อ่านรีวิว EG214":
+        - heading "EG214" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: PRESENTATION SKILLS
+        - paragraph: ทักษะการนำเสนอ
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: ไม่มีสอบ
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว FR205":
+        - heading "FR205" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - generic: เปิดเฉพาะเทอม 1
+        - paragraph: FRENCH FOR EVERYDAY LIFE
+        - paragraph: ภาษาฝรั่งเศสในชีวิตประจำวัน
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: อาจารย์ใจดี
+        - generic: ไม่มีพื้นฐานเรียนได้
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว TH291":
+        - heading "TH291" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: WRITING PROFICIENCY DEVELOPMENT
+        - paragraph: การพัฒนาสมรรถภาพการเขียน
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: ไม่มีสอบ
+        - text: อ่านรีวิว
+  - region "หมวดจิตวิทยาและพฤติกรรมศาสตร์":
+    - heading "หมวดจิตวิทยาและพฤติกรรมศาสตร์" [level=2]:
+      - text: หมวดจิตวิทยาและพฤติกรรมศาสตร์
+    - generic: 4 วิชา
+    - article:
+      - button "อ่านรีวิว PY200":
+        - heading "PY200" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: GENERAL PSYCHOLOGY
+        - paragraph: จิตวิทยาทั่วไป
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีงานกลุ่ม
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว PY250":
+        - heading "PY250" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT
+        - paragraph: จิตวิทยาบุคลิกภาพและการปรับตน
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีงานกลุ่ม
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว PY252":
+        - heading "PY252" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: PSYCHOLOGY OF INTERPERSONAL RELATIONS
+        - paragraph: จิตวิทยาความสัมพันธ์ระหว่างบุคคล
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีงานกลุ่ม
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว PY320":
+        - heading "PY320" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: SOCIAL PSYCHOLOGY
+        - paragraph: จิตวิทยาสังคม
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีงานกลุ่ม
+        - text: อ่านรีวิว
+  - region "หมวดสังคม วัฒนธรรม และสุขภาพ":
+    - heading "หมวดสังคม วัฒนธรรม และสุขภาพ" [level=2]:
+      - text: หมวดสังคม วัฒนธรรม และสุขภาพ
+    - generic: 5 วิชา
+    - article:
+      - button "อ่านรีวิว AN242":
+        - heading "AN242" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - generic: เปิดเฉพาะเทอม 2
+        - paragraph: INTRODUCTION TO MUSEUM STUDIES
+        - paragraph: พิพิธภัณฑ์ศึกษาเบื้องต้น
+        - generic: ไม่มีสอบ
+        - generic: อาจารย์ใจดี
+        - generic: ไม่มีพื้นฐานเรียนได้
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว AN347":
+        - heading "AN347" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - generic: เปิดเฉพาะเทอม 2
+        - paragraph: ARCHAEOLOGY OF DEATH
+        - paragraph: โบราณคดีความตาย
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: อาจารย์ใจดี
+        - generic: ไม่มีพื้นฐานเรียนได้
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว AS201":
+        - heading "AS201" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: KOREAN CULTURE AND INNOVATION
+        - paragraph: วัฒนธรรมและนวัตกรรมเกาหลี
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีสอบ
+        - generic: เก็บ A ง่าย
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว GE225":
+        - heading "GE225" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - generic: เปิดเฉพาะเทอม 1
+        - paragraph: POPULATION GEOGRAPHY AND MIGRATION
+        - paragraph: ภูมิศาสตร์ประชากรและการย้ายถิ่น
+        - generic: อาจารย์ใจดี
+        - generic: ไม่มีพื้นฐานเรียนได้
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว PB317":
+        - heading "PB317" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: GENDER, SEXUALITY AND HEALTH
+        - paragraph: เพศภาวะ เพศวิถี และสุขภาพ
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีงานกลุ่ม
+        - generic: เก็บ A ง่าย
+        - text: อ่านรีวิว
+  - region "หมวดวิทยาศาสตร์และเทคโนโลยี":
+    - heading "หมวดวิทยาศาสตร์และเทคโนโลยี" [level=2]:
+      - text: หมวดวิทยาศาสตร์และเทคโนโลยี
+    - generic: 4 วิชา
+    - article:
+      - button "อ่านรีวิว AT326":
+        - heading "AT326" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - generic: เปิดเฉพาะเทอม 1
+        - paragraph: RICE AND PRODUCTION TECHNOLOGY
+        - paragraph: ข้าวและเทคโนโลยีการผลิต
+        - generic: ไม่มีงานกลุ่ม
+        - generic: เก็บ A ง่าย
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว FD216":
+        - heading "FD216" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: FOOD TECHNOLOGY IN EVERYDAY LIFE
+        - paragraph: เทคโนโลยีการอาหารในชีวิตประจำวัน
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: เก็บ A ง่าย
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว IS313":
+        - heading "IS313" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: BUSINESS DATA COMMUNICATIONS ON CLOUD COMPUTING AND NETWORKING
+        - paragraph: การสื่อสารข้อมูลทางธุรกิจบนเครือข่ายและการประมวลผลแบบคลาวด์
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: อาจารย์ใจดี
+        - generic: ไม่มีพื้นฐานเรียนได้
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว PC280":
+        - heading "PC280" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - generic: เปิดเฉพาะเทอม 2
+        - paragraph: INTRODUCTION TO ASTRONOMY
+        - paragraph: ดาราศาสตร์เบื้องต้น
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: ไม่มีงานกลุ่ม
+        - generic: เก็บ A ง่าย
+        - text: อ่านรีวิว
+  - region "หมวดสื่อ สารสนเทศ และภาพยนตร์":
+    - heading "หมวดสื่อ สารสนเทศ และภาพยนตร์" [level=2]:
+      - text: หมวดสื่อ สารสนเทศ และภาพยนตร์
+    - generic: 2 วิชา
+    - article:
+      - button "อ่านรีวิว JC217":
+        - heading "JC217" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - generic: เปิดเฉพาะเทอม 1
+        - paragraph: JOURNALISM AND SOCIAL CHANGE
+        - paragraph: วารสารศาสตร์กับการเปลี่ยนแปลงของสังคม
+        - generic: รายวิชาที่ต้องขอโควตา
+        - generic: อาจารย์ใจดี
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว RE468":
+        - heading "RE468" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - generic: เปิดเฉพาะเทอม 1
+        - paragraph: RELIGION AND FILM
+        - paragraph: ศาสนากับภาพยนตร์
+        - generic: อาจารย์ใจดี
+        - text: อ่านรีวิว
+  - dialog "รายละเอียดวิชาเสรี":
+    - heading "รายละเอียดวิชาเสรี" [level=2]
+    - button "ปิดรายละเอียดวิชา" [active]: ×
+    - heading "PY250" [level=3]
+    - generic: เลือกเสรี
+    - generic: 3.0 หน่วยกิต
+    - paragraph: PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT
+    - paragraph: จิตวิทยาบุคลิกภาพและการปรับตน
+    - generic: ไม่เช็คชื่อ
+    - generic: ไม่มีงานกลุ่ม
+    - group "กลุ่มเรียนและตารางเรียน (Sections)":
+      - generic: กลุ่มเรียนและตารางเรียน (Sections)
+      - radio "Sec 820001 ภาคเรียนที่ 1" [disabled]
+      - text: Sec 820001
+      - generic: ภาคเรียนที่ 1
+      - paragraph: (ตารางเรียนปัจจุบันคือภาคเรียนที่ 2)
+      - paragraph: วันจันทร์ 13:30 - 16:30 น.
+      - paragraph: "ห้องเรียน: LC1-201"
+      - paragraph: "ผู้สอน: อ.วรรณปรัชญ์ พิทักษ์ไพบูลย์กิจ"
+      - radio "Sec 230001 ภาคเรียนที่ 2" [checked]
+      - text: Sec 230001
+      - generic: ภาคเรียนที่ 2
+      - paragraph: วันอังคาร 09:30 - 12:30 น.
+      - paragraph: "ห้องเรียน: ไม่ระบุ"
+      - paragraph: "ผู้สอน: อ.วรรณปรัชญ์ พิทักษ์ไพบูลย์กิจ"
+    - region "รายละเอียดวิชา & รีวิวจากรุ่นพี่":
+      - heading "รายละเอียดวิชา & รีวิวจากรุ่นพี่" [level=3]
+      - list:
+        - listitem: เรียนจิตวิทยาเกี่ยวกับบุคลิกภาพการรู้จักเข้าใจตัวเองและผู้อื่น เพื่อสร้างความสัมพันธ์และการใช้ชีวิตประจำอย่างมีความสุข
+        - listitem: เรียนบรรยายในห้อง อาจารย์สอนสนุก สไลด์เป็นภาษาอังกฤษ
+        - listitem: ไม่มีงานกลุ่ม
+        - listitem: มีสอบ กลางภาค และ ปลายภาค
+    - button "+ เพิ่มลงตาราง"
+- contentinfo:
+  - paragraph:
+    - generic: TU
+    - text: MockTimetableTU
+    - generic: · ระบบช่วยจัดตารางเรียนสำหรับนักศึกษาวิทยาการคอมพิวเตอร์ ภาคปกติ มหาวิทยาลัยธรรมศาสตร์
+  - navigation "ลิงก์ช่วยเหลือ":
+    - link "REG-TU":
+      - /url: https://vnweb68.reg.tu.ac.th/registrar/home
+      - text: REG-TU
+    - link "แจ้งปัญหา":
+      - /url: https://github.com/Non-Sin/CS261-G3-MockTimetableTU/issues
+- alert

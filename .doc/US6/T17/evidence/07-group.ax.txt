@@ -1,0 +1,124 @@
+- text: คำเตือนสำคัญ
+- generic: ระบบนี้เป็นเพียงระบบช่วยวางแผนตารางเรียนเท่านั้น
+- strong: ไม่สามารถใช้ลงทะเบียนเรียนจริงได้
+- link "ไปยัง REG-TU":
+  - /url: https://vnweb68.reg.tu.ac.th/registrar/home
+  - text: ไปยัง REG-TU
+- banner:
+  - paragraph: MockTimetable TU
+  - paragraph: ระบบช่วยวางแผนและจัดตารางเรียนจำลอง
+  - navigation "เมนูหลัก":
+    - button "จัดตารางเรียนจำลอง":
+      - text: จัดตารางเรียนจำลอง
+    - button "ดูวิชาเสรีแนะนำ":
+      - text: ดูวิชาเสรีแนะนำ
+    - button "ค้นหาช่องทางขอโควตา":
+      - text: ค้นหาช่องทางขอโควตา
+  - generic "ข้อมูลนักศึกษา":
+    - button "SJ Somchai Jaidee 6609000001":
+      - generic: SJ
+      - paragraph: Somchai Jaidee
+      - paragraph: "6609000001"
+    - dialog "เมนูบัญชีผู้ใช้":
+      - generic: SJ
+      - separator
+      - button "ออกจากระบบ":
+        - text: ออกจากระบบ
+- main:
+  - paragraph: วางแผนวันนี้ เรียนอย่างมั่นใจ
+  - heading "ดูวิชาเสรีแนะนำ" [level=1]
+  - paragraph: ยินดีต้อนรับ Somchai สำรวจวิชาเลือกเสรีสำหรับแผนการเรียนของคุณ
+  - paragraph: "ตารางปัจจุบัน: ภาคเรียนที่ 1 ปีการศึกษา 2568"
+  - region "ค้นหาและกรองวิชาเสรี":
+    - generic: ค้นหาด้วยรหัสวิชา หรือชื่อวิชา
+    - textbox "ค้นหาด้วยรหัสวิชา หรือชื่อวิชา":
+      - /placeholder: ค้นหาด้วยรหัสวิชา หรือชื่อวิชา เช่น PY200
+    - button "ค้นหาวิชา":
+      - text: ค้นหาวิชา
+    - text: กรองตามวันเรียน
+    - combobox "กรองตามวันเรียน":
+      - option "ทุกวันเรียน" [selected]
+      - option "วันจันทร์"
+      - option "วันอังคาร"
+      - option "วันพุธ"
+      - option "วันพฤหัสบดี"
+      - option "วันศุกร์"
+      - option "วันเสาร์"
+    - text: กรองตามช่วงเวลาเรียน
+    - combobox "กรองตามช่วงเวลาเรียน":
+      - option "ทุกช่วงเวลา" [selected]
+      - option "เช้า (08:00 - 12:30)"
+      - option "บ่าย (13:30 - 16:30)"
+      - option "เย็น (16:30 - 19:30)"
+    - text: หมวดหมู่วิชา
+    - combobox "หมวดหมู่วิชา":
+      - option "ทั้งหมด (ทุกหมวดหมู่)"
+      - option "หมวดภาษาและการสื่อสาร"
+      - option "หมวดจิตวิทยาและพฤติกรรมศาสตร์" [selected]
+      - option "หมวดสังคม วัฒนธรรม และสุขภาพ"
+      - option "หมวดวิทยาศาสตร์และเทคโนโลยี"
+      - option "หมวดสื่อ สารสนเทศ และภาพยนตร์"
+    - text: ภาคเรียนที่ต้องการค้นหา
+    - combobox "ภาคเรียนที่ต้องการค้นหา":
+      - option "ทุกภาคเรียน (ทั้งหมด)" [selected]
+      - option "ภาคเรียนที่ 1"
+      - option "ภาคเรียนที่ 2"
+    - checkbox "แสดงเฉพาะวิชาที่ไม่ชนกับตารางปัจจุบัน"
+    - text: แสดงเฉพาะวิชาที่ไม่ชนกับตารางปัจจุบัน
+    - paragraph: แสดงทั้งหมด 4 วิชาแนะนำ
+  - region "หมวดจิตวิทยาและพฤติกรรมศาสตร์":
+    - heading "หมวดจิตวิทยาและพฤติกรรมศาสตร์" [level=2]:
+      - text: หมวดจิตวิทยาและพฤติกรรมศาสตร์
+    - generic: 4 วิชา
+    - article:
+      - button "อ่านรีวิว PY200":
+        - heading "PY200" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: GENERAL PSYCHOLOGY
+        - paragraph: จิตวิทยาทั่วไป
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีงานกลุ่ม
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว PY250":
+        - heading "PY250" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: PSYCHOLOGY OF PERSONALITY AND ADJUSTMENT
+        - paragraph: จิตวิทยาบุคลิกภาพและการปรับตน
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีงานกลุ่ม
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว PY252":
+        - heading "PY252" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: PSYCHOLOGY OF INTERPERSONAL RELATIONS
+        - paragraph: จิตวิทยาความสัมพันธ์ระหว่างบุคคล
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีงานกลุ่ม
+        - text: อ่านรีวิว
+    - article:
+      - button "อ่านรีวิว PY320":
+        - heading "PY320" [level=3]
+        - generic: เลือกเสรี
+        - generic: 3.0 หน่วยกิต
+        - paragraph: SOCIAL PSYCHOLOGY
+        - paragraph: จิตวิทยาสังคม
+        - generic: ไม่เช็คชื่อ
+        - generic: ไม่มีงานกลุ่ม
+        - text: อ่านรีวิว
+- contentinfo:
+  - paragraph:
+    - generic: TU
+    - text: MockTimetableTU
+    - generic: · ระบบช่วยจัดตารางเรียนสำหรับนักศึกษาวิทยาการคอมพิวเตอร์ ภาคปกติ มหาวิทยาลัยธรรมศาสตร์
+  - navigation "ลิงก์ช่วยเหลือ":
+    - link "REG-TU":
+      - /url: https://vnweb68.reg.tu.ac.th/registrar/home
+      - text: REG-TU
+    - link "แจ้งปัญหา":
+      - /url: https://github.com/Non-Sin/CS261-G3-MockTimetableTU/issues
+- alert: Login

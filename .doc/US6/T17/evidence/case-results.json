@@ -1,0 +1,298 @@
+[
+  {
+    "id": "IT-UI-API-US6-01",
+    "name": "เปิดเมนูและรายการทั้งหมด",
+    "result": "PASS",
+    "actual": "18 วิชา แบ่ง 5 หมวด 3/4/5/4/2 ไม่มี EL105/CS100",
+    "evidence": "01-02-list.ax.txt",
+    "networkCaseId": "01"
+  },
+  {
+    "id": "IT-UI-API-US6-02",
+    "name": "ข้อมูลการ์ดและป้าย",
+    "result": "PASS",
+    "actual": "FR205 ชื่อสองภาษา/3 หน่วยกิต/โควตา/tags; TH291 เปิดสองภาค; PY250 ไม่มีป้ายโควตา",
+    "evidence": "01-02-list.ax.txt",
+    "networkCaseId": "01"
+  },
+  {
+    "id": "IT-UI-API-US6-03",
+    "name": "ค้นรหัสไม่สนตัวพิมพ์",
+    "result": "PASS",
+    "actual": "py2 ได้ PY200, PY250, PY252",
+    "evidence": "03-code-prefix.ax.txt",
+    "networkCaseId": "03"
+  },
+  {
+    "id": "IT-UI-API-US6-04",
+    "name": "ค้นไทย/English word prefix",
+    "result": "PASS",
+    "actual": "ฝรั่งเศส → FR205; everyday → FR205, FD216; DAY → ว่าง",
+    "evidence": "04b-english.ax.txt",
+    "networkCaseId": "04"
+  },
+  {
+    "id": "IT-UI-API-US6-05",
+    "name": "ค้นหาไม่พบ",
+    "result": "PASS",
+    "actual": "SA240 ได้ 200 [] และ Empty State พร้อมปุ่มดูทั้งหมด",
+    "evidence": "05-empty.ax.txt",
+    "networkCaseId": "05"
+  },
+  {
+    "id": "IT-UI-API-US6-06",
+    "name": "ล้างคำค้นและตัวกรองทั้งหมด",
+    "result": "PASS",
+    "actual": "กลับค่าตั้งต้นครบ คำขอไม่มีตัวกรอง และแสดง 18 วิชา",
+    "evidence": "06-reset-all.ax.txt",
+    "networkCaseId": "06"
+  },
+  {
+    "id": "IT-UI-API-US6-07",
+    "name": "หมวดจิตวิทยา",
+    "result": "PASS",
+    "actual": "4 วิชา PY200/PY250/PY252/PY320",
+    "evidence": "07-group.ax.txt",
+    "networkCaseId": "07"
+  },
+  {
+    "id": "IT-UI-API-US6-08",
+    "name": "กรองภาคเรียน",
+    "result": "PASS",
+    "actual": "semester=2 แต่ currentSemester=1; 13 วิชา ไม่มี FR205",
+    "evidence": "08-semester.ax.txt",
+    "networkCaseId": "08"
+  },
+  {
+    "id": "IT-UI-API-US6-09",
+    "name": "วันและช่วงเวลา",
+    "result": "PASS",
+    "actual": "อังคารเย็น FR205; พฤหัสบดีบ่าย EG214/TH291/PB317",
+    "evidence": "09b-afternoon.ax.txt",
+    "networkCaseId": "09"
+  },
+  {
+    "id": "IT-UI-API-US6-10",
+    "name": "หลายเงื่อนไขใน Sec เดียว",
+    "result": "PASS",
+    "actual": "อังคารเช้า 4 วิชา; เพิ่ม semester=1 เหลือ EG214/AT326/IS313 ไม่รวม PY250",
+    "evidence": "10b-combined.ax.txt",
+    "networkCaseId": "10"
+  },
+  {
+    "id": "IT-UI-API-US6-11",
+    "name": "วันและเวลาในคาบเดียว",
+    "result": "PASS",
+    "actual": "จันทร์เช้า PY200/FD216/RE468 ไม่รวม PY250",
+    "evidence": "11-same-slot.ax.txt",
+    "networkCaseId": "11"
+  },
+  {
+    "id": "IT-UI-API-US6-12",
+    "name": "ไม่ชนเมื่อตารางว่าง",
+    "result": "PASS",
+    "actual": "15 วิชา เฉพาะที่เปิดภาคปัจจุบัน ตัด 3 วิชาที่มีแต่ภาค 2",
+    "evidence": "12-empty-timetable-filter.ax.txt",
+    "networkCaseId": "12"
+  },
+  {
+    "id": "IT-UI-API-US6-13",
+    "name": "ไม่ชนร่วมกับอีกภาค",
+    "result": "PASS",
+    "actual": "excludeConflicts=true และ semester=2 ขณะ currentSemester=1 ได้ []",
+    "evidence": "13-other-term.ax.txt",
+    "networkCaseId": "13"
+  },
+  {
+    "id": "IT-UI-API-US6-14",
+    "name": "คำขอตอบกลับสลับลำดับ",
+    "result": "PASS",
+    "actual": "หน่วง FR205 ให้ตอบหลัง PY250; หน้าคงผล PY250 ไม่ย้อนกลับ",
+    "evidence": "14-after-delayed-response.ax.txt",
+    "networkCaseId": "14"
+  },
+  {
+    "id": "IT-UI-API-US6-15",
+    "name": "กรองวิชาชน TU100",
+    "result": "PASS",
+    "actual": "14 วิชา ตัด PY250 แต่คง FR205/TH291",
+    "evidence": "15-tu100-conflict-filter.ax.txt",
+    "networkCaseId": "15"
+  },
+  {
+    "id": "IT-UI-API-US6-16",
+    "name": "คาบต่อกันพอดีไม่ชน",
+    "result": "PASS",
+    "actual": "11 วิชา คง FR205 เพราะเริ่ม 16:30 เท่ากับ CS213 เลิก และตัด TH291",
+    "evidence": "16-adjacent-slot-not-conflict.ax.txt",
+    "networkCaseId": "16"
+  },
+  {
+    "id": "IT-UI-API-US6-17",
+    "name": "ตัดวิชาที่อยู่ในตาราง",
+    "result": "PASS",
+    "actual": "14 วิชา ไม่มี FR205 ที่เพิ่มแล้ว",
+    "evidence": "17-existing-course-filter.ax.txt",
+    "networkCaseId": "17"
+  },
+  {
+    "id": "IT-UI-API-US6-18",
+    "name": "รายละเอียด PY250",
+    "result": "PASS",
+    "actual": "รีวิว 4 ข้อ Sec 820001 ถูกเลือก; 230001 disabled และห้องไม่ระบุ",
+    "evidence": "18-py250-detail.ax.txt",
+    "networkCaseId": "18"
+  },
+  {
+    "id": "IT-UI-API-US6-19",
+    "name": "รายละเอียด FR205",
+    "result": "PASS",
+    "actual": "2 Sec ภาค 1; เลือก 260001 อัตโนมัติ ปุ่มเพิ่มใช้ได้ และมีปุ่มโควตา",
+    "evidence": "19-fr205-detail.ax.txt",
+    "networkCaseId": "19"
+  },
+  {
+    "id": "IT-UI-API-US6-20",
+    "name": "บริบทตารางภาค 2",
+    "result": "PASS",
+    "actual": "230001 ถูกเลือกและใช้ได้; 820001 disabled; ส่ง currentSemester=2",
+    "evidence": "20-current-semester-two.ax.txt",
+    "networkCaseId": "20"
+  },
+  {
+    "id": "IT-UI-API-US6-21",
+    "name": "เตือนเวลาชนใน modal",
+    "result": "PASS",
+    "actual": "PY250 Sec 820001 เตือนชน TU100 แต่ปุ่มเพิ่มยังใช้ได้ อีกภาคไม่มี conflict",
+    "evidence": "21-tu100-modal.ax.txt",
+    "networkCaseId": "21"
+  },
+  {
+    "id": "IT-UI-API-US6-22",
+    "name": "วิชาที่เพิ่มแล้ว",
+    "result": "FAIL",
+    "actual": "ป้องกัน POST ซ้ำและแสดงเพิ่มแล้วถูกต้อง แต่ปิด radio 260002 ด้วย ทั้งที่ T13 ระบุว่ายังเลือกได้",
+    "evidence": "22-disabled-alternative.ax.txt",
+    "networkCaseId": "22"
+  },
+  {
+    "id": "IT-UI-API-US6-23",
+    "name": "เพิ่ม FR205 สำเร็จ",
+    "result": "PASS",
+    "actual": "POST 1 ครั้ง 201; modal ปิด; ข้อความสำเร็จ; เปิดซ้ำ inTimetable=true และตารางมีสองคาบ",
+    "evidence": "23-timetable.ax.txt",
+    "networkCaseId": "23"
+  },
+  {
+    "id": "IT-UI-API-US6-24",
+    "name": "เพิ่มวิชาที่ชนได้",
+    "result": "PASS",
+    "actual": "201 พร้อม TU100/PY250 conflict จันทร์ 13:30–16:30 และ UI ตารางแสดงคำเตือน",
+    "evidence": "24-timetable.ax.txt",
+    "networkCaseId": "24"
+  },
+  {
+    "id": "IT-UI-API-US6-25",
+    "name": "โหลดรายการใหม่หลังเพิ่ม",
+    "result": "PASS",
+    "actual": "15 → 14 วิชา มี GET excludeConflicts=true ใหม่ และ FR205 หายจากรายการ",
+    "evidence": "25-auto-refresh.ax.txt",
+    "networkCaseId": "25"
+  },
+  {
+    "id": "IT-UI-API-US6-26",
+    "name": "หน่วยกิตเกิน",
+    "result": "FAIL",
+    "actual": "UI ปิดปุ่มทันทีที่ 21+3>22 ไม่มี POST/ข้อความ 409 ตาม T13; ยิง API เสริมได้ 409 ถูกต้อง",
+    "evidence": "26-credit-limit-blocked.ax.txt",
+    "networkCaseId": "26"
+  },
+  {
+    "id": "IT-UI-API-US6-27",
+    "name": "ข้อมูลเก่าจากสองแท็บ",
+    "result": "PASS",
+    "actual": "แท็บ 2 เพิ่ม Sec 260002 ได้ 201; แท็บ 1 เพิ่ม Sec 260001 ได้ 409 พร้อม detail ถูกต้อง",
+    "evidence": "27-duplicate-conflict.ax.txt",
+    "networkCaseId": "27"
+  },
+  {
+    "id": "IT-UI-API-US6-28",
+    "name": "กันกดเพิ่มซ้ำ",
+    "result": "PASS",
+    "actual": "หน่วง POST แล้ว double-click มี POST เพียง 1 ครั้ง 201 ระหว่างรอปุ่ม disabled",
+    "evidence": "28-pending.ax.txt",
+    "networkCaseId": "28"
+  },
+  {
+    "id": "IT-UI-API-US6-29",
+    "name": "ห้ามเพิ่ม Sec อีกภาค",
+    "result": "PASS",
+    "actual": "Sec 230001 disabled/ไม่ถูกเลือก ไม่มี POST และ GET ตารางภาค 2 ยังว่าง",
+    "evidence": "29-other-term-disabled.ax.txt",
+    "networkCaseId": "29"
+  },
+  {
+    "id": "IT-UI-API-US6-30",
+    "name": "GET ไม่มีสิทธิ์",
+    "result": "PASS",
+    "actual": "ถอน Authorization ที่ proxy; backend ตอบ 401 จริง UI กลับ Login และไม่คงการ์ดเดิม",
+    "evidence": "30-get-401-login.ax.txt",
+    "networkCaseId": "30"
+  },
+  {
+    "id": "IT-UI-API-US6-31",
+    "name": "POST ไม่มีสิทธิ์",
+    "result": "PASS",
+    "actual": "ถอน Authorization ที่ proxy; backend ตอบ 401 จริง modal หาย กลับ Login และตารางยังว่าง",
+    "evidence": "31-post-401-login.ax.txt",
+    "networkCaseId": "31"
+  },
+  {
+    "id": "IT-UI-API-US6-32",
+    "name": "รายละเอียดไม่ใช่วิชาแนะนำ",
+    "result": "PASS",
+    "actual": "EL105, CS100, SA240 ได้ 404 ProblemDetail ครบ 3 ค่า",
+    "evidence": "api-contract-results.json",
+    "networkCaseId": "32"
+  },
+  {
+    "id": "IT-UI-API-US6-33",
+    "name": "รายละเอียดถูกลบหลังโหลดรายการ",
+    "result": "FAIL",
+    "actual": "ลบข้อมูล PY250 จริงใน DB ทดสอบ ได้ 404; UI แสดง ไม่พบรายละเอียดวิชาเสรีนี้ ต่างจากข้อความทีมกำหนด",
+    "evidence": "33-detail-404.ax.txt",
+    "networkCaseId": "33"
+  },
+  {
+    "id": "IT-UI-API-US6-34",
+    "name": "พารามิเตอร์ผิด",
+    "result": "PASS",
+    "actual": "ครบ 8 subcases ได้ 400 ProblemDetail",
+    "evidence": "api-contract-results.json",
+    "networkCaseId": "34"
+  },
+  {
+    "id": "IT-UI-API-US6-35",
+    "name": "SUNDAY และ currentSemester ผิด",
+    "result": "PASS",
+    "actual": "SUNDAY ได้ 200 []; รายละเอียด currentSemester=3 ได้ 400",
+    "evidence": "api-contract-results.json",
+    "networkCaseId": "35"
+  },
+  {
+    "id": "IT-UI-API-US6-36",
+    "name": "เครือข่ายล่มและกลับมา",
+    "result": "FAIL",
+    "actual": "ไม่มีการ์ดเก่าปน/กู้คืนได้ แต่ข้อความเป็น โหลดวิชาเสรีแนะนำไม่สำเร็จ กรุณาลองใหม่ ต่างจาก T13",
+    "evidence": "36-network-error.ax.txt",
+    "networkCaseId": "36"
+  },
+  {
+    "id": "IT-UI-API-US6-37",
+    "name": "POST ตอบ 500",
+    "result": "PASS",
+    "actual": "ฉีด 500 ที่ proxy; modal คงอยู่ มีข้อความผิดพลาด ปุ่มใช้ได้อีก และตารางไม่เปลี่ยน",
+    "evidence": "37-post-error.ax.txt",
+    "networkCaseId": "37"
+  }
+]
