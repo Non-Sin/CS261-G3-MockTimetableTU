@@ -1,0 +1,810 @@
+{
+  "info": {
+    "name": "US7-T08 Quota API (test fixtures before T09)",
+    "description": "Controller/Service/DTO/JWT tests using QuotaPostmanApplication. Data reader and timetable repositories are test fixtures, not SQL. Do not use real TU credentials. See README.md in this folder.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:18087"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tokenOther",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 REQUIRED - EL395",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=EL395"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Course and status\", () => { pm.expect(body.courses[0].courseCode).to.eql(\"EL395\"); pm.expect(body.courses[0].quotaStatus).to.eql(\"REQUIRED\"); });",
+              "pm.test(\"Related course\", () => { pm.expect(body.courses[0].conditions[0].relatedCourseCode).to.eql(\"EL295\"); });",
+              "pm.test(\"Multiple channels and explicit nulls\", () => { pm.expect(body.courses[0].channels).to.have.length(2); pm.expect(body.courses[0].channels[1]).to.have.property(\"url\", null); pm.expect(body.courses[0].channels[0]).to.have.property(\"note\", null); });",
+              "pm.test(\"ISO date and HH:mm\", () => { pm.expect(body.courses[0].rounds[0]).to.include({startDate:null,endDate:\"2025-08-20\",endTime:\"15:00\"}); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Code prefix and case-insensitive",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=el3"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Only EL395\", () => { pm.expect(body.courses.map(c=>c.courseCode)).to.eql([\"EL395\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 English word prefix",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=calc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"MA211\", () => { pm.expect(body.courses.map(c=>c.courseCode)).to.eql([\"MA211\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Thai substring",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=%E0%B9%81%E0%B8%84%E0%B8%A5%E0%B8%84%E0%B8%B9%E0%B8%A5%E0%B8%B1%E0%B8%AA"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"MA211 Thai name\", () => { pm.expect(body.courses[0].courseCode).to.eql(\"MA211\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Trim query",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=%20EL395%20"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Normalized query\", () => { pm.expect(body.query).to.eql(\"EL395\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Search unknown is 200 empty",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=DM201"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Empty\", () => { pm.expect(body.total).to.eql(0); pm.expect(body.courses).to.eql([]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Detail unknown is 404",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses/DM201?academicYear=2568&semester=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));",
+              "pm.test(\"404 detail\", () => { pm.expect(body.detail).to.eql(\"ไม่พบรายวิชา DM201\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Detail lower-case",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses/el295?academicYear=2568&semester=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Normalized code\", () => { pm.expect(body.courseCode).to.eql(\"EL295\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Existing course NO_DATA",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=TU101"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"NO_DATA and null name\", () => { const c=body.courses[0]; pm.expect(c.quotaStatus).to.eql(\"NO_DATA\"); pm.expect(c).to.have.property(\"courseNameTh\",null); [\"conditions\",\"rounds\",\"channels\",\"contacts\"].forEach(k=>pm.expect(c[k]).to.eql([])); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 NOT_REQUIRED",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=CS232"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Empty details\", () => { const c=body.courses[0]; pm.expect(c.quotaStatus).to.eql(\"NOT_REQUIRED\"); [\"conditions\",\"rounds\",\"channels\",\"contacts\"].forEach(k=>pm.expect(c[k]).to.eql([])); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 NOT_OFFERED before REQUIRED",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses/FR205?academicYear=2568&semester=2"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Not offered\", () => { pm.expect(body.quotaStatus).to.eql(\"NOT_OFFERED\"); pm.expect(body.offeredSemesters).to.eql([1]); pm.expect(body.channels).to.eql([]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 No sections anywhere in year",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses/EL395?academicYear=2569&semester=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Empty offeredSemesters\", () => { pm.expect(body.quotaStatus).to.eql(\"NOT_OFFERED\"); pm.expect(body.offeredSemesters).to.eql([]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 REQUIRED with no rounds",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=FR205"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Still required\", () => { pm.expect(body.courses[0].quotaStatus).to.eql(\"REQUIRED\"); pm.expect(body.courses[0].rounds).to.eql([]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 My timetable, null query",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&mine=true"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Only my courses\", () => { pm.expect(body.query).to.eql(null); pm.expect(body.courses.map(c=>c.courseCode)).to.eql([\"LAS101\",\"MA211\"]); pm.expect(body.courses.every(c=>c.inMyTimetable)).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 Mine plus query AND",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&mine=true&q=MA"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Only MA211\", () => { pm.expect(body.courses.map(c=>c.courseCode)).to.eql([\"MA211\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 Mine false still marks membership",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=MA211&mine=false"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Membership\", () => { pm.expect(body.courses[0].inMyTimetable).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 Empty timetable for another term",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=2&mine=true"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Empty\", () => { pm.expect(body.courses).to.eql([]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 Authenticated student isolation",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&mine=true",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{tokenOther}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Other student has only TU101\", () => { pm.expect(body.courses.map(c=>c.courseCode)).to.eql([\"TU101\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 Max results 50, total 55",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=ZZ"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Limit and total\", () => { pm.expect(body.total).to.eql(55); pm.expect(body.courses).to.have.length(50); pm.expect(body.courses[0].courseCode).to.eql(\"ZZ000\"); pm.expect(body.courses[49].courseCode).to.eql(\"ZZ049\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 No search condition",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));",
+              "pm.test(\"Business code\", () => { pm.expect(body.code).to.eql(\"QUOTA_SEARCH_QUERY_REQUIRED\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 Blank query",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=%20%20"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));",
+              "pm.test(\"Business code\", () => { pm.expect(body.code).to.eql(\"QUOTA_SEARCH_QUERY_REQUIRED\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22 Query 51 characters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23 Query 50 characters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Empty valid search\", () => { pm.expect(body.courses).to.eql([]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "24 Invalid query parameters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?semester=1&q=EL395"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "25 Invalid query parameters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&q=EL395"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "26 Invalid query parameters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=abc&semester=1&q=EL395"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "27 Invalid query parameters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=3&q=EL395"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "28 Invalid query parameters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=0&q=EL395"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "29 Invalid query parameters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=EL395&mine=wrong"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "30 Invalid detail semester",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses/EL395?academicYear=2568&semester=3"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "31 Missing JWT",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=EL395",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "32 Invalid JWT",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=EL395",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "not-a-jwt",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "const body = pm.response.json();",
+              "pm.test(\"ProblemDetail status\", () => pm.expect(body.status).to.eql(pm.response.code));",
+              "pm.test(\"ProblemDetail content type\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/problem+json\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "33 Literal percent is not wildcard",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=%25"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Only literal fixture\", () => { pm.expect(body.courses.map(c=>c.courseCode)).to.eql([\"SP001\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "34 Literal underscore is not wildcard",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=_"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Only literal fixture\", () => { pm.expect(body.courses.map(c=>c.courseCode)).to.eql([\"SP001\"]); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "35 Literal bracket is not wildcard",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/quota/courses?academicYear=2568&semester=1&q=%5B"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Only literal fixture\", () => { pm.expect(body.courses.map(c=>c.courseCode)).to.eql([\"SP001\"]); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
