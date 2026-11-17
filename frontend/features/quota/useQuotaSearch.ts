@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ApiError } from "@/lib/api";
 import { getCourseQuota, searchQuotaCourses } from "./api";
 import type { QuotaCourse } from "./types";
@@ -29,15 +29,14 @@ export function useQuotaSearch({ academicYear, semester, myCourseCodes }: UseQuo
   // นับลำดับคำขอ เพื่อไม่ใช้ผลของคำขอเก่าที่ตอบกลับมาช้ากว่าคำขอใหม่
   const latestRequestId = useRef(0);
 
-  // รีเซ็ตตัวกรองและผลค้นหาเมื่อแผนการเรียนกลายเป็นว่าง พร้อมตัดผลคำขอเก่าทิ้ง
-  useEffect(() => {
-    if (myCourseCodes && myCourseCodes.length === 0 && mine) {
-      latestRequestId.current += 1; // ทิ้งผลของคำขอที่ยังค้างอยู่ ป้องกันผลเก่ากลับมาทับ
-      setMine(false);
-      setInput("");
-      setState({ status: "idle" });
-    }
-  }, [myCourseCodes, mine]);
+  // เมื่อแผนการเรียนกลายเป็นว่าง ให้รีเซ็ตตัวกรองและผลค้นหากลับสู่สถานะเริ่มต้น
+  const hasPlan = (myCourseCodes?.length ?? 0) > 0;
+  if (myCourseCodes && !hasPlan && mine) {
+    latestRequestId.current += 1; // ทิ้งผลของคำขอที่ยังค้างอยู่ ป้องกันผลเก่ากลับมาทับ
+    setMine(false);
+    setInput("");
+    setState({ status: "idle" });
+  }
 
   const run = useCallback(
     (request: QuotaRequest) => {
