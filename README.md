@@ -90,6 +90,8 @@ Frontend เรียก `/api/*` แล้ว Next.js จะ rewrite ไปท�
 | GET | `/api/courses?academicYear=2568&semester=1&q=&category=` | รายวิชาที่เปิดในภาคนั้น พร้อมกลุ่มเรียนและคาบเรียน (US1) |
 | GET | `/api/timetable?academicYear=2568&semester=1` | ตารางเรียนจำลองของฉัน พร้อมหน่วยกิตรวมและเวลาชน (US1) |
 | POST | `/api/timetable/entries` | เพิ่มกลุ่มเรียนลงตาราง (`{ "sectionId": 305 }`) ตอบ 201 พร้อมตารางทั้งก้อน หรือ 409 พร้อม `code` (US1) |
+| GET | `/api/electives?academicYear=2568&currentSemester=1&q=&semester=&day=&timeSlot=&group=&excludeConflicts=` | วิชาเสรีแนะนำพร้อมตัวกรอง (US6) |
+| GET | `/api/electives/{courseCode}?academicYear=2568&currentSemester=1` | รายละเอียดวิชาเสรี Sec และรีวิว (US6) |
 | GET | `/api/study-plans?studyYear=3&semester=1` | แผนการเรียน (preset) และวิชาโทของสาขานักศึกษาตามชั้นปี/ภาคที่เลือก (US8) |
 | POST | `/api/timetable/apply-plan` | จัดตารางตามแผน (`{ "planId": 6, "minorId": 1, "academicYear": 2568, "dryRun": true }`) ตอบ 200 พร้อม `added` / `skipped` และตารางทั้งก้อนเมื่อยืนยัน (US8) |
 | GET | `/api/quota/courses?academicYear=2568&semester=1&q=EL395&mine=false` | ค้นหาวิชาพร้อมสถานะและช่องทางขอโควตา ต้องมีคำค้นหรือ `mine=true`; ตอบ 200 พร้อม `total` และ `courses` (US7) |

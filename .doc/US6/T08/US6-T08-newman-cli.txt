@@ -1,0 +1,252 @@
+(node:15108) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+newman
+
+US6-T08 Elective API
+
+→ 00 [IT-US6-30] GET /api/electives ไม่มี token → 401
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1 [401 Unauthorized, 596B, 47ms]
+  √  401 ProblemDetail (ทุก endpoint ของ US6 ต้อง login)
+
+→ 01 POST login นักศึกษา CS (เตรียม token)
+  POST http://localhost:8081/api/auth/login [200 OK, 635B, 42ms]
+  √  200 ได้ token เป็น JWT
+
+→ 02 [setup] GET ตาราง 2568/1 เก็บ entryId
+  GET http://localhost:8081/api/timetable?academicYear=2568&semester=1 [200 OK, 551B, 16ms]
+  √  200 อ่านตาราง 2568/1
+  ┌
+  │ 'Using "postman.setNextRequest" is deprecated. Use "pm
+  │ .execution.setNextRequest()" instead.'
+  └
+
+Attempting to set next request to 04 [setup] GET /api/courses หา sectionId ของ TU100 820001 และ CS213 050001
+
+→ 04 [setup] GET /api/courses หา sectionId ของ TU100 820001 และ CS213 050001
+  GET http://localhost:8081/api/courses?academicYear=2568&semester=1 [200 OK, 20.27kB, 27ms]
+  √  200 พบ TU100 820001 และ CS213 050001 ใน seed
+
+→ 05 [IT-US6-01] ไม่มีตัวกรอง → 18 วิชาเรียงตามหมวดแล้วรหัส
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1 [200 OK, 5.4kB, 22ms]
+  √  200 ได้ 18 วิชาตามลำดับ InterestGroup แล้ว courseCode
+  √  ไม่มีวิชาที่ไม่ใช่วิชาเสรีแนะนำ (EL105, CS100, JP171)
+  √  นับต่อหมวด LANGUAGE 3, PSYCHOLOGY 4, SOCIETY 5, SCIENCE 4, MEDIA 2
+  √  [IT-US6-02] การ์ด FR205 / TH291 / PY250 ตาม Spec
+
+→ 06 [IT-US6-03] q=py2 → รหัสขึ้นต้น ไม่สนตัวพิมพ์
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&q=py2 [200 OK, 1.27kB, 22ms]
+  √  200 [PY200, PY250, PY252] (PY320 ไม่ขึ้นต้นด้วย PY2)
+
+→ 07 [IT-US6-04] q=ฝรั่งเศส → ชื่อไทยมีคำนี้กลางชื่อ
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&q=%E0%B8%9D%E0%B8%A3%E0%B8%B1%E0%B9%88%E0%B8%87%E0%B9%80%E0%B8%A8%E0%B8%AA [200 OK, 699B, 21ms]
+  √  200 [FR205]
+
+→ 08 [IT-US6-04] q=everyday → คำขึ้นต้นในชื่ออังกฤษ
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&q=everyday [200 OK, 982B, 23ms]
+  √  200 [FR205, FD216] (FOOD TECHNOLOGY IN EVERYDAY LIFE ก็มีคำนี้)
+
+→ 09 [IT-US6-04] q=DAY → อยู่กลางคำ EVERYDAY ไม่ใช่ต้นคำ
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&q=DAY [200 OK, 416B, 14ms]
+  √  200 []
+
+→ 10 [IT-US6-05] q=SA240 → 200 [] ไม่ใช่ 404
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&q=SA240 [200 OK, 416B, 14ms]
+  √  200 []
+
+→ 11 [IT-US6-07] group=PSYCHOLOGY
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&group=PSYCHOLOGY [200 OK, 1.51kB, 20ms]
+  √  200 เฉพาะหมวดจิตวิทยา 4 วิชา
+
+→ 12 [IT-US6-08] semester=2 (currentSemester ยังเป็น 1)
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&semester=2 [200 OK, 4.03kB, 24ms]
+  √  200 13 วิชาที่มี Sec ภาค 2 ไม่มี FR205 (เปิดเฉพาะภาค 1)
+  √  offeredSemesters ไม่หดตามตัวกรอง (TH291 ยังเป็น [1, 2])
+
+→ 13 [IT-US6-09] day=TUESDAY&timeSlot=EVENING
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&day=TUESDAY&timeSlot=EVENING [200 OK, 699B, 23ms]
+  √  200 [FR205] (คาบ 16:30 อยู่ช่วงเย็น)
+
+→ 14 [IT-US6-09] day=THURSDAY&timeSlot=AFTERNOON
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&day=THURSDAY&timeSlot=AFTERNOON [200 OK, 1.17kB, 23ms]
+  √  200 [EG214, TH291, PB317] (13:30 อยู่ช่วงบ่าย)
+
+→ 15 [IT-US6-10] day=TUESDAY&timeSlot=MORNING
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&day=TUESDAY&timeSlot=MORNING [200 OK, 1.62kB, 24ms]
+  √  200 มี PY250 จาก Sec 230001 ภาค 2
+
+→ 16 [IT-US6-10] day=TUESDAY&timeSlot=MORNING&semester=1
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&day=TUESDAY&timeSlot=MORNING&semester=1 [200 OK, 1.32kB, 23ms]
+  √  200 PY250 หายเพราะไม่มี Sec ภาค 1 ที่เรียนอังคารเช้า
+
+→ 17 [IT-US6-11] day=MONDAY&timeSlot=MORNING → ต้องตรงในคาบเดียวกันของ Sec เดียวกัน
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&day=MONDAY&timeSlot=MORNING [200 OK, 1.16kB, 22ms]
+  √  200 ไม่มี PY250 (มีคาบจันทร์บ่ายกับอังคารเช้าคนละ Sec)
+
+→ 18 [IT-US6-12] excludeConflicts=true ตารางว่าง
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true [200 OK, 4.62kB, 27ms]
+  √  200 15 วิชาที่มี Sec ภาค 1 (ไม่มี AN242, AN347, PC280 ที่เปิดเฉพาะภาค 2)
+
+→ 19 [IT-US6-13] excludeConflicts=true&semester=2 → []
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true&semester=2 [200 OK, 416B, 27ms]
+  √  200 [] ไม่ใช่ error
+
+→ 20 [IT-US6-35] day=SUNDAY → 200 []
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&day=SUNDAY [200 OK, 416B, 22ms]
+  √  200 [] ไม่ใช่ 400
+
+→ 21 [IT-US6-34] ไม่ส่ง academicYear → 400
+  GET http://localhost:8081/api/electives?currentSemester=1 [400 Bad Request, 536B, 5ms]
+  √  400 ProblemDetail ไม่ใช่ 500
+
+→ 22 [IT-US6-34] ไม่ส่ง currentSemester → 400
+  GET http://localhost:8081/api/electives?academicYear=2568 [400 Bad Request, 539B, 7ms]
+  √  400 ProblemDetail ไม่ใช่ 500
+
+→ 23 [IT-US6-34] currentSemester=3 → 400
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=3 [400 Bad Request, 544B, 13ms]
+  √  400 ProblemDetail ไม่ใช่ 500
+
+→ 24 [IT-US6-34] semester=3 → 400
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&semester=3 [400 Bad Request, 537B, 12ms]
+  √  400 ProblemDetail ไม่ใช่ 500
+
+→ 25 [IT-US6-34] day=FUNDAY → 400
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&day=FUNDAY [400 Bad Request, 710B, 8ms]
+  √  400 ProblemDetail ไม่ใช่ 500
+
+→ 26 [IT-US6-34] timeSlot=NIGHT → 400
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&timeSlot=NIGHT [400 Bad Request, 778B, 8ms]
+  √  400 ProblemDetail ไม่ใช่ 500
+
+→ 27 [IT-US6-34] group=SPORT → 400
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&group=SPORT [400 Bad Request, 777B, 8ms]
+  √  400 ProblemDetail ไม่ใช่ 500
+
+→ 28 [IT-US6-34] excludeConflicts=maybe → 400
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=maybe [400 Bad Request, 655B, 7ms]
+  √  400 ProblemDetail ไม่ใช่ 500
+
+→ 29 [IT-US6-18] GET /api/electives/PY250 ตารางว่าง
+  GET http://localhost:8081/api/electives/PY250?academicYear=2568&currentSemester=1 [200 OK, 1.98kB, 31ms]
+  √  200 ข้อมูลวิชา หน่วยกิต ป้าย และรีวิว 4 ข้อ
+  √  Sec 820001 ภาค 1 เลือกได้ · Sec 230001 ภาค 2 เลือกไม่ได้ ห้อง null
+
+→ 30 [IT-US6-19] GET /api/electives/FR205 ตารางว่าง
+  GET http://localhost:8081/api/electives/FR205?academicYear=2568&currentSemester=1 [200 OK, 2.04kB, 26ms]
+  √  200 2 Sec ภาค 1 เลือกได้ทั้งคู่ ต้องขอโควตา
+
+→ 31 [IT-US6-20] GET /api/electives/PY250 currentSemester=2
+  GET http://localhost:8081/api/electives/PY250?academicYear=2568&currentSemester=2 [200 OK, 1.98kB, 27ms]
+  √  200 เปิดตารางภาค 2: Sec 230001 เลือกได้ Sec 820001 เลือกไม่ได้
+
+→ 32 [IT-US6-32] GET /api/electives/SA240 → 404
+  GET http://localhost:8081/api/electives/SA240?academicYear=2568&currentSemester=1 [404 Not Found, 579B, 13ms]
+  √  404 ProblemDetail
+
+→ 33 [IT-US6-32] GET /api/electives/EL105 → 404
+  GET http://localhost:8081/api/electives/EL105?academicYear=2568&currentSemester=1 [404 Not Found, 579B, 15ms]
+  √  404 ProblemDetail
+
+→ 34 [IT-US6-32] GET /api/electives/CS100 → 404
+  GET http://localhost:8081/api/electives/CS100?academicYear=2568&currentSemester=1 [404 Not Found, 579B, 18ms]
+  √  404 ProblemDetail
+
+→ 35 [IT-US6-35] GET /api/electives/PY250 currentSemester=3 → 400
+  GET http://localhost:8081/api/electives/PY250?academicYear=2568&currentSemester=3 [400 Bad Request, 550B, 12ms]
+  √  400 ProblemDetail ไม่ใช่ 500
+
+→ 36 [setup T-TU100] POST TU100 820001
+  POST http://localhost:8081/api/timetable/entries [201 Created, 813B, 44ms]
+  √  201 36 [setup T-TU100] POST TU100 820001
+
+→ 37 [IT-US6-15] T-TU100 excludeConflicts=true
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true [200 OK, 4.31kB, 31ms]
+  √  200 ไม่มี PY250 (Sec ภาค 1 จันทร์ 13:30–16:30 ชน TU100)
+
+→ 38 [IT-US6-21] T-TU100 GET /api/electives/PY250
+  GET http://localhost:8081/api/electives/PY250?academicYear=2568&currentSemester=1 [200 OK, 1.99kB, 27ms]
+  √  200 Sec 820001 conflictWith [TU100] แต่ยังเลือกได้ · Sec 230001 []
+
+→ 39 [IT-US6-24] T-TU100 POST PY250 820001 → 201 พร้อม conflicts
+  POST http://localhost:8081/api/timetable/entries [201 Created, 1.21kB, 35ms]
+  √  201 39 [IT-US6-24] T-TU100 POST PY250 820001 → 201 พร้อม conflicts
+  √  เวลาชนไม่ block: conflicts จันทร์ 13:30–16:30 TU100 กับ PY250
+
+→ 40 [IT-US6-21] หลังเพิ่ม GET /api/electives/PY250 → inTimetable
+  GET http://localhost:8081/api/electives/PY250?academicYear=2568&currentSemester=1 [200 OK, 1.99kB, 28ms]
+  √  200 Sec 820001 inTimetable true
+
+→ 41 [setup] GET ตาราง 2568/1 เก็บ entryId
+  GET http://localhost:8081/api/timetable?academicYear=2568&semester=1 [200 OK, 1.2kB, 16ms]
+  √  200 อ่านตาราง 2568/1
+
+→ 42 [setup] DELETE ทุกวิชาให้ตารางว่าง (T-EMPTY)
+  DELETE http://localhost:8081/api/timetable/entries?entryIds=60057,60058 [200 OK, 551B, 28ms]
+  √  200 ตารางว่าง
+
+→ 43 [setup T-CS213] POST CS213 050001
+  POST http://localhost:8081/api/timetable/entries [201 Created, 876B, 27ms]
+  √  201 43 [setup T-CS213] POST CS213 050001
+
+→ 44 [IT-US6-16] T-CS213 excludeConflicts=true
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true [200 OK, 3.55kB, 28ms]
+  √  200 FR205 อยู่ (16:30 ต่อกันพอดี) ตัด TH291 / PB317 / JC217 / PY320 ที่ชน อังคาร/พฤหัส 15:00–16:30
+  √  EG214 ยังอยู่ เพราะมี Sec อื่นที่ไม่ชน
+
+→ 45 [setup] GET ตาราง 2568/1 เก็บ entryId
+  GET http://localhost:8081/api/timetable?academicYear=2568&semester=1 [200 OK, 871B, 16ms]
+  √  200 อ่านตาราง 2568/1
+
+→ 46 [setup] DELETE ทุกวิชาให้ตารางว่าง (T-EMPTY)
+  DELETE http://localhost:8081/api/timetable/entries?entryIds=60059 [200 OK, 551B, 28ms]
+  √  200 ตารางว่าง
+
+→ 47 [IT-US6-23] T-EMPTY POST FR205 260001 → 201
+  POST http://localhost:8081/api/timetable/entries [201 Created, 903B, 28ms]
+  √  201 47 [IT-US6-23] T-EMPTY POST FR205 260001 → 201
+  √  ตาราง 2568/1 มี FR205 อังคาร/พฤหัส 16:30–18:00
+
+→ 48 [IT-US6-22] T-FR205 GET /api/electives/FR205
+  GET http://localhost:8081/api/electives/FR205?academicYear=2568&currentSemester=1 [200 OK, 2.04kB, 27ms]
+  √  200 Sec 260001 inTimetable · conflictWith ว่างทั้ง 2 Sec (ข้ามวิชาเดียวกัน)
+
+→ 49 [IT-US6-17][IT-US6-25] T-FR205 excludeConflicts=true
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true [200 OK, 4.34kB, 28ms]
+  √  200 ไม่มี FR205 (อยู่ในตารางแล้ว) แม้ Sec 260002 ไม่ชน
+
+→ 50 [IT-US6-27] T-FR205 POST FR205 260002 → 409
+  POST http://localhost:8081/api/timetable/entries [409 Conflict, 741B, 22ms]
+  √  409 50 [IT-US6-27] T-FR205 POST FR205 260002 → 409
+  √  409 COURSE_ALREADY_IN_TIMETABLE พร้อม detail
+
+→ 51 [setup] GET ตาราง 2568/1 เก็บ entryId
+  GET http://localhost:8081/api/timetable?academicYear=2568&semester=1 [200 OK, 898B, 15ms]
+  √  200 อ่านตาราง 2568/1
+
+→ 52 [setup] DELETE ทุกวิชาให้ตารางว่าง (T-EMPTY)
+  DELETE http://localhost:8081/api/timetable/entries?entryIds=60060 [200 OK, 551B, 28ms]
+  √  200 ตารางว่าง
+
+→ 53 จบ: GET /api/electives?excludeConflicts=true กลับเป็น 15 วิชา
+  GET http://localhost:8081/api/electives?academicYear=2568&currentSemester=1&excludeConflicts=true [200 OK, 4.62kB, 27ms]
+  √  200 ตารางว่างแล้ว รันซ้ำได้
+
+┌─────────────────────────┬──────────────────┬─────────────────┐
+│                         │         executed │          failed │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│              iterations │                1 │               0 │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│                requests │               53 │               0 │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│            test-scripts │               53 │               0 │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│      prerequest-scripts │                0 │               0 │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│              assertions │               62 │               0 │
+├─────────────────────────┴──────────────────┴─────────────────┤
+│ total run duration: 5.4s                                     │
+├──────────────────────────────────────────────────────────────┤
+│ total data received: 71.4kB (approx)                         │
+├──────────────────────────────────────────────────────────────┤
+│ average response time: 22ms [min: 5ms, max: 47ms, s.d.: 9ms] │
+└──────────────────────────────────────────────────────────────┘
